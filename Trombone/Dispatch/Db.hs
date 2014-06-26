@@ -55,8 +55,8 @@ _run (DbQuery ret tpl) ps =
         Left e -> 
             -- 400 Bad request: Request parameters did not match template
             return $ errorResponse ErrorBadRequest $ Text.concat
-                [ "Invalid route: Template parameter list undersaturated, \
-                  \with the following arguments missing: "
+                [ "Invalid route: Template parameter list undersaturated. \
+                  \Arguments missing: "
                 , Text.concat $ intersperse ", " $ map arg e ]
         Right q -> do
             liftIO $ print q

@@ -5,6 +5,7 @@ module Trombone.Middleware.Amqp
     , amqp 
     ) where
 
+import Control.Monad                          ( when )
 import Data.ByteString.Char8                  ( split, filter )
 import Data.ByteString.Lazy                   ( fromStrict )
 import Data.List                              ( intersperse )
@@ -37,13 +38,13 @@ connectAmqp user pass = do
 amqp :: Channel -> (Request -> IO Response) -> Request -> IO Response
 amqp chan app req@Request{..} = do
     resp <- app req
-    let ppd = requestMethod `elem` ["POST", "PUT", "DELETE", "PATCH"]
-    case (ppd, statusCode $ responseStatus resp) of
-        (True, 200) -> do
-            let p = Text.concat $ [decodeUtf8 requestMethod, " "] ++ intersperse "/" pathInfo
-            publishMsg chan "trombone" "api" 
-                newMsg { msgBody         = fromStrict $ encodeUtf8 p
+    when (effectful && status resp == 200) $
+        publishMsg chan "trombone" "api" 
+                newMsg { msgBody         = fromStrict $ encodeUtf8 body
                        , msgDeliveryMode = Just Persistent }
-            return resp
-        _ -> return resp
+    return resp
+  where effectful = requestMethod `elem` ["POST", "PUT", "DELETE", "PATCH"]
+        body = Text.concat $ [decodeUtf8 requestMethod, " "] 
+             ++ intersperse "/" pathInfo
+        status = statusCode . responseStatus 
 
