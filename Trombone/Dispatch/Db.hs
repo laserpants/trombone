@@ -161,6 +161,7 @@ valuesToPersistList :: Vector Value -> PersistValue
 valuesToPersistList = PersistList . map jsonValToPersistVal . toList
 
 scientificToPersistVal :: Scientific -> PersistValue
+{-# INLINE scientificToPersistVal #-}
 scientificToPersistVal s = 
     case floatingOrInteger s of
       Left  r -> PersistDouble r
@@ -168,6 +169,7 @@ scientificToPersistVal s =
 
 -- | Piggy-back on the underlying Show instance (as the last option).
 showV :: (Show a) => a -> Value
+{-# INLINE showV #-}
 showV = String . pack . show
 
 -------------------------------------------------------------------------------

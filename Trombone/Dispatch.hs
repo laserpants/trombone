@@ -14,6 +14,7 @@ dispatchNodeJsAction :: Text -> Dispatch RouteResponse
 dispatchNodeJsAction js = undefined
 
 dispatch :: RouteAction -> [(Text, EscapedText)] -> Dispatch RouteResponse
+{-# INLINE dispatch #-}
 dispatch (RouteSql query) ps = dispatchDbAction query ps
 dispatch (RouteMesh mesh) _  = dispatchMeshAction mesh
 dispatch (RouteNodeJs js) _  = dispatchNodeJsAction js

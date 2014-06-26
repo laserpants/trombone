@@ -2,11 +2,14 @@
 module Main where
 
 import Data.Aeson
+import Data.Default
 import Data.Maybe                                      ( fromMaybe )
 import Database.Persist.Postgresql
 import Network.HTTP.Types                              
-import Network.Wai                                     ( Application, Response, responseLBS )
+import Network.Wai                                     ( Application, Middleware, Response, responseLBS )
 import Network.Wai.Handler.Warp                        ( run )
+import Network.Wai.Middleware.RequestLogger
+import System.Log.FastLogger
 import Trombone.Db.Template
 import Trombone.Dispatch
 import Trombone.RoutePattern
@@ -20,8 +23,8 @@ myQuery = DbQuery (Collection [ "id"
                               , "longitude"
                               , "tin"
                               , "phone"
-                              , "is_active"
-                              , "price_category_name"
+                              , "isActive"
+                              , "priceCategoryName"
                               ]) 
                   (DbTemplate [ DbSqlStatic 
                     "select customer.id as id                                                              \
@@ -38,7 +41,7 @@ myQuery = DbQuery (Collection [ "id"
                               ])
 
 myQuery2 :: DbQuery
-myQuery2 = DbQuery (Item ["id", "name", "phone", "is_active"]) 
+myQuery2 = DbQuery (Item ["id", "name", "phone", "isActive"]) 
                    (DbTemplate 
                         [ DbSqlStatic "select id, name, phone, is_active from customer where id = "
                         , DbSqlUriParam "id" 
@@ -74,5 +77,12 @@ app pool request = do
 main :: IO ()
 main = do
     runTests
-    withPostgresqlPool conn 10 $ run 3010 . app 
+    withPostgresqlPool conn 10 $ \pool -> do
+
+        file <- newFileLoggerSet defaultBufSize "trombone.log"
+        log  <- mkRequestLogger def { destination = Logger file }
+
+        run 3010 
+            $ log 
+            $ app pool
 

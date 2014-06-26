@@ -77,5 +77,6 @@ instantiate (DbTemplate segms) table = subst segms "" []
         f (DbSqlJsonValue txt) = txt
 
 instantiateQ :: DbQuery -> [(Text, EscapedText)] -> Either [Text] Text
+{-# INLINE instantiateQ #-}
 instantiateQ (DbQuery _ tpl) = instantiate tpl
 

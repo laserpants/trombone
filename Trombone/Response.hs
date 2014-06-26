@@ -65,7 +65,9 @@ errorResponse re = RouteResponse code . toJSON . ErrorObj code err
   where code = responseCode re
         err  = toText re
 
+-- | Generate a 200 OK response from the provided lookup table.
 okResponse_ :: [(Text, Value)] -> RouteResponse
+{-# INLINE okResponse_ #-}
 okResponse_ = RouteResponse 200 . Object . fromList 
 
 -- | Ok response with default message and status properties, 
@@ -82,6 +84,9 @@ sendJsonResponse (RouteResponse st val) = responseLBS (Status st "") headers bod
   where headers = [("Content-Type", "application/json; charset=utf-8")]
         body = encode val
 
+-- | Same as sendJsonResponse, but operates on a Maybe type, with the behavior
+-- that Nothing values are translated to a standard 404 message.
 sendJsonResponseOr404 :: Maybe RouteResponse -> Response
+{-# INLINE sendJsonResponseOr404 #-}
 sendJsonResponseOr404 = sendJsonResponse . fromMaybe (errorResponse ErrorNotFound "Resource not found.") 
 

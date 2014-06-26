@@ -36,6 +36,7 @@ decompose = RoutePattern . map f . filter blanks . Text.splitOn "/"
 
 -- | Simple predicate function to dismiss blank uri segments.
 blanks :: Text -> Bool
+{-# INLINE blanks #-}
 blanks ""  = False
 blanks ":" = False
 blanks _   = True

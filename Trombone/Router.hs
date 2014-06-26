@@ -22,7 +22,7 @@ runRoutes routes = do
         run (Route method pattern action:rs) mtd info 
                 -- First check if the request methods match 
                 | mtd /= method = run rs mtd info
-                | otherwise    =
+                | otherwise =
             case match pattern info of
                 Params ps -> liftM Just (dispatch action $ params ps)
                 _         -> run rs mtd info
@@ -32,6 +32,7 @@ params = map (prefix *** escape)
   where escape = EscapedText . quoute . sanitize
 
 prefix :: Text -> Text
+{-# INLINE prefix #-}
 prefix = Text.cons ':'
 
 sanitize :: Text -> Text
@@ -41,5 +42,6 @@ sanitize = Text.filter pred
                | otherwise    = c `elem` "-_!"
  
 filterNot :: (a -> Bool) -> [a] -> [a]
+{-# INLINE filterNot #-}
 filterNot f = filter (not . f)
 
