@@ -3,18 +3,20 @@ module Main where
 
 import Data.Aeson
 import Data.Maybe                                      ( fromMaybe )
-import Database.Persist.Postgresql
+import Database.Persist.Postgresql  hiding ( Filter )
 import Network.HTTP.Types                              
 import Network.Wai                                     ( Application, Middleware, Response, responseLBS )
 import Network.Wai.Handler.Warp                        ( run )
 import Trombone.Db.Template
 import Trombone.Dispatch
-import Trombone.Middleware.Amqp
+import Trombone.Middleware.Amqp     hiding ( Message )
 import Trombone.Middleware.Logger
 import Trombone.Middleware.Cors
 import Trombone.RoutePattern
 import Trombone.Router
 import Trombone.Tests.Bootstrap
+
+import qualified Data.Text                             as Text
 
 myQuery :: DbQuery
 myQuery = DbQuery (Collection [ "id"
@@ -71,7 +73,7 @@ conn = "host=localhost port=5432 user=postgres password=postgres dbname=sdrp5"
 
 app :: ConnectionPool -> Application
 app pool request = do
-    resp <- runReaderT (runRoutes myRoutes) (Context pool request)
+    resp <- runReaderT runRoutes (Context pool request myRoutes)
     return $ sendJsonResponseOr404 resp
 
 main :: IO ()
@@ -85,4 +87,51 @@ main = do
             $ logger 
             $ amqp channel
             $ app pool
+
+-----------------------
+
+data TransType = TransExclude
+               | TransInclude
+               | TransBind
+               | TransRename
+    deriving (Eq, Ord, Show)
+
+data Transformer = Transformer TransType [Value]
+    deriving (Eq, Show)
+
+data Predicate = PredEqualTo
+               | PredNotEqualTo
+               | PredGreaterThan
+               | PredGreaterThanOrEqual
+               | PredLessThan
+               | PredLessThanOrEqual
+    deriving (Show)
+
+data Filter = Filter
+    { property  :: String
+    , predicate :: Predicate
+    , value     :: Value
+    } deriving (Show)
+
+data Processor = Processor
+    { processorId     :: Int              -- ^ A unique identifier
+    , processorMethod :: Method           -- ^ Any valid HTTP method
+    , processorUri    :: String           -- ^ The resource identifier 
+    , processorAggr   :: Maybe Text.Text  -- ^ An optional aggregator
+    } deriving (Show)
+
+data Connection = Connection
+    { source       :: ProcessorId
+    , destination  :: ProcessorId
+    , transformers :: [Transformer]
+    , filters      :: [Filter]
+    } deriving (Show)
+
+data ProcessorId = Id Int | In | Out
+    deriving (Eq, Show)
+
+data Message = Message ProcessorId Object
+    deriving (Show)
+
+type MessageQueue = [Message]
 

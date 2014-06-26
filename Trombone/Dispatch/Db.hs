@@ -34,7 +34,7 @@ import qualified Data.Vector                           as Vect
 -- | Run a database query and return the result in the Dispatch monad stack.
 dispatchDbAction :: DbQuery -> [(Text, EscapedText)] -> Dispatch RouteResponse
 dispatchDbAction q ps = do
-    Context _ r <- ask
+    Context _ r _ <- ask
     body <- lift $ requestBody r $$ CL.consume
     run $ requestObj body 
   where run (Array a) = 
@@ -71,7 +71,7 @@ _run (DbQuery ret tpl) ps =
 
 -- | Run a database action in the Dispatch monad.
 runDbDispatch :: Sql a -> Dispatch a
-runDbDispatch sql = ask >>= \(Context pool _) -> lift $ runDb sql pool
+runDbDispatch sql = ask >>= \(Context pool _ _) -> lift $ runDb sql pool
 
 -- | Run a database query and respond according to the specified result type.
 getDbResponse :: DbResult -> Text -> Dispatch RouteResponse

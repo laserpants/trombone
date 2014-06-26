@@ -24,7 +24,7 @@ import Trombone.Route                         as Core
 import qualified Data.Text                    as Text
 
 -- | Various state required to process a request.
-data Context = Context ConnectionPool Request
+data Context = Context ConnectionPool Request [Route]
 
 -- | Monad transformer in which requests are dispatched.
 type Dispatch = ReaderT Context IO

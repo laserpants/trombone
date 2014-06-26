@@ -11,9 +11,9 @@ import Trombone.RoutePattern
 
 import qualified Data.Text                             as Text
 
-runRoutes :: [Route] -> Dispatch (Maybe RouteResponse)
-runRoutes routes = do
-    Context pool Request{..} <- ask
+runRoutes :: Dispatch (Maybe RouteResponse)
+runRoutes = do
+    Context pool Request{..} routes <- ask
     let info = filterNot Text.null pathInfo
     run routes requestMethod info 
   where run [] _ _ = do
