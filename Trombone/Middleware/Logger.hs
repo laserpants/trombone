@@ -1,5 +1,5 @@
 module Trombone.Middleware.Logger 
-    ( module Network.Wai.Middleware.RequestLogger
+    ( module System.Log.FastLogger
     , buildLogger
     ) where
 

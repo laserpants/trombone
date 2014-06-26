@@ -2,19 +2,17 @@
 module Main where
 
 import Data.Aeson
-import Data.Default
 import Data.Maybe                                      ( fromMaybe )
 import Database.Persist.Postgresql
 import Network.HTTP.Types                              
 import Network.Wai                                     ( Application, Middleware, Response, responseLBS )
 import Network.Wai.Handler.Warp                        ( run )
-import Network.Wai.Middleware.RequestLogger
-import System.Log.FastLogger
 import Trombone.Db.Template
 import Trombone.Dispatch
 import Trombone.RoutePattern
 import Trombone.Router
 import Trombone.Tests.Bootstrap
+import Trombone.Middleware.Logger
 
 myQuery :: DbQuery
 myQuery = DbQuery (Collection [ "id"
@@ -79,8 +77,7 @@ main = do
     runTests
     withPostgresqlPool conn 10 $ \pool -> do
 
-        file <- newFileLoggerSet defaultBufSize "trombone.log"
-        log  <- mkRequestLogger def { destination = Logger file }
+        log <- buildLogger defaultBufSize "trombone.log"
 
         run 3010 
             $ log 
