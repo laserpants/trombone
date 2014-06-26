@@ -26,7 +26,7 @@ import Prelude                                hiding ( filter )
 -- to obtain the connection-channel pair.
 connectAmqp :: Text -> Text -> IO (Connection, Channel)
 connectAmqp user pass = do
-    conn <-  openConnection "127.0.0.1" "/" user pass
+    conn <- openConnection "127.0.0.1" "/" user pass
     chan <- openChannel conn
     declareExchange chan newExchange { exchangeName = "trombone"
                                      , exchangeType = "direct" }
