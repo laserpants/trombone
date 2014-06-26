@@ -35,7 +35,7 @@ noResult :: Text -> Sql ()
 noResult query = rawExecute query []
 
 -- | Run a database query using a connection pool and one of the (Text -> Sql a) 
--- helpers and return the result in the IO monad.
+-- helpers. Return the result in the IO monad.
 --
 -- Example use: 
 --     runDb (getResult "select * from customer") pool >>= print
