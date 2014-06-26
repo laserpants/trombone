@@ -69,7 +69,7 @@ conn = "host=localhost port=5432 user=postgres password=postgres dbname=sdrp5"
 app :: ConnectionPool -> Application
 app pool request = do
     resp <- runReaderT (runRoutes myRoutes) (Context pool request)
-    return $ sendJsonResponse $ fromMaybe (errorResponse ErrorNotFound "Resource not found.") resp
+    return $ sendJsonResponseOr404 resp
 
 main :: IO ()
 main = do

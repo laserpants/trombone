@@ -7,10 +7,12 @@ module Trombone.Response
     , okResponse_
     , responseCode
     , sendJsonResponse
+    , sendJsonResponseOr404
     ) where
 
 import Data.Aeson
 import Data.HashMap.Strict                             ( fromList, union )
+import Data.Maybe                                      ( fromMaybe )
 import Data.Text                                       ( Text, pack )
 import Network.HTTP.Types                              
 import Network.Wai                                     ( Response, responseLBS )
@@ -79,4 +81,7 @@ sendJsonResponse :: RouteResponse -> Response
 sendJsonResponse (RouteResponse st val) = responseLBS (Status st "") headers body
   where headers = [("Content-Type", "application/json; charset=utf-8")]
         body = encode val
+
+sendJsonResponseOr404 :: Maybe RouteResponse -> Response
+sendJsonResponseOr404 = sendJsonResponse . fromMaybe (errorResponse ErrorNotFound "Resource not found.") 
 
