@@ -1,9 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
+import Data.Aeson
+import Data.Maybe                                      ( fromMaybe )
 import Database.Persist.Postgresql
 import Network.HTTP.Types                              
-import Network.Wai                                     ( Application, responseLBS )
+import Network.Wai                                     ( Application, Response, responseLBS )
 import Network.Wai.Handler.Warp                        ( run )
 import Trombone.Db.Template
 import Trombone.Dispatch
@@ -66,8 +68,8 @@ conn = "host=localhost port=5432 user=postgres password=postgres dbname=sdrp5"
 
 app :: ConnectionPool -> Application
 app pool request = do
-    runReaderT (runRoutes myRoutes) (Context pool request)
-    return $ responseLBS status200 [] "-\n"
+    resp <- runReaderT (runRoutes myRoutes) (Context pool request)
+    return $ sendJsonResponse $ fromMaybe (errorResponse ErrorNotFound "Resource not found.") resp
 
 main :: IO ()
 main = do
