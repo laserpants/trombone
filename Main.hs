@@ -9,10 +9,11 @@ import Network.Wai                                     ( Application, Middleware
 import Network.Wai.Handler.Warp                        ( run )
 import Trombone.Db.Template
 import Trombone.Dispatch
+import Trombone.Middleware.Amqp
+import Trombone.Middleware.Logger
 import Trombone.RoutePattern
 import Trombone.Router
 import Trombone.Tests.Bootstrap
-import Trombone.Middleware.Logger
 
 myQuery :: DbQuery
 myQuery = DbQuery (Collection [ "id"
@@ -76,10 +77,10 @@ main :: IO ()
 main = do
     runTests
     withPostgresqlPool conn 10 $ \pool -> do
-
+        (conn, channel) <- connectAmqp "guest" "guest"
         log <- buildLogger defaultBufSize "trombone.log"
-
         run 3010 
             $ log 
+            $ amqp channel
             $ app pool
 

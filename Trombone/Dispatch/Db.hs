@@ -36,9 +36,7 @@ dispatchDbAction :: DbQuery -> [(Text, EscapedText)] -> Dispatch RouteResponse
 dispatchDbAction q ps = do
     Context _ r <- ask
     body <- lift $ requestBody r $$ CL.consume
-    r <- run $ requestObj body 
-    liftIO $ print r
-    return r
+    run $ requestObj body 
   where run (Array a) = 
             -- Run a sequence of actions and collect the results
             liftM resp $ mapM run (Vect.toList a)
@@ -54,8 +52,7 @@ dispatchDbAction q ps = do
 _run :: DbQuery -> [(Text, EscapedText)] -> Dispatch RouteResponse
 _run (DbQuery ret tpl) ps = 
     case instantiate tpl ps of
-        Left e -> do
-            liftIO $ print e
+        Left e -> 
             -- 400 Bad request: Request parameters did not match template
             return $ errorResponse ErrorBadRequest $ Text.concat
                 [ "Invalid route: Template parameter list undersaturated, \
