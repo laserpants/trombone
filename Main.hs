@@ -11,6 +11,7 @@ import Trombone.Db.Template
 import Trombone.Dispatch
 import Trombone.Middleware.Amqp
 import Trombone.Middleware.Logger
+import Trombone.Middleware.Cors
 import Trombone.RoutePattern
 import Trombone.Router
 import Trombone.Tests.Bootstrap
@@ -78,9 +79,10 @@ main = do
     runTests
     withPostgresqlPool conn 10 $ \pool -> do
         (conn, channel) <- connectAmqp "guest" "guest"
-        log <- buildLogger defaultBufSize "trombone.log"
+        logger <- buildLogger defaultBufSize "trombone.log"
         run 3010 
-            $ log 
+            $ cors
+            $ logger 
             $ amqp channel
             $ app pool
 
