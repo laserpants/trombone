@@ -18,7 +18,7 @@ import Data.Text.Lazy.Builder.Int
 import Data.Text.Lazy.Builder.RealFloat
 import Data.Vector                                     ( Vector, fromList, toList )
 import Database.Persist
-import Database.Persist.Postgresql                     hiding ( Sql )
+import Database.Persist.Postgresql              hiding ( Sql )
 import Database.PostgreSQL.Simple                      ( SqlError(..) )
 import Network.Wai.Internal                            ( Request(..) )
 import Trombone.Db.Execute

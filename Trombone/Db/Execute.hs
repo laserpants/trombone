@@ -15,7 +15,7 @@ import Data.Conduit
 import Data.Maybe                                      ( listToMaybe )
 import Data.Text
 import Database.Persist
-import Database.Persist.Postgresql                     hiding ( Sql )
+import Database.Persist.Postgresql              hiding ( Sql )
 
 import qualified Data.Conduit.List                     as CL
 import qualified Data.Text                             as Text
