@@ -109,6 +109,21 @@ myQuery5 = DbQuery (LastInsert "order_product" "id")
 conn :: ConnectionString
 conn = "host=localhost port=5432 user=postgres password=postgres dbname=sdrp5"
 
+runWithMiddleware :: Int          -- ^ Connection pool size
+                  -> Int          -- ^ Port number
+                  -> [Middleware] -- ^ Middleware components
+                  -> Context      -- ^ Dispatch context
+                  -> IO ()
+runWithMiddleware s port mware context = 
+    withPostgresqlPool conn s $ \pool -> run port 
+--        $ cors
+--        $ logger 
+--        $ amqp channel
+        $ \request -> liftM sendJsonResponseOr404 $ 
+            runReaderT runRoutes context
+
+-- (((run port) cors) logger) something
+
 main :: IO ()
 main = do
     (_, channel) <- connectAmqp "guest" "guest"
