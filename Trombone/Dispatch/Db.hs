@@ -65,7 +65,7 @@ run (DbQuery ret tpl) ps =
             return $ errorResponse ErrorBadRequest $ Text.concat
                 [ "Invalid route: Template parameter list undersaturated. \
                   \Arguments missing: "
-                , Text.concat $ intersperse ", " $ map arg e ]
+                , Text.concat $ intersperse ", " $ map arg e, "." ]
         Right q -> do
             liftIO $ print q
             res <- try $ getDbResponse ret q 

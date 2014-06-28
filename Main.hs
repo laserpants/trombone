@@ -67,7 +67,7 @@ myQuery2 = DbQuery (Item ["id", "name", "phone", "isActive"])
                         ])
 
 myQuery3 :: DbQuery
-myQuery3 = DbQuery Count
+myQuery3 = DbQuery (LastInsert "order_object" "id")
                    (DbTemplate 
                         [ DbSqlStatic "insert into order_object (created, customer_id, status, last_change, user_id) values ('now()', "
                         , DbSqlJsonValue "customerId" 
@@ -89,7 +89,7 @@ myRoutes = [
            ]
 
 myQuery4 :: DbQuery
-myQuery4 = DbQuery NoResult
+myQuery4 = DbQuery (LastInsert "order_object" "id")
                 (DbTemplate 
                     [ DbSqlStatic "insert into order_object (created, customer_id, status, last_change, user_id) values ('now()', 1, 'ok', 'now()', 1)"
                     ])
@@ -128,7 +128,6 @@ main = do
             $ cors
             $ logger 
             $ amqp channel
-            $ \request -> do
-        resp <- runReaderT runRoutes (Context pool request myRoutes systems) 
-        return $ sendJsonResponseOr404 resp
+            $ \request -> liftM sendJsonResponseOr404 $ 
+                runReaderT runRoutes (Context pool request myRoutes systems)
 

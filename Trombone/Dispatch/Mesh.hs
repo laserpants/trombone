@@ -74,6 +74,7 @@ runProcessor (Processor pid mtd uri exp) msgs conns = do
     case r of
         Just (Route _ _ (RouteSql q), ps) -> do
             RouteResponse _ v <- dispatchDbAction_ q ps $ compileMsgs exp msgs
+            liftIO $ print v
             return $ broadcast conns v 
         Just (Route _ _ (RouteMesh   _), ps) -> return [] -- @todo
         Just (Route _ _ (RouteNodeJs _), ps) -> return [] -- @todo
