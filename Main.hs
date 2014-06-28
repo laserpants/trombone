@@ -11,6 +11,7 @@ import Database.Persist.Postgresql  hiding ( Filter, Connection, In )
 import Database.PostgreSQL.Simple                      ( SqlError(..) )
 import Data.Conduit
 import Data.Scientific
+import Data.ByteString                                 ( ByteString )
 import Network.HTTP.Types                              
 import Network.Wai                                     ( Application, Middleware, Response, responseLBS )
 import Network.Wai.Internal
@@ -25,6 +26,7 @@ import Trombone.RoutePattern
 import Trombone.Router
 import Trombone.Route
 import Trombone.Mesh
+import Trombone.Server
 import Trombone.Mesh.Json
 import Trombone.Db.Execute
 import Trombone.Tests.Bootstrap
@@ -33,7 +35,10 @@ import qualified Data.Conduit.List                     as CL
 import qualified Data.HashMap.Strict                   as HMS
 import qualified Data.Text                             as Text
 import qualified Data.Vector                           as Vect
+import qualified Data.ByteString                       as BS
+import qualified Data.ByteString.Char8                 as C8
 import qualified Data.ByteString.Lazy.Char8            as L8
+import qualified Text.Show.ByteString                  as Show
 
 myQuery :: DbQuery
 myQuery = DbQuery (Collection [ "id"
@@ -110,43 +115,30 @@ myQuery5 = DbQuery (LastInsert "order_product" "id")
                     , DbSqlStatic ", (select product_price.price from customer join product_price on product_price.price_cat_id = customer.price_cat_id where customer.id = 1 and product_price.product_id = 5))"
                     ])
 
-conn :: ConnectionString
-conn = "host=localhost port=5432 user=postgres password=postgres dbname=sdrp5"
-
-runWithMiddleware :: Int          -- ^ Connection pool size
-                  -> Int          -- ^ Port number
-                  -> [Middleware] -- ^ Middleware components
-                  -> Context      -- ^ Dispatch context
-                  -> IO ()
-runWithMiddleware s port mware context = 
-    withPostgresqlPool conn s $ \pool -> run port 
---        $ cors
---        $ logger 
---        $ amqp channel
-        $ \request -> liftM sendJsonResponseOr404 $ 
-            runReaderT runRoutes context
-
--- (((run port) cors) logger) something
-
 main :: IO ()
 main = do
+
     (_, channel) <- connectAmqp "guest" "guest"
     logger <- buildLogger defaultBufSize "trombone.log"
     systems <- parseMeshFromFile "mesh.conf"
 
---    withPostgresqlPool conn 10 $ \pool -> do
---        res <- try $ runDb (rawExecute "insert into order_product (order_id, product_id, quantity, price) values (694, 1, 2, 100)" [] $$ CL.consume) pool
---        case res of
---            Left e  -> let x = e :: SomeException in print "A"
---            Right x -> print res
-
     print systems
 
-    withPostgresqlPool conn 10 $ \pool -> 
-        run 3010 
-            $ cors
-            $ logger 
-            $ amqp channel
-            $ \request -> liftM sendJsonResponseOr404 $ 
-                runReaderT runRoutes (Context pool request myRoutes systems)
+    let conf = DbConf 
+            { dbHost = "localhost"
+            , dbPort = 5432
+            , dbUser = "postgres" 
+            , dbPass = "postgres" 
+            , dbName = "sdrp5"
+            }
 
+    runWithMiddleware 10 3010 conf [cors, logger, amqp channel] myRoutes systems
+
+--    withPostgresqlPool conn 10 $ \pool -> 
+--        run 3010 
+--            $ cors
+--            $ logger 
+--            $ amqp channel
+--            $ \request -> liftM sendJsonResponseOr404 $ 
+--                runReaderT runRoutes (Context pool request myRoutes systems)
+--

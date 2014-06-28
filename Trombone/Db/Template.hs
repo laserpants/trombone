@@ -17,11 +17,11 @@ import qualified Data.Text                             as Text
 -- | The type of result produced by an SQL statement.
 data DbResult = NoResult 
               | Item       [Text]
-              -- ^ A single item, or a 404 error message
+              -- ^ Return a single item, or a 404 error message
               | ItemOk     [Text]
-              -- ^ Same as above, expect with added 'Ok' status message 
+              -- ^ Same as Item, except with added 'Ok' status message 
               | Collection [Text]
-              -- ^ A collection of items
+              -- ^ Return a collection of items
               | LastInsert  Text    -- ^ Table name
                             Text    -- ^ Sequence
               -- ^ Return the last inserted id (for INSERT statements)

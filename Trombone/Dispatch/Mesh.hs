@@ -17,7 +17,6 @@ import qualified Data.Vector                           as Vect
 dispatchMeshAction :: System -> [(Text, EscapedText)] -> Dispatch RouteResponse
 dispatchMeshAction (System pcs conns _) ps = do
     mq <- initMq
-    liftIO $ print mq
     runEagerly (System pcs conns mq) 
   where initMq = do
             Context _ r _ _ <- ask
@@ -51,7 +50,9 @@ runEagerly sys@(System _ _ mq) =
 integrate :: System -> Dispatch System
 integrate s@(System _ _ []) = return s
 integrate (System pcs conns mq) = do
-    liftIO $ print mq
+    liftIO $ do
+        print "#######################################################"
+        print mq
     liftM (System pcs conns . concat) (mapM f pcs)
   where f pc@(Processor p _ _ _) = do
             let pid = Id p
@@ -69,7 +70,17 @@ runProcessor :: Processor
              -> [Connection]
              -> Dispatch [Message]
 runProcessor (Processor pid mtd uri exp) msgs conns = do
+
     liftIO $ print $ "Running processor: " ++ show pid
+
+-- temp
+--    if uri == "forward"
+--        then do
+--            liftIO $ print "forward"
+--            return [] -- broadcast conns $ compileMsgs exp msgs
+--
+--        else do
+
     r <- lookupRoute mtd uri
     case r of
         Just (Route _ _ (RouteSql q), ps) -> do
@@ -78,7 +89,7 @@ runProcessor (Processor pid mtd uri exp) msgs conns = do
             return $ broadcast conns v 
         Just (Route _ _ (RouteMesh   _), ps) -> return [] -- @todo
         Just (Route _ _ (RouteNodeJs _), ps) -> return [] -- @todo
-        _                                    -> return [] -- @todo
+        _                                    -> undefined -- @todo
 
 lookupRoute :: Method -> Text -> Dispatch (Maybe (Route, [(Text, EscapedText)]))
 lookupRoute mtd uri = do
