@@ -1,22 +1,39 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
+import Control.Applicative
+import Control.Arrow ( second )
+import Control.Exception.Lifted                        ( SomeException, try, fromException )
 import Data.Aeson
-import Data.Maybe                                      ( fromMaybe )
-import Database.Persist.Postgresql  hiding ( Filter )
+import Data.Maybe                                      ( fromMaybe, mapMaybe )
+import Data.Text                                       ( Text )
+import Database.Persist.Postgresql  hiding ( Filter, Connection, In )
+import Database.PostgreSQL.Simple                      ( SqlError(..) )
+import Data.Conduit
+import Data.Scientific
 import Network.HTTP.Types                              
 import Network.Wai                                     ( Application, Middleware, Response, responseLBS )
+import Network.Wai.Internal
 import Network.Wai.Handler.Warp                        ( run )
 import Trombone.Db.Template
 import Trombone.Dispatch
-import Trombone.Middleware.Amqp     hiding ( Message )
-import Trombone.Middleware.Logger
+import Trombone.Middleware.Amqp     hiding ( Message, Connection )
 import Trombone.Middleware.Cors
+import Trombone.Middleware.Logger
+import Trombone.Dispatch.Db         ( escVal, dispatchDbAction_ )
 import Trombone.RoutePattern
 import Trombone.Router
+import Trombone.Route
+import Trombone.Mesh
+import Trombone.Mesh.Json
+import Trombone.Db.Execute
 import Trombone.Tests.Bootstrap
 
+import qualified Data.Conduit.List                     as CL
+import qualified Data.HashMap.Strict                   as HMS
 import qualified Data.Text                             as Text
+import qualified Data.Vector                           as Vect
+import qualified Data.ByteString.Lazy.Char8            as L8
 
 myQuery :: DbQuery
 myQuery = DbQuery (Collection [ "id"
@@ -66,72 +83,52 @@ myRoutes = [
            , Route "GET"  (decompose "customer/:id")                   (RouteSql myQuery2)
            , Route "POST" (decompose "customrr/:customer-id/:status")  (RouteSql myQuery3)
            , Route "POST" (decompose "customer")                       (RouteSql myQuery3)
+           , Route "POST" (decompose "border")                         (RouteMesh "createorder")
+           , Route "POST" (decompose "order")                          (RouteSql myQuery4)
+           , Route "POST" (decompose "order-product")                  (RouteSql myQuery5)
            ]
+
+myQuery4 :: DbQuery
+myQuery4 = DbQuery NoResult
+                (DbTemplate 
+                    [ DbSqlStatic "insert into order_object (created, customer_id, status, last_change, user_id) values ('now()', 1, 'ok', 'now()', 1)"
+                    ])
+
+myQuery5 :: DbQuery
+myQuery5 = DbQuery (LastInsert "order_product" "id")
+                (DbTemplate 
+                    [ DbSqlStatic "insert into order_product (order_id, product_id, quantity, price) values ("
+                    , DbSqlJsonValue "orderId" 
+                    , DbSqlStatic ", "
+                    , DbSqlJsonValue "productId" 
+                    , DbSqlStatic ", "
+                    , DbSqlJsonValue "quantity"
+                    , DbSqlStatic ", (select product_price.price from customer join product_price on product_price.price_cat_id = customer.price_cat_id where customer.id = 1 and product_price.product_id = 5))"
+                    ])
 
 conn :: ConnectionString
 conn = "host=localhost port=5432 user=postgres password=postgres dbname=sdrp5"
 
-app :: ConnectionPool -> Application
-app pool request = do
-    resp <- runReaderT runRoutes (Context pool request myRoutes)
-    return $ sendJsonResponseOr404 resp
-
 main :: IO ()
 main = do
-    runTests
-    withPostgresqlPool conn 10 $ \pool -> do
-        (conn, channel) <- connectAmqp "guest" "guest"
-        logger <- buildLogger defaultBufSize "trombone.log"
+    (_, channel) <- connectAmqp "guest" "guest"
+    logger <- buildLogger defaultBufSize "trombone.log"
+    systems <- parseMeshFromFile "mesh.conf"
+
+--    withPostgresqlPool conn 10 $ \pool -> do
+--        res <- try $ runDb (rawExecute "insert into order_product (order_id, product_id, quantity, price) values (694, 1, 2, 100)" [] $$ CL.consume) pool
+--        case res of
+--            Left e  -> let x = e :: SomeException in print "A"
+--            Right x -> print res
+
+    print systems
+
+    withPostgresqlPool conn 10 $ \pool -> 
         run 3010 
             $ cors
             $ logger 
             $ amqp channel
-            $ app pool
-
------------------------
-
-data TransType = TransExclude
-               | TransInclude
-               | TransBind
-               | TransRename
-    deriving (Eq, Ord, Show)
-
-data Transformer = Transformer TransType [Value]
-    deriving (Eq, Show)
-
-data Predicate = PredEqualTo
-               | PredNotEqualTo
-               | PredGreaterThan
-               | PredGreaterThanOrEqual
-               | PredLessThan
-               | PredLessThanOrEqual
-    deriving (Show)
-
-data Filter = Filter
-    { property  :: String
-    , predicate :: Predicate
-    , value     :: Value
-    } deriving (Show)
-
-data Processor = Processor
-    { processorId     :: Int              -- ^ A unique identifier
-    , processorMethod :: Method           -- ^ Any valid HTTP method
-    , processorUri    :: String           -- ^ The resource identifier 
-    , processorAggr   :: Maybe Text.Text  -- ^ An optional aggregator
-    } deriving (Show)
-
-data Connection = Connection
-    { source       :: ProcessorId
-    , destination  :: ProcessorId
-    , transformers :: [Transformer]
-    , filters      :: [Filter]
-    } deriving (Show)
-
-data ProcessorId = Id Int | In | Out
-    deriving (Eq, Show)
-
-data Message = Message ProcessorId Object
-    deriving (Show)
-
-type MessageQueue = [Message]
+            $ \request -> do
+        resp <- runReaderT runRoutes (Context pool request myRoutes systems) 
+        return $ sendJsonResponseOr404 resp
 

@@ -17,7 +17,10 @@ import qualified Data.Text                             as Text
 -- | The type of result produced by an SQL statement.
 data DbResult = NoResult 
               | Item       [Text]
+              | ItemOk     [Text]
               | Collection [Text]
+              | LastInsert  Text    -- ^ Table name
+                            Text    -- ^ Sequence
               | Count
 
 -- | A part of a query template.

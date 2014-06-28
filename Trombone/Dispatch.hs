@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Trombone.Dispatch 
     ( module Trombone.Dispatch.Core
     , dispatch
@@ -5,17 +6,21 @@ module Trombone.Dispatch
 
 import Trombone.Dispatch.Core
 import Trombone.Dispatch.Db
+import Trombone.Dispatch.Mesh
 import Data.Text                                       ( Text )
 
-dispatchMeshAction :: Text -> Dispatch RouteResponse
-dispatchMeshAction mesh = undefined
+import qualified Data.Text                             as Text
 
 dispatchNodeJsAction :: Text -> Dispatch RouteResponse
 dispatchNodeJsAction js = undefined
 
 dispatch :: RouteAction -> [(Text, EscapedText)] -> Dispatch RouteResponse
-{-# INLINE dispatch #-}
 dispatch (RouteSql query) ps = dispatchDbAction query ps
-dispatch (RouteMesh mesh) _  = dispatchMeshAction mesh
+dispatch (RouteMesh mesh) ps = do
+    Context _ _ _ table <- ask
+    case lookup mesh table of
+        Nothing -> return $ errorResponse ErrorServerConfiguration
+            $ Text.concat ["Unknown mesh system '", mesh, "'."]
+        Just s  -> dispatchMeshAction s ps
 dispatch (RouteNodeJs js) _  = dispatchNodeJsAction js
 

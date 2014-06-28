@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Trombone.Dispatch.Db 
     ( dispatchDbAction
+    , dispatchDbAction_
+    , escVal
     ) where
 
 import Control.Arrow                                   ( second )
@@ -33,24 +35,30 @@ import qualified Data.Vector                           as Vect
 
 -- | Run a database query and return the result in the Dispatch monad stack.
 dispatchDbAction :: DbQuery -> [(Text, EscapedText)] -> Dispatch RouteResponse
-dispatchDbAction q ps = do
-    Context _ r _ <- ask
-    body <- lift $ requestBody r $$ CL.consume
-    run $ requestObj body 
-  where run (Array a) = 
-            -- Run a sequence of actions and collect the results
-            liftM resp $ mapM run (Vect.toList a)
-          where val (RouteResponse _ x) = x
-                -- Using response code 202 is to indicate that the result
-                -- of each individual request must be considered separately
-                -- and that no claim is made as to the state of success 
-                -- w.r.t these.
-                resp = RouteResponse 202 . Array . Vect.fromList . map val
-        run (Object o) = _run q $ ps ++ map (second escVal) (HMS.toList o)
-        run _          = _run q ps
+dispatchDbAction q ps = 
+    ask >>= \(Context _ r _ _) -> 
+        lift (requestBody r $$ CL.consume) 
+            >>= dispatchDbAction_ q ps . requestObj 
+ 
+dispatchDbAction_ :: DbQuery 
+                  -> [(Text, EscapedText)] 
+                  -> Value 
+                  -> Dispatch RouteResponse
+dispatchDbAction_ q ps (Array a) = 
+    -- Run a sequence of actions and collect the results
+    liftM resp $ mapM (dispatchDbAction_ q ps) (Vect.toList a)
+  where val (RouteResponse _ x) = x
+        -- Using response code 202 is to indicate that the result
+        -- of each individual request must be considered separately
+        -- and that no claim is made as to the state of success 
+        -- w.r.t. these.
+        resp = RouteResponse 202 . Array . Vect.fromList . map val
+dispatchDbAction_ q ps (Object o) = 
+    run q $ ps ++ map (second escVal) (HMS.toList o)
+dispatchDbAction_ q ps _ = run q ps
 
-_run :: DbQuery -> [(Text, EscapedText)] -> Dispatch RouteResponse
-_run (DbQuery ret tpl) ps = 
+run :: DbQuery -> [(Text, EscapedText)] -> Dispatch RouteResponse
+run (DbQuery ret tpl) ps = 
     case instantiate tpl ps of
         Left e -> 
             -- 400 Bad request: Request parameters did not match template
@@ -71,7 +79,7 @@ _run (DbQuery ret tpl) ps =
 
 -- | Run a database action in the Dispatch monad.
 runDbDispatch :: Sql a -> Dispatch a
-runDbDispatch sql = ask >>= \(Context pool _ _) -> lift $ runDb sql pool
+runDbDispatch sql = ask >>= \(Context pool _ _ _) -> lift $ runDb sql pool
 
 -- | Run a database query and respond according to the specified result type.
 getDbResponse :: DbResult -> Text -> Dispatch RouteResponse
@@ -80,12 +88,31 @@ getDbResponse NoResult q = runDbDispatch (noResult q) >> return (okResponse [])
 -- Respond with a single item, or a 404 error.
 getDbResponse (Item ns) q = do 
     r <- runDbDispatch (getOne q) 
-    return $ case row ns $ concat $ maybeToList r of
-               Nothing -> errorResponse ErrorNotFound "Resource not found."
-               Just v  -> RouteResponse 200 v
+    case r of 
+        Nothing -> return $ errorResponse ErrorNotFound "Resource not found."
+        Just v  -> 
+          case row ns v of
+              Nothing -> return $ errorResponse ErrorServerConfiguration
+                  "Invalid query template: The number of return \
+                  \parameters is different from actual result."
+              Just ok -> return $ RouteResponse 200 ok
+-- Ok response with default message and status properties
+getDbResponse (ItemOk ns) q = do 
+    r <- getDbResponse (Item ns) q
+    case r of
+        RouteResponse 200 (Object o) -> return $ RouteResponse 200 $ f o
+        _                            -> return r
+  where f o = Object $ HMS.union o $ HMS.fromList [ ("message", "Ok.")
+                                                  , ("status", Bool True) ]
 -- Respond with a collection.
 getDbResponse (Collection ns) q = liftM f $ runDbDispatch (getResult q)
   where f = RouteResponse 200 . Array . fromList . mapMaybe (row ns)
+-- Reponse with "last insert id"
+getDbResponse (LastInsert table seq) q = do
+    runDbDispatch (noResult q) 
+    getDbResponse (ItemOk ["id"]) lst
+  where lst = Text.concat ["select currval(pg_get_serial_sequence('"
+                          , table, "', '", seq, "'))" ]
 -- Respond with the row count in a result.
 getDbResponse Count q = do
     r <- runDbDispatch (getCount q) 
@@ -97,30 +124,6 @@ row ns xs | length xs /= length ns = Nothing
 
 toObj :: [(Text, PersistValue)] -> Value
 toObj = Object . HMS.fromList . map (second persistValToJsonVal)
-
--- | Translate a JSON value to an equivalent PersistValue.
-jsonValToPersistVal :: Value -> PersistValue
-jsonValToPersistVal (String t) = PersistText t
-jsonValToPersistVal (Bool   b) = PersistBool b
-jsonValToPersistVal (Number n) = scientificToPersistVal n
-jsonValToPersistVal (Array  a) = valuesToPersistList a
-jsonValToPersistVal (Object _) = PersistText "[object]"
-jsonValToPersistVal  Null      = PersistNull
-
--- | Translate a PersistValue to a JSON value.
-persistValToJsonVal :: PersistValue -> Value
-persistValToJsonVal (PersistText       t) = String t
-persistValToJsonVal (PersistBool       b) = Bool b
-persistValToJsonVal (PersistByteString b) = String $ decodeUtf8 b
-persistValToJsonVal (PersistInt64      n) = Number $ fromIntegral n
-persistValToJsonVal (PersistDouble     d) = Number $ fromFloatDigits d
-persistValToJsonVal (PersistMap        m) = toObj m
-persistValToJsonVal (PersistUTCTime    u) = showV u
-persistValToJsonVal (PersistTimeOfDay  t) = showV t
-persistValToJsonVal (PersistDay        d) = showV d
-persistValToJsonVal (PersistList      xs) = persistValsToJsonArray xs
-persistValToJsonVal  PersistNull          = Null
-persistValToJsonVal  _                    = String "[unsupported SQL type]"
 
 -- | Translate a JSON value to a format ready to be inserted into an SQL query
 -- template. Special care must be taken w.r.t. string values. 
@@ -150,6 +153,30 @@ escapeChars = [("\"", "\\\""), ("'", "\\'")]
 -------------------------------------------------------------------------------
 -- Type conversion helper functions
 -------------------------------------------------------------------------------
+
+-- | Translate a JSON value to an equivalent PersistValue.
+jsonValToPersistVal :: Value -> PersistValue
+jsonValToPersistVal (String t) = PersistText t
+jsonValToPersistVal (Bool   b) = PersistBool b
+jsonValToPersistVal (Number n) = scientificToPersistVal n
+jsonValToPersistVal (Array  a) = valuesToPersistList a
+jsonValToPersistVal (Object _) = PersistText "[object]"
+jsonValToPersistVal  Null      = PersistNull
+
+-- | Translate a PersistValue to a JSON value.
+persistValToJsonVal :: PersistValue -> Value
+persistValToJsonVal (PersistText       t) = String t
+persistValToJsonVal (PersistBool       b) = Bool b
+persistValToJsonVal (PersistByteString b) = String $ decodeUtf8 b
+persistValToJsonVal (PersistInt64      n) = Number $ fromIntegral n
+persistValToJsonVal (PersistDouble     d) = Number $ fromFloatDigits d
+persistValToJsonVal (PersistMap        m) = toObj m
+persistValToJsonVal (PersistUTCTime    u) = showV u
+persistValToJsonVal (PersistTimeOfDay  t) = showV t
+persistValToJsonVal (PersistDay        d) = showV d
+persistValToJsonVal (PersistList      xs) = persistValsToJsonArray xs
+persistValToJsonVal  PersistNull          = Null
+persistValToJsonVal  _                    = String "[unsupported SQL type]"
 
 persistValsToJsonArray :: [PersistValue] -> Value
 persistValsToJsonArray = Array . fromList . map persistValToJsonVal

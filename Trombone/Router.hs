@@ -1,10 +1,8 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 module Trombone.Router where
 
-import Control.Arrow                                   ( (***) )
-import Data.Char                                       ( isAlphaNum )
 import Data.Text                                       ( Text )
-import Trombone.Db.Template
+import Network.HTTP.Types                              ( Method )
 import Trombone.Dispatch
 import Trombone.Dispatch.Core
 import Trombone.RoutePattern
@@ -13,9 +11,8 @@ import qualified Data.Text                             as Text
 
 runRoutes :: Dispatch (Maybe RouteResponse)
 runRoutes = do
-    Context pool Request{..} routes <- ask
-    let info = filterNot Text.null pathInfo
-    run routes requestMethod info 
+    Context pool Request{..} routes _ <- ask
+    run routes requestMethod $ filterNot Text.null pathInfo
   where run [] _ _ = do
             liftIO $ print "(no match)"
             return Nothing -- List exhausted
@@ -27,21 +24,3 @@ runRoutes = do
                 Params ps -> liftM Just (dispatch action $ params ps)
                 _         -> run rs mtd info
  
-params :: [(Text, Text)] -> [(Text, EscapedText)]
-params = map (prefix *** escape) 
-  where escape = EscapedText . quoute . sanitize
-
-prefix :: Text -> Text
-{-# INLINE prefix #-}
-prefix = Text.cons ':'
-
-sanitize :: Text -> Text
-sanitize = Text.filter pred 
-  where pred :: Char -> Bool
-        pred c | isAlphaNum c = True
-               | otherwise    = c `elem` "-_!"
- 
-filterNot :: (a -> Bool) -> [a] -> [a]
-{-# INLINE filterNot #-}
-filterNot f = filter (not . f)
-

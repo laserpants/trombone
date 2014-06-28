@@ -30,6 +30,8 @@ data ResponseError
   | ErrorSqlConstraintViolation
   | ErrorSqlUniqueViolation
   | ErrorSqlGeneric
+  -- Configuration error
+  | ErrorServerConfiguration
   -- Unspecified server error
   | ErrorServerGeneric
 
@@ -41,6 +43,7 @@ toText ErrorConflict               = "CONFLICT"
 toText ErrorSqlConstraintViolation = "SQL_FOREIGN_KEY_CONSTRAINT_VIOLATION"
 toText ErrorSqlUniqueViolation     = "SQL_UNIQUE_CONSTRAINT_VIOLATION"
 toText ErrorSqlGeneric             = "SQL_ERROR"
+toText ErrorServerConfiguration    = "SERVER_CONFIGURATION_ERROR"
 toText _                           = "INTERNAL_SERVER_ERROR"
 
 -- | JSON response used for errors.
