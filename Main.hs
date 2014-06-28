@@ -91,7 +91,11 @@ myRoutes = [
 myQuery4 :: DbQuery
 myQuery4 = DbQuery (LastInsert "order_object" "id")
                 (DbTemplate 
-                    [ DbSqlStatic "insert into order_object (created, customer_id, status, last_change, user_id) values ('now()', 1, 'ok', 'now()', 1)"
+                    [ DbSqlStatic "insert into order_object (created, customer_id, status, last_change, user_id) values ('now()', "
+                    , DbSqlJsonValue "customerId"
+                    , DbSqlStatic ", 'queued', 'now()', "
+                    , DbSqlJsonValue "userId"
+                    , DbSqlStatic ")"
                     ])
 
 myQuery5 :: DbQuery

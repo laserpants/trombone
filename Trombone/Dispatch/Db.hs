@@ -107,7 +107,7 @@ getDbResponse (ItemOk ns) q = do
 -- Respond with a collection.
 getDbResponse (Collection ns) q = liftM f $ runDbDispatch (getResult q)
   where f = RouteResponse 200 . Array . fromList . mapMaybe (row ns)
--- Reponse with "last insert id"
+-- Respond with "last insert id"
 getDbResponse (LastInsert table seq) q = do
     runDbDispatch (noResult q) 
     getDbResponse (ItemOk ["id"]) lst
