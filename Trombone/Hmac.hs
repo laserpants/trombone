@@ -33,8 +33,9 @@ authenticate body = do
               then return $ Right Local
               else case lookup "API-Access" $ requestHeaders req of
                      Nothing -> if isPing req
-                                 then return $ Right Anonymous
-                                 else liftM Left unauthorized 
+                                   -- Allow "ping" requests to pass through
+                                   then return $ Right Anonymous
+                                   else liftM Left unauthorized 
                      Just h  -> case C8.split ':' h of
                                 [client, code] -> 
                                     case lookupKey client conf of
