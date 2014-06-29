@@ -130,7 +130,9 @@ main = do
             , dbName = "sdrp5"
             }
 
-    runWithMiddleware 10 3010 conf [cors, logger, amqp channel] myRoutes Nothing systems
+    let hmac = buildHmacConf [("generic", "14ad0ef86bc392b39bad6009113c2a5a8a1d993a")] True
+
+    runWithMiddleware 10 3010 conf [cors, logger, amqp channel] myRoutes hmac systems
 
 --    withPostgresqlPool conn 10 $ \pool -> 
 --        run 3010 

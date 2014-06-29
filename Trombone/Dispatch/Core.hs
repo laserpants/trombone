@@ -5,6 +5,7 @@ module Trombone.Dispatch.Core
     , Dispatch(..)
     , HmacKeyConf(..)
     , allowLocal
+    , buildHmacConf
     , filterNot
     , lookupKey
     , params
@@ -37,6 +38,9 @@ import qualified Data.HashMap                 as Map
 data HmacKeyConf = HmacKeyConf 
     (Map ByteString ByteString)  -- ^ Hash map with client keys
     Bool                         -- ^ Bypass authentication for localhost?
+
+buildHmacConf :: [(ByteString, ByteString)] -> Bool -> Maybe HmacKeyConf
+buildHmacConf keys = Just . HmacKeyConf (Map.fromList keys) 
 
 lookupKey :: ByteString -> HmacKeyConf -> Maybe ByteString
 lookupKey key (HmacKeyConf hm _) = Map.lookup key hm
