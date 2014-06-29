@@ -5,7 +5,7 @@ import Data.Conduit
 import Data.Scientific
 import Network.HTTP.Types                              
 import Trombone.Dispatch.Core
-import Trombone.Dispatch.Db                            ( escVal, dispatchDbAction_ )
+import Trombone.Dispatch.Db                            ( escVal, dispatchDbAction )
 import Trombone.Mesh
 import Trombone.RoutePattern
 
@@ -14,14 +14,12 @@ import qualified Data.HashMap.Strict                   as HMS
 import qualified Data.Text                             as Text
 import qualified Data.Vector                           as Vect
 
-dispatchMeshAction :: System -> [(Text, EscapedText)] -> Dispatch RouteResponse
-dispatchMeshAction (System pcs conns _) ps = do
+dispatchMeshAction :: System -> [(Text, EscapedText)] -> Value -> Dispatch RouteResponse
+dispatchMeshAction (System pcs conns _) ps obj = do
     mq <- initMq
     runEagerly (System pcs conns mq) 
   where initMq = do
-            Context _ r _ _ <- ask
-            body <- lift (requestBody r $$ CL.consume) 
-            let obj = requestObj body
+            Context{ dispatchRequest = r } <- ask
             return $ broadcast (outgoingConns In conns) $ foldr inject obj ps
         inject :: (Text, EscapedText) -> Value -> Value
         inject   (k, EscapedText v) (Object o) = Object $ HMS.insert k (String v) o
@@ -63,7 +61,11 @@ integrate (System pcs conns mq) = do
             if count destination == length msgs
                 then runProcessor pc msgs $ outgoingConns pid conns
                 -- This processor is still waiting for more results
-                else return msgs
+                else do
+                    liftIO $ print ("pc "        ++ show p ++ " waiting")
+                    liftIO $ print ("incoming: " ++ show (count destination))
+                    liftIO $ print ("msgs: "     ++ show (length msgs))
+                    return msgs
 
 runProcessor :: Processor
              -> [Message]
@@ -84,7 +86,7 @@ runProcessor (Processor pid mtd uri exp) msgs conns = do
     r <- lookupRoute mtd uri
     case r of
         Just (Route _ _ (RouteSql q), ps) -> do
-            RouteResponse _ v <- dispatchDbAction_ q ps $ compileMsgs exp msgs
+            RouteResponse _ v <- dispatchDbAction q ps $ compileMsgs exp msgs
             liftIO $ print v
             return $ broadcast conns v 
         Just (Route _ _ (RouteMesh   _), ps) -> return [] -- @todo
@@ -93,7 +95,7 @@ runProcessor (Processor pid mtd uri exp) msgs conns = do
 
 lookupRoute :: Method -> Text -> Dispatch (Maybe (Route, [(Text, EscapedText)]))
 lookupRoute mtd uri = do
-    Context _ _ routes _ <- ask
+    Context{ dispatchRoutes = routes } <- ask
     run routes 
   where run [] = return Nothing
         run (route@(Route method pattern _):rs) 

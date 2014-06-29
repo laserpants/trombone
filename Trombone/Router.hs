@@ -11,7 +11,7 @@ import qualified Data.Text                             as Text
 
 runRoutes :: Dispatch (Maybe RouteResponse)
 runRoutes = do
-    Context pool Request{..} routes _ <- ask
+    Context pool Request{..} routes _ _ <- ask
     run routes requestMethod $ filterNot Text.null pathInfo
   where run [] _ _ = do
             liftIO $ print "(no match)"

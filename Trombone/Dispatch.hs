@@ -4,23 +4,33 @@ module Trombone.Dispatch
     , dispatch
     ) where
 
+import Control.Applicative                             ( (<$>) )
+import Data.Conduit
+import Data.Monoid                                     ( mconcat )
+import Data.Text                                       ( Text )
 import Trombone.Dispatch.Core
 import Trombone.Dispatch.Db
 import Trombone.Dispatch.Mesh
-import Data.Text                                       ( Text )
+import Trombone.Hmac
 
+import qualified Data.Conduit.List                     as CL
 import qualified Data.Text                             as Text
 
-dispatchNodeJsAction :: Text -> Dispatch RouteResponse
-dispatchNodeJsAction js = undefined
-
 dispatch :: RouteAction -> [(Text, EscapedText)] -> Dispatch RouteResponse
-dispatch (RouteSql query) ps = dispatchDbAction query ps
-dispatch (RouteMesh mesh) ps = do
-    Context _ _ _ table <- ask
-    case lookup mesh table of
-        Nothing -> return $ errorResponse ErrorServerConfiguration
-            $ Text.concat ["Unknown mesh system '", mesh, "'."]
-        Just s  -> dispatchMeshAction s ps
-dispatch (RouteNodeJs js) _  = dispatchNodeJsAction js
+dispatch route ps = do
+    Context{ dispatchRequest = r, dispatchMesh = table } <- ask
+    body <- liftIO $ mconcat <$> (requestBody r $$ CL.consume)
+    auth <- authenticate body
+    case auth of
+        Left resp -> return resp
+        Right _   -> 
+            let obj = requestObj body in
+            case route of
+                RouteSql query -> dispatchDbAction query ps obj
+                RouteMesh mesh -> 
+                    case lookup mesh table of
+                        Nothing -> return $ errorResponse ErrorServerConfiguration
+                            $ Text.concat ["Unknown mesh system '", mesh, "'."]
+                        Just s  -> dispatchMeshAction s ps obj
+                RouteNodeJs js -> undefined
 

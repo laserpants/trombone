@@ -21,7 +21,6 @@ import Trombone.Dispatch
 import Trombone.Middleware.Amqp     hiding ( Message, Connection )
 import Trombone.Middleware.Cors
 import Trombone.Middleware.Logger
-import Trombone.Dispatch.Db         ( escVal, dispatchDbAction_ )
 import Trombone.RoutePattern
 import Trombone.Router
 import Trombone.Route
@@ -51,14 +50,14 @@ myQuery = DbQuery (Collection [ "id"
                               , "priceCategoryName"
                               ]) 
                   (DbTemplate [ DbSqlStatic 
-                    "select customer.id as id                                                              \
-                  \       , customer.name as name                                                          \
-                  \       , customer.latitude as latitude                                                  \
-                  \       , customer.longitude as longitude                                                \
-                  \       , customer.tin as tin                                                            \
-                  \       , customer.phone as phone                                                        \
-                  \       , customer.is_active as is_active                                                \
-                  \       , product_price_category.name as price_category_name                             \
+                    "select customer.id                                                                    \
+                  \       , customer.name                                                                  \
+                  \       , customer.latitude                                                              \
+                  \       , customer.longitude                                                             \
+                  \       , customer.tin                                                                   \
+                  \       , customer.phone                                                                 \
+                  \       , customer.is_active                                                             \
+                  \       , product_price_category.name                                                    \
                   \      from customer                                                                     \
                   \      join product_price_category on product_price_category.id = customer.price_cat_id  \
                   \      order by id" 
@@ -83,8 +82,7 @@ myQuery3 = DbQuery (LastInsert "order_object" "id")
                         , DbSqlStatic ")" 
                         ])
 
-myRoutes = [ 
-             Route "GET"  (decompose "customer")                       (RouteSql myQuery) 
+myRoutes = [ Route "GET"  (decompose "customer")                       (RouteSql myQuery) 
            , Route "GET"  (decompose "customer/:id")                   (RouteSql myQuery2)
            , Route "POST" (decompose "customrr/:customer-id/:status")  (RouteSql myQuery3)
            , Route "POST" (decompose "customer")                       (RouteSql myQuery3)
@@ -132,7 +130,7 @@ main = do
             , dbName = "sdrp5"
             }
 
-    runWithMiddleware 10 3010 conf [cors, logger, amqp channel] myRoutes systems
+    runWithMiddleware 10 3010 conf [cors, logger, amqp channel] myRoutes Nothing systems
 
 --    withPostgresqlPool conn 10 $ \pool -> 
 --        run 3010 
@@ -141,4 +139,4 @@ main = do
 --            $ amqp channel
 --            $ \request -> liftM sendJsonResponseOr404 $ 
 --                runReaderT runRoutes (Context pool request myRoutes systems)
---
+

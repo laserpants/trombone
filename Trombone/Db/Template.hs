@@ -67,7 +67,7 @@ newtype EscapedText = EscapedText Text
 instantiate :: DbTemplate          
             -- ^ The query template
             -> [(Text, EscapedText)]      
-            -- ^ uri variable and JSON key-value pairs
+            -- ^ Uri variable and JSON key-value pairs
             -> Either [Text] Text  
             -- ^ A list of non-matching keys, or the query
 instantiate (DbTemplate segms) table = subst segms "" []

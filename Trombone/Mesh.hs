@@ -144,8 +144,8 @@ buildJsonRequest = foldr f HMS.empty
 processorMsgs :: ProcessorId -> MessageQueue -> MessageQueue
 processorMsgs p = filter $ \(Message pid _) -> pid == p
 
--- | Count the number of source or destination nodes for a processor in the
--- given list of connections.
+-- | Count the number of source or destination endpoints connected to a specific
+-- processor in the given list of connections.
 connections :: ProcessorId -> [Connection] -> (Connection -> ProcessorId) -> Int
 connections _ [] _ = 0
 connections p (x:xs) f | p == f x   = 1 + connections p xs f

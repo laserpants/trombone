@@ -40,11 +40,12 @@ runWithMiddleware :: Int               -- ^ Connection pool size
                   -> DbConf            -- ^ Database connection settings
                   -> [Middleware]      -- ^ Middleware stack
                   -> [Route]           -- ^ Application routes
+                  -> Maybe HmacKeyConf -- ^ HMAC configuration
                   -> [(Text, System)]  -- ^ Mesh systems
                   -> IO ()
-runWithMiddleware size port dbconf mws routes systems = 
+runWithMiddleware size port dbconf mws routes hconf systems = 
     withPostgresqlPool (buildConnectionString dbconf) size $ \pool -> 
         run port $ foldr ($) `flip` mws $ \request -> do
-            let context = Context pool request routes systems
+            let context = Context pool request routes hconf systems
             liftM sendJsonResponseOr404 $ runReaderT runRoutes context
 

@@ -1,14 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Trombone.Dispatch.Db 
     ( dispatchDbAction
-    , dispatchDbAction_
     , escVal
     ) where
 
 import Control.Arrow                                   ( second )
 import Control.Exception.Lifted                        ( SomeException, try, fromException )
 import Data.Aeson
-import Data.Conduit
 import Data.List                                       ( intersperse )
 import Data.Maybe                                      ( listToMaybe, maybeToList, fromMaybe, mapMaybe )
 import Data.Scientific
@@ -28,34 +26,26 @@ import Trombone.Db.Template
 import Trombone.Dispatch.Core
 import Trombone.Response
 
-import qualified Data.Conduit.List                     as CL
 import qualified Data.HashMap.Strict                   as HMS
 import qualified Data.Text                             as Text
 import qualified Data.Vector                           as Vect
 
--- | Run a database query and return the result in the Dispatch monad stack.
-dispatchDbAction :: DbQuery -> [(Text, EscapedText)] -> Dispatch RouteResponse
-dispatchDbAction q ps = 
-    ask >>= \(Context _ r _ _) -> 
-        lift (requestBody r $$ CL.consume) 
-            >>= dispatchDbAction_ q ps . requestObj 
- 
-dispatchDbAction_ :: DbQuery 
-                  -> [(Text, EscapedText)] 
-                  -> Value 
-                  -> Dispatch RouteResponse
-dispatchDbAction_ q ps (Array a) = 
+dispatchDbAction :: DbQuery 
+                 -> [(Text, EscapedText)] 
+                 -> Value 
+                 -> Dispatch RouteResponse
+dispatchDbAction q ps (Array a) = 
     -- Run a sequence of actions and collect the results
-    liftM resp $ mapM (dispatchDbAction_ q ps) (Vect.toList a)
+    liftM resp $ mapM (dispatchDbAction q ps) (Vect.toList a)
   where val (RouteResponse _ x) = x
         -- Using response code 202 is to indicate that the result
         -- of each individual request must be considered separately
         -- and that no claim is made as to the state of success 
         -- w.r.t. these.
         resp = RouteResponse 202 . Array . Vect.fromList . map val
-dispatchDbAction_ q ps (Object o) = 
+dispatchDbAction q ps (Object o) = 
     run q $ ps ++ map (second escVal) (HMS.toList o)
-dispatchDbAction_ q ps _ = run q ps
+dispatchDbAction q ps _ = run q ps
 
 run :: DbQuery -> [(Text, EscapedText)] -> Dispatch RouteResponse
 run (DbQuery ret tpl) ps = 
@@ -79,7 +69,7 @@ run (DbQuery ret tpl) ps =
 
 -- | Run a database action in the Dispatch monad.
 runDbDispatch :: Sql a -> Dispatch a
-runDbDispatch sql = ask >>= \(Context pool _ _ _) -> lift $ runDb sql pool
+runDbDispatch sql = ask >>= \Context{ dispatchPool = pool } -> lift $ runDb sql pool
 
 -- | Run a database query and respond according to the specified result type.
 getDbResponse :: DbResult -> Text -> Dispatch RouteResponse
@@ -191,7 +181,7 @@ scientificToPersistVal s =
       Left  r -> PersistDouble r
       Right i -> PersistInt64 i
 
--- | Piggy-back on the underlying Show instance (as the last option).
+-- | Piggyback on the underlying Show instance (as the last option).
 showV :: (Show a) => a -> Value
 {-# INLINE showV #-}
 showV = String . pack . show
@@ -216,5 +206,5 @@ catchDbErrors SqlError{ sqlState = sqls } =
                     "Undefined table."
       -- @todo: Add more error types here!
       _       -> errorResponse ErrorSqlGeneric             
-                    "Unknown SQL error."
+                    "SQL error."
 
