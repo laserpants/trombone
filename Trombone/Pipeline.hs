@@ -1,29 +1,30 @@
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
-module Trombone.Mesh 
-    ( module Mesh
+module Trombone.Pipeline
+    ( module Pipe
     , Connection(..)
     , Filter(..)
     , Message(..)
+    , Pipeline(..)
     , Predicate(..)
     , Processor(..)
     , ProcessorId(..)
-    , System(..)
     , TransType(..)
     , Transformer(..)
     , broadcast
     , buildJsonRequest
-    , compileMsgs
     , connections
+    , expand
     , outgoingConns
-    , processorMsgs
+    , processorMsgs 
     ) where
 
 import Control.Applicative
-import Data.Aeson                            as Mesh
+import Data.Aeson                            as Pipe
 import Data.Maybe                                      ( fromMaybe, mapMaybe )
-import Data.Text                             as Mesh   ( Text )
+import Data.Text                             as Pipe   ( Text )
 import Network.HTTP.Types                              
-import Trombone.Db.Template                  as Mesh
+import Trombone.Db.Template                  as Pipe
+import Trombone.RoutePattern
 
 import qualified Data.HashMap.Strict         as HMS
 import qualified Data.Vector                 as Vect
@@ -32,6 +33,7 @@ data TransType = TransExclude
                | TransInclude
                | TransBind
                | TransRename
+               | TransAggregate
     deriving (Eq, Ord, Show)
 
 data Transformer = Transformer TransType [Value]
@@ -51,11 +53,12 @@ data Filter = Filter
     , value     :: Value
     } deriving (Show)
 
-data Processor = Processor
-    { processorId     :: Int              -- ^ A unique identifier
-    , processorMethod :: Method           -- ^ Any valid HTTP method
-    , processorUri    :: Text             -- ^ The resource identifier 
-    , processorExpand :: Maybe Text       -- ^ An optional "expansion" property
+data Processor = Processor 
+    { processorId     :: Int            -- ^ A unique identifier
+    , processorFields :: [Text]         -- ^ List of input fields
+    , processorMethod :: Method         -- ^ Any valid HTTP method
+    , processorUri    :: RoutePattern   -- ^ A route pattern
+    , processorExpand :: Maybe Text     -- ^ An optional "expansion" property
     } deriving (Show)
 
 data Connection = Connection
@@ -69,13 +72,13 @@ data ProcessorId = Id Int | In | Out
     deriving (Eq, Show)
 
 data Message = Message ProcessorId Object
-    deriving (Show)
+    deriving (Eq, Show)
 
 type MessageQueue = [Message]
 
-data System = System [Processor]
-                     [Connection]
-                     MessageQueue
+data Pipeline = Pipeline [Processor]
+                         [Connection]
+                         MessageQueue
     deriving (Show)
 
 broadcast :: [Connection] -> Value -> [Message]
@@ -122,17 +125,16 @@ runTransformer (Transformer TransRename (String from:String to:_)) o =
       Nothing -> o
       Just v  -> HMS.insert to v $ HMS.delete from o
 runTransformer (Transformer TransBind (String key:val:_)) o = HMS.insert key val o
+runTransformer (Transformer TransAggregate (String key:_)) o = HMS.fromList [(key, Object o)]
 runTransformer _ o = o
 
-compileMsgs :: Maybe Text -> [Message] -> Value
-compileMsgs Nothing  msgs = Object $ buildJsonRequest msgs
-compileMsgs (Just v) msgs = 
+expand :: Maybe Text -> Object -> Value
+expand Nothing  obj = Object obj
+expand (Just v) obj = 
     case HMS.lookup v obj of
         Just x  -> f x
-        Nothing -> compileMsgs Nothing msgs
-  where obj  = buildJsonRequest msgs
-        obj' = HMS.delete v obj
-        f (Object o) = Object $ HMS.union o obj'
+        Nothing -> Object obj
+  where f (Object o) = Object $ HMS.union o obj
         f (Array  a) = Array  $ Vect.map f a
         f x          = x
 

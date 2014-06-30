@@ -1,6 +1,7 @@
 {-# LANGUAGE RecordWildCards, OverloadedStrings #-}
 module Trombone.Server 
     ( DbConf(..)
+    , buildConnectionString
     , runWithMiddleware
     ) where
 
@@ -11,7 +12,7 @@ import Database.Persist.Postgresql
 import Network.Wai                                     ( Middleware )
 import Network.Wai.Handler.Warp                        ( run )
 import Trombone.Dispatch.Core
-import Trombone.Mesh
+import Trombone.Pipeline
 import Trombone.Route
 import Trombone.Router
 
@@ -35,13 +36,13 @@ buildConnectionString DbConf{..} =
               , "password=" ,                         dbPass , " "
               , "dbname="   ,                         dbName ]
 
-runWithMiddleware :: Int               -- ^ Connection pool size
-                  -> Int               -- ^ Server port number
-                  -> DbConf            -- ^ Database connection settings
-                  -> [Middleware]      -- ^ Middleware stack
-                  -> [Route]           -- ^ Application routes
-                  -> Maybe HmacKeyConf -- ^ HMAC configuration
-                  -> [(Text, System)]  -- ^ Mesh systems
+runWithMiddleware :: Int                 -- ^ Connection pool size
+                  -> Int                 -- ^ Server port number
+                  -> DbConf              -- ^ Database connection settings
+                  -> [Middleware]        -- ^ Middleware stack
+                  -> [Route]             -- ^ Application routes
+                  -> Maybe HmacKeyConf   -- ^ HMAC configuration
+                  -> [(Text, Pipeline)]  -- ^ Pipeline map
                   -> IO ()
 runWithMiddleware size port dbconf mws routes hconf systems = 
     withPostgresqlPool (buildConnectionString dbconf) size $ \pool -> 

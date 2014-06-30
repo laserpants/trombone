@@ -24,9 +24,9 @@ import Trombone.Middleware.Logger
 import Trombone.RoutePattern
 import Trombone.Router
 import Trombone.Route
-import Trombone.Mesh
+import Trombone.Pipeline
 import Trombone.Server
-import Trombone.Mesh.Json
+import Trombone.Pipeline.Json
 import Trombone.Db.Execute
 import Trombone.Tests.Bootstrap
 
@@ -86,7 +86,7 @@ myRoutes = [ Route "GET"  (decompose "customer")                       (RouteSql
            , Route "GET"  (decompose "customer/:id")                   (RouteSql myQuery2)
            , Route "POST" (decompose "customrr/:customer-id/:status")  (RouteSql myQuery3)
            , Route "POST" (decompose "customer")                       (RouteSql myQuery3)
-           , Route "POST" (decompose "border")                         (RouteMesh "createorder")
+           , Route "POST" (decompose "border")                         (RoutePipes "createorder")
            , Route "POST" (decompose "order")                          (RouteSql myQuery4)
            , Route "POST" (decompose "order-product")                  (RouteSql myQuery5)
            ]
@@ -118,7 +118,7 @@ main = do
 
     (_, channel) <- connectAmqp "guest" "guest"
     logger <- buildLogger defaultBufSize "trombone.log"
-    systems <- parseMeshFromFile "mesh.conf"
+    systems <- parsePipesFromFile "pipelines.conf"
 
     print systems
 
@@ -134,11 +134,11 @@ main = do
 
     runWithMiddleware 10 3010 conf [cors, logger, amqp channel] myRoutes hmac systems
 
---    withPostgresqlPool conn 10 $ \pool -> 
+--    withPostgresqlPool (buildConnectionString conf) 10 $ \pool -> 
 --        run 3010 
 --            $ cors
 --            $ logger 
 --            $ amqp channel
 --            $ \request -> liftM sendJsonResponseOr404 $ 
---                runReaderT runRoutes (Context pool request myRoutes systems)
+--                runReaderT runRoutes (Context pool request myRoutes hmac systems)
 

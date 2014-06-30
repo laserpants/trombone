@@ -68,13 +68,13 @@ errorResponse re = RouteResponse code . toJSON . ErrorObj code err
   where code = responseCode re
         err  = toText re
 
--- | Generate a 200 OK response from the provided lookup table.
+-- | Generate a 200 OK response from the provided association list.
 okResponse_ :: [(Text, Value)] -> RouteResponse
 {-# INLINE okResponse_ #-}
 okResponse_ = RouteResponse 200 . Object . fromList 
 
--- | Ok response with default message and status properties, 
--- unless already present in the provided lookup table.
+-- | Ok response generated from the list, with default message and status 
+-- fields automatically inserted, unless already present.
 okResponse :: [(Text, Value)] -> RouteResponse
 okResponse r = RouteResponse i (decorate v)
   where (RouteResponse i v) = okResponse_ r

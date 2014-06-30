@@ -10,7 +10,7 @@ import Trombone.RoutePattern
 
 -- | A target action associated with a route.
 data RouteAction = RouteSql    DbQuery
-                 | RouteMesh   Text
+                 | RoutePipes  Text
                  | RouteNodeJs Text
 
 -- | A request route specification: 

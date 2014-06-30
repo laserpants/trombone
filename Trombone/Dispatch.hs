@@ -10,7 +10,7 @@ import Data.Monoid                                     ( mconcat )
 import Data.Text                                       ( Text )
 import Trombone.Dispatch.Core
 import Trombone.Dispatch.Db
-import Trombone.Dispatch.Mesh
+import Trombone.Dispatch.Pipeline
 import Trombone.Hmac
 
 import qualified Data.Conduit.List                     as CL
@@ -27,7 +27,7 @@ dispatch route ps = do
             let obj = requestObj body in
             case route of
                 RouteSql query -> dispatchDbAction query ps obj
-                RouteMesh mesh -> 
+                RoutePipes mesh -> 
                     case lookup mesh table of
                         Nothing -> return $ errorResponse ErrorServerConfiguration
                             $ Text.concat ["Unknown mesh system '", mesh, "'."]

@@ -2,6 +2,7 @@
 module Trombone.Dispatch.Db 
     ( dispatchDbAction
     , escVal
+    , escVal'
     ) where
 
 import Control.Arrow                                   ( second )
@@ -135,6 +136,10 @@ escVal (Array a) = listify a
         listify = EscapedText . quoute . Text.concat . intersperse "," 
                               . map f  . Vect.toList 
 escVal _ = EscapedText empty
+
+escVal' :: Value -> Text
+escVal' v = t
+  where (EscapedText t) = escVal v
 
 -- | A list of from-and-to character sequences used to escape SQL parameters.
 escapeChars :: [(Text, Text)]

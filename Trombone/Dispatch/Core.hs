@@ -27,7 +27,7 @@ import Database.Persist.Postgresql
 import Network.Wai.Internal                   as Core  ( Request(..) )
 import Trombone.Db.Template
 import Trombone.Db.Template                   as Core  ( EscapedText ) 
-import Trombone.Mesh
+import Trombone.Pipeline
 import Trombone.Response                      as Core
 import Trombone.Route                         as Core
 
@@ -54,7 +54,7 @@ data Context = Context
     , dispatchRequest :: Request            -- ^ Request object
     , dispatchRoutes  :: [Route]            -- ^ Application routes
     , dispatchKeys    :: Maybe HmacKeyConf  -- ^ HMAC authentication keys
-    , dispatchMesh    :: [(Text, System)]   -- ^ Mesh lookup table
+    , dispatchMesh    :: [(Text, Pipeline)] -- ^ Mesh lookup table
     }
 
 -- | Monad transformer in which requests are dispatched.
