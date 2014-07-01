@@ -27,10 +27,10 @@ dispatch route ps = do
             let obj = requestObj body in
             case route of
                 RouteSql query -> dispatchDbAction query ps obj
-                RoutePipes mesh -> 
-                    case lookup mesh table of
+                RoutePipes pipe -> 
+                    case lookup pipe table of
                         Nothing -> return $ errorResponse ErrorServerConfiguration
-                            $ Text.concat ["Unknown mesh system '", mesh, "'."]
+                            $ Text.concat ["Unknown pipeline: '", pipe , "'."]
                         Just s  -> dispatchMeshAction s ps obj
                 RouteNodeJs js -> undefined
 
