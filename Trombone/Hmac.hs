@@ -50,13 +50,16 @@ authenticate body = do
                 else return $ Right $ Client (decodeUtf8 client)
   
 isPing :: Request -> Bool
+{-# INLINE isPing #-}
 isPing req = not (null info) && "ping" == head info
   where info = pathInfo req
 
 unauthorized :: Dispatch RouteResponse
+{-# INLINE unauthorized #-}
 unauthorized = return $ errorResponse ErrorUnauthorized "Unauthorized."
 
 isLocalhost :: SockAddr -> Bool
+{-# INLINE isLocalhost #-}
 isLocalhost (SockAddrInet  _   ha   ) = 16777343  == ha
 isLocalhost (SockAddrInet6 _ _ ha6 _) = (0,0,0,1) == ha6
 isLocalhost _                         = True
