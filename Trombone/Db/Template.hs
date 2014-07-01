@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Trombone.Db.Template 
     ( DbResult(..)
+    , DbQuery(..)
     , DbSqlSegment(..)
     , DbTemplate(..)
-    , DbQuery(..)
     , EscapedText(..)
     , instantiate
     , instantiateQ
@@ -27,6 +27,7 @@ data DbResult = NoResult
               -- ^ Return the last inserted id (for INSERT statements)
               | Count
               -- ^ Return a row count result
+    deriving (Show)
 
 -- | A part of a query template.
 data DbSqlSegment 
@@ -54,6 +55,7 @@ newtype DbTemplate = DbTemplate [DbSqlSegment]
 --         (DbResult Collection ["name", "phone", "address"])
 --         (DbTemplate [DbSqlStatic "select name, phone, address from customer"])
 data DbQuery = DbQuery DbResult DbTemplate
+    deriving (Show)
 
 -- | Represents a properly escaped and quouted placeholder value.
 newtype EscapedText = EscapedText Text

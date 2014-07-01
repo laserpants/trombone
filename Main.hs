@@ -1,43 +1,31 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
-import Control.Applicative
-import Control.Arrow ( second )
-import Control.Exception.Lifted                        ( SomeException, try, fromException )
-import Data.Aeson
-import Data.Maybe                                      ( fromMaybe, mapMaybe )
-import Data.Text                                       ( Text )
-import Database.Persist.Postgresql  hiding ( Filter, Connection, In )
-import Database.PostgreSQL.Simple                      ( SqlError(..) )
-import Data.Conduit
-import Data.Scientific
-import Data.ByteString                                 ( ByteString )
-import Network.HTTP.Types                              
-import Network.Wai                                     ( Application, Middleware, Response, responseLBS )
-import Network.Wai.Internal
-import Network.Wai.Handler.Warp                        ( run )
+import Data.Text                                       ( Text, pack )
+import Network.HTTP.Types.Method
+import Text.ParserCombinators.Parsec
+import Trombone.Db.Execute
 import Trombone.Db.Template
 import Trombone.Dispatch
-import Trombone.Middleware.Amqp     hiding ( Message, Connection )
+import Trombone.Middleware.Amqp                           hiding ( Message, Connection )
 import Trombone.Middleware.Cors
 import Trombone.Middleware.Logger
+import Trombone.Pipeline
+import Trombone.Pipeline.Json
+import Trombone.Route
 import Trombone.RoutePattern
 import Trombone.Router
-import Trombone.Route
-import Trombone.Pipeline
 import Trombone.Server
-import Trombone.Pipeline.Json
-import Trombone.Db.Execute
 import Trombone.Tests.Bootstrap
-
-import qualified Data.Conduit.List                     as CL
-import qualified Data.HashMap.Strict                   as HMS
-import qualified Data.Text                             as Text
-import qualified Data.Vector                           as Vect
-import qualified Data.ByteString                       as BS
-import qualified Data.ByteString.Char8                 as C8
-import qualified Data.ByteString.Lazy.Char8            as L8
-import qualified Text.Show.ByteString                  as Show
+ 
+-- import qualified Data.Conduit.List                     as CL
+-- import qualified Data.HashMap.Strict                   as HMS
+-- import qualified Data.Text                             as Text
+-- import qualified Data.Vector                           as Vect
+-- import qualified Data.ByteString                       as BS
+-- import qualified Data.ByteString.Char8                 as C8
+-- import qualified Data.ByteString.Lazy.Char8            as L8
+-- import qualified Text.Show.ByteString                  as Show
 
 myQuery :: DbQuery
 myQuery = DbQuery (Collection [ "id"
@@ -116,6 +104,9 @@ myQuery5 = DbQuery (LastInsert "order_product" "id")
 main :: IO ()
 main = do
 
+    testParseMethod
+    testParseUri
+
     (_, channel) <- connectAmqp "guest" "guest"
     logger <- buildLogger defaultBufSize "trombone.log"
     systems <- parsePipesFromFile "pipelines.conf"
@@ -142,3 +133,90 @@ main = do
 --            $ \request -> liftM sendJsonResponseOr404 $ 
 --                runReaderT runRoutes (Context pool request myRoutes hmac systems)
 
+
+
+
+-- | Parse a HTTP method.
+method :: GenParser Char st Method
+method = try ( string "GET"    >> return "GET"    )
+     <|> try ( string "POST"   >> return "POST"   )
+     <|> try ( string "PUT"    >> return "PUT"    )
+     <|> try ( string "PATCH"  >> return "PATCH"  )
+     <|>     ( string "DELETE" >> return "DELETE" )
+
+-- | Parse a route pattern.
+uri :: GenParser Char st RoutePattern
+uri = do
+    optional $ char '/'
+    liftM RoutePattern $ sepEndBy1 (variable <|> atom) $ char '/'
+
+-- | Parse a uri variable segment.
+variable :: GenParser Char st RouteSegment
+variable = char ':' >> liftM Variable literal 
+
+-- | Parse a text uri segment.
+atom :: GenParser Char st RouteSegment
+atom = liftM Atom literal
+
+-- | Parse a string consisting strictly of alphanumeric characters, dashes, 
+-- underscores or exclamation marks.
+literal :: GenParser Char st Text
+literal = liftM pack $ many1 (alphaNum <|> oneOf "-_!")
+
+-- | Parse a single line of input, which may be a comment, a blank line, or 
+-- a valid route description.
+line :: GenParser Char st (Maybe Route)
+line = do
+    blankspaces
+    r <- optionMaybe route
+    optional comment
+    eol
+    return r
+
+comment :: GenParser Char st ()
+comment = char '#' >> skipMany (noneOf "\n\r") 
+
+route :: GenParser Char st Route
+route = do
+    m <- method
+    blankspaces
+    u <- uri
+    blankspaces
+    return $ Route m u (RoutePipes "tmp")
+
+arrow :: GenParser Char st String
+arrow = string "~>"
+
+blankspaces :: GenParser Char st ()
+blankspaces = skipMany (char ' ')
+
+eol :: GenParser Char st String
+eol = try (string "\n\r")
+  <|> try (string "\r\n")
+  <|> string "\n"
+  <|> string "\r"
+
+
+
+
+testParseMethod = do
+    let (Right a) = parse method "" "GET"
+    let (Right b) = parse method "" "POST"
+    let (Right c) = parse method "" "PUT"
+    let (Right d) = parse method "" "PATCH"
+    let (Right e) = parse method "" "DELETE"
+    let (Left  f) = parse method "" "PASTA"
+    print (a, b, c, d, e, f)
+
+testParseUri = do
+    let (Right a) = parse uri "" "/a/:bcd/efg/"
+    let (Right b) = parse uri "" "hello"
+    let (Right c) = parse uri "" "/:one/:two"
+    let (Right d) = parse uri "" "abcd/x"
+    let (Right e) = parse uri "" "/x/"
+    let (Right f) = parse uri "" ":what"
+--    let (Left  g) = parse uri "" "ab//def"
+--    let (Left  h) = parse uri "" "@@hello"
+--    let (Left  i) = parse uri "" "/what?"
+    print (a, b, c, d, e, f)
+ 

@@ -33,9 +33,13 @@ stabilize sys@(Pipeline _ _ mq) = do
     liftIO $ print mq
     s@(Pipeline _ _ mq') <- integrate sys 
     if mq == mq'  -- Has the message queue changed?
-        then let o  = combine $ processorMsgs Out mq
-                 rc = returnCode $ HMS.lookup "responseCode" o in
-            return $ RouteResponse rc $ Object o
+        then case processorMsgs Out mq of
+               [] -> return $ errorResponse ErrorServerGeneric 
+                                "Bad pipeline. (Null response)"
+               msgs -> let o = combine msgs
+                        in return $ RouteResponse 
+                            (returnCode $ HMS.lookup "responseCode" o) 
+                            (Object o)
         else stabilize s
   where returnCode (Just (Number n)) = 
             case floatingOrInteger n of
@@ -69,11 +73,9 @@ runProcessor :: Processor -> [Message] -> [Connection] -> Dispatch [Message]
 runProcessor (Processor pid fields mtd uri exp) msgs conns = do
     let o = buildJsonRequest msgs
         v = expand exp o
-    -- temp
-    liftIO $ do
-        print $ "fields: " ++ show fields
-        print $ "obj: " ++ show v
-
+    --liftIO $ do
+    --    print $ "fields : " ++ show fields
+    --    print $ "object : " ++ show v
     case (saturated fields v, fill uri o) of
         (True, Just x) -> do
             r <- lookupRoute mtd x

@@ -12,8 +12,10 @@ import Trombone.RoutePattern
 data RouteAction = RouteSql    DbQuery
                  | RoutePipes  Text
                  | RouteNodeJs Text
+    deriving (Show)
 
 -- | A request route specification: 
 -- viz. (1) the request method (2) a route pattern, and (3) an action.
 data Route = Route Method RoutePattern RouteAction
+    deriving (Show)
  

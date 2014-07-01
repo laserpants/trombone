@@ -19,6 +19,6 @@ executable trombone
   main-is:             Main.hs
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base >=4.5 && <4.6, warp, wai, http-types, aeson, text, persistent, persistent-postgresql, resourcet, monad-logger, conduit, mtl, lifted-base, bytestring, unordered-containers, vector, scientific, time, postgresql-simple, fast-logger, wai-extra, data-default, amqp, MissingH, bytestring-show, network, hashmap, SHA
+  build-depends:       base >=4.5 && <4.6, warp, wai, http-types, aeson, text, persistent, persistent-postgresql, resourcet, monad-logger, conduit, mtl, lifted-base, bytestring, unordered-containers, vector, scientific, time, postgresql-simple, fast-logger, wai-extra, data-default, amqp, MissingH, bytestring-show, network, hashmap, SHA, parsec
   -- hs-source-dirs:      
   default-language:    Haskell2010
