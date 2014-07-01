@@ -73,9 +73,6 @@ runProcessor :: Processor -> [Message] -> [Connection] -> Dispatch [Message]
 runProcessor (Processor pid fields mtd uri exp) msgs conns = do
     let o = buildJsonRequest msgs
         v = expand exp o
-    --liftIO $ do
-    --    print $ "fields : " ++ show fields
-    --    print $ "object : " ++ show v
     case (saturated fields v, fill uri o) of
         (True, Just x) -> do
             r <- lookupRoute mtd x
