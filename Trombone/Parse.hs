@@ -175,17 +175,18 @@ sqlCount = symbolSqlCount >> blankspaces >> result Count
 
 -- | Parse a pipeline route.
 pipelineRoute :: GenParser Char st RouteAction
-pipelineRoute = do
-    symbolPipeline
-    blankspaces
-    liftM (RoutePipes . pack) $ many (noneOf ",\n\r)")
+pipelineRoute = symbolPipeline >> arg RoutePipes
 
 -- | Parse a nodejs route.
 nodeJsRoute :: GenParser Char st RouteAction
-nodeJsRoute = do
-    symbolNodeJs
+nodeJsRoute = symbolNodeJs >> arg RouteNodeJs
+
+arg :: (Text -> RouteAction) -> GenParser Char st RouteAction
+arg t = do
     blankspaces
-    liftM (RouteNodeJs . pack) $ many (noneOf ",\n\r)")
+    r <- many (noneOf ",\n\r) ")
+    blankspaces
+    return $ t $ pack r
 
 mkQuery :: DbResult -> String -> DbQuery
 mkQuery res = DbQuery res . parseDbTemplate . pack 

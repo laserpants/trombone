@@ -109,7 +109,7 @@ main = do
     systems <- parsePipesFromFile "pipelines.conf"
     routes  <- parseRoutesFromFile "routes.conf"
 
-    print systems
+    -- print systems
 
     let conf = DbConf 
             { dbHost = "localhost"
