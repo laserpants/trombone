@@ -1,5 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Trombone.Db.Parse where
+module Trombone.Db.Parse 
+    ( parseDbTemplate
+    , arbitrary
+    ) where
 
 import Data.Text                                       ( Text, pack, unpack )
 import Trombone.Db.Template

@@ -1,4 +1,6 @@
-module Trombone.Db.Reflection where
+module Trombone.Db.Reflection 
+    ( probeTemplate
+    ) where
 
 import Data.Text                                       ( Text, pack, unpack )
 import Database.HsSqlPpp.Ast

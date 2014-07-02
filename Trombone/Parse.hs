@@ -1,5 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Trombone.Parse where
+module Trombone.Parse 
+    ( lines
+    , uri
+    , method
+    , parseRoutesFromFile
+    ) where
 
 import Control.Monad
 import Data.Maybe                                      ( catMaybes )
