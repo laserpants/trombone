@@ -107,6 +107,7 @@ main = do
     (_, channel) <- connectAmqp "guest" "guest"
     logger <- buildLogger defaultBufSize "trombone.log"
     systems <- parsePipesFromFile "pipelines.conf"
+    routes  <- parseRoutesFromFile "routes.conf"
 
     print systems
 
@@ -119,12 +120,6 @@ main = do
             }
 
     let hmac = buildHmacConf [("generic", "14ad0ef86bc392b39bad6009113c2a5a8a1d993a")] True
-
-    r <- readFile "routes.conf"
-    let (Right xs) = parse (many line) "" r
-        routes = catMaybes xs
-
-    print routes
 
     runWithMiddleware 10 3010 conf [cors, logger, amqp channel] routes hmac systems
 

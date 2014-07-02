@@ -2,6 +2,7 @@
 module Trombone.Parse where
 
 import Control.Monad
+import Data.Maybe                                      ( catMaybes )
 import Data.Text                                       ( Text, pack, unpack )
 import Network.HTTP.Types.Method
 import Text.ParserCombinators.Parsec
@@ -233,4 +234,12 @@ eol = try (string "\n\r")
   <|> try (string "\r\n")
   <|> string "\n"
   <|> string "\r"
+
+-- | Read and parse routes from a configuration file.
+parseRoutesFromFile :: FilePath -> IO [Route]
+parseRoutesFromFile file = do
+    r <- readFile file
+    case parse (many line) "" r of
+        Left e   -> error $ show e
+        Right xs -> return $ catMaybes xs
 
