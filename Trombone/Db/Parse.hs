@@ -10,6 +10,7 @@ import Trombone.Db.Template
 import qualified Data.Text                             as Text
 
 tokenize :: Text -> [Text]
+{-# INLINE tokenize #-}
 tokenize = concatMap (Text.splitOn "}}") . Text.splitOn "{{" 
 
 consume :: [Text] -> [DbSqlSegment]

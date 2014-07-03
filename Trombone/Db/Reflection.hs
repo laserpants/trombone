@@ -13,6 +13,7 @@ import Trombone.Db.Template
 import qualified Data.Text                             as Text
 
 probeTemplate :: DbTemplate -> (Maybe Text, Maybe [Text])
+{-# INLINE probeTemplate #-}
 probeTemplate = probe . arbitrary
 
 probe :: String                      -- ^ A "raw" SQL SELECT or INSERT statement
@@ -63,6 +64,7 @@ statmCols _                     = Nothing
 
 -- | Translate underscore_separated_text to camelCaseFormatting.
 uscToCamel :: Text -> Text
+{-# INLINE uscToCamel #-}
 uscToCamel = toCamelCase "_"
 
 toCamelCase :: Text -> Text -> Text
