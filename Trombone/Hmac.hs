@@ -21,7 +21,7 @@ data ClientId = Anonymous | Local | Client Text
 -- attached to the request in the form of an "API-Access" header. A subsequent 
 -- code is computed from the request object using a stored key associated with 
 -- the client application. The result is then compared to the MAC attached to 
--- the request in order to establish the authenticity of the request.
+-- the request in order to establish its authenticity.
 authenticate :: ByteString -> Dispatch (Either RouteResponse ClientId)
 authenticate body = do
     Context{ dispatchRequest = req, dispatchKeys = keys } <- ask
