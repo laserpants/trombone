@@ -4,6 +4,7 @@ module Main where
 import Data.Maybe                                      ( catMaybes )
 import Data.Text                                       ( Text, pack, unpack )
 import Database.HsSqlPpp.Ast
+import Data.ByteString
 import Database.HsSqlPpp.Parser
 import Network.HTTP.Types.Method
 import Text.ParserCombinators.Parsec
@@ -156,3 +157,77 @@ main = do
 -- --    let (Left  i) = parse uri "" "/what?"
 --     print (a, b, c, d, e, f)
 --  
+--
+
+-- | Server startup configuration parameters.
+data Config = Config
+    { configEnHmac     :: Bool
+    -- ^ Enable message integrity authentication (HMAC)?
+    , configEnCors     :: Bool
+    -- ^ Support cross-origin resource sharing?
+    , configEnAmqp     :: Bool
+    -- ^ Whether RabbitMQ messaging middleware should be enabled.
+    , configEnPipes    :: Bool
+    -- ^ Enable request pipelines?
+    , configEnLogging  :: Bool
+    -- ^ Enable logging to file?
+    , configServerPort :: Int
+    -- ^ Port number on which the server should listen.
+    , configLogFile    :: FilePath
+    -- ^ Location of log file.
+    , configLogBufSize :: BufSize
+    -- ^ Application log file size limit.
+    , configAmqpUser   :: ByteString
+    -- ^ RabbitMQ username
+    , configAmqpPass   :: ByteString
+    -- ^ RabbitMQ password
+    , configDbHost     :: ByteString
+    -- ^ Database host
+    , configDbName     :: ByteString
+    -- ^ Database name
+    , configDbUser     :: ByteString
+    -- ^ Database username
+    , configDbPass     :: ByteString
+    -- ^ Database password
+    , configDbPort     :: Int
+    -- ^ Database port
+    , configRoutesFile :: FilePath
+    -- ^ Route pattern configuration file.
+    , configPipesFile :: FilePath
+    -- ^ Pipelines configuration file.
+    , configTrustLocal :: Bool
+    -- ^ Skip HMAC authentication for requests originating from localhost?
+    , configPoolSize   :: Int
+    -- ^ The number of connections to keep in PostgreSQL connection pool.
+    , configShowVer    :: Bool
+    -- ^ Show version number?
+    , configShowHelp   :: Bool
+    -- ^ Show usage info?
+    }
+
+-- | Default values for server startup.
+defaultConfig :: Config
+defaultConfig = Config
+    { configEnHmac     = True
+    , configEnCors     = False
+    , configEnAmqp     = False
+    , configEnPipes    = False
+    , configEnLogging  = False
+    , configServerPort = 3010
+    , configLogFile    = "log/access.log"
+    , configLogBufSize = defaultBufSize
+    , configAmqpUser   = "guest"
+    , configAmqpPass   = "guest"
+    , configDbHost     = "localhost"
+    , configDbName     = "trombone"
+    , configDbUser     = "postgres"
+    , configDbPass     = "postgres"
+    , configDbPort     = 5432
+    , configRoutesFile = "routes.conf"
+    , configPipesFile  = "pipelines.conf"
+    , configTrustLocal = False
+    , configPoolSize   = 10
+    , configShowVer    = False
+    , configShowHelp   = False
+    }
+
