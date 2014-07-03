@@ -1,5 +1,7 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Trombone.Db.Reflection 
     ( probeTemplate
+    , uscToCamel
     ) where
 
 import Data.Text                                       ( Text, pack, unpack )
@@ -8,16 +10,20 @@ import Database.HsSqlPpp.Parser
 import Trombone.Db.Parse
 import Trombone.Db.Template
 
+import qualified Data.Text                             as Text
+
 probeTemplate :: DbTemplate -> (Maybe Text, Maybe [Text])
 probeTemplate = probe . arbitrary
 
 probe :: String                      -- ^ A "raw" SQL SELECT or INSERT statement
       -> (Maybe Text, Maybe [Text])  -- ^ Table name and list of columns
 probe x = case parseStatements "" x of
-            Right [i@Insert{}]         -> (statmTable i, statmCols i)
-            Right [QueryStatement _ s] -> (queryTable s, queryCols s)
+            Right [i@Insert{}]         -> (statmTable i, cc $ statmCols i)
+            Right [QueryStatement _ s] -> (queryTable s, cc $ queryCols s)
             Right _                    -> (Nothing, Nothing)
             Left e                     -> error $ show e
+  where cc Nothing     = Nothing
+        cc (Just cols) = Just $ map uscToCamel cols  -- CamelCase field names
 
 -- | Probe and extract the table name from a standard SELECT query.
 queryTable :: QueryExpr -> Maybe Text
@@ -54,4 +60,15 @@ statmTable _                                   = Nothing
 statmCols :: Statement -> Maybe [Text]
 statmCols ( Insert _ _ xs _ _ ) = Just $ map (pack . ncStr) xs
 statmCols _                     = Nothing
+
+-- | Translate underscore_separated_text to camelCaseFormatting.
+uscToCamel :: Text -> Text
+uscToCamel = toCamelCase "_"
+
+toCamelCase :: Text -> Text -> Text
+toCamelCase _ "" = ""
+toCamelCase d t  = Text.concat $ head pieces:map oneUp (tail pieces)
+  where pieces = Text.splitOn d t
+        oneUp ""   = ""
+        oneUp text = let (a, b) = Text.splitAt 1 text in Text.concat [Text.toUpper a, b]
 
