@@ -15,8 +15,8 @@ import qualified Data.HashMap.Strict                   as HMS
 import qualified Data.Text                             as Text
 import qualified Data.Vector                           as Vect
 
-dispatchMeshAction :: Pipeline -> [(Text, EscapedText)] -> Value -> Dispatch RouteResponse
-dispatchMeshAction (Pipeline pcs conns _) ps obj = do
+dispatchPipeline :: Pipeline -> [(Text, EscapedText)] -> Value -> Dispatch RouteResponse
+dispatchPipeline (Pipeline pcs conns _) ps obj = do
     mq <- initMq
     stabilize (Pipeline pcs conns mq) 
   where initMq = do

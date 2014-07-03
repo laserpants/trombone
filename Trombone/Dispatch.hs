@@ -10,6 +10,7 @@ import Data.Monoid                                     ( mconcat )
 import Data.Text                                       ( Text )
 import Trombone.Dispatch.Core
 import Trombone.Dispatch.Db
+import Trombone.Dispatch.NodeJs
 import Trombone.Dispatch.Pipeline
 import Trombone.Hmac
 
@@ -31,6 +32,6 @@ dispatch route ps = do
                     case lookup pipe table of
                         Nothing -> return $ errorResponse ErrorServerConfiguration
                             $ Text.concat ["Unknown pipeline: '", pipe , "'."]
-                        Just s  -> dispatchMeshAction s ps obj
-                RouteNodeJs js -> undefined
+                        Just s -> dispatchPipeline s ps obj
+                RouteNodeJs js -> dispatchNodeJs js body
 
