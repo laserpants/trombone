@@ -9,6 +9,8 @@ trombone2
 
 ### REST 101
 
+### JSON
+
 ### Server configuration
 
 #### Route format
