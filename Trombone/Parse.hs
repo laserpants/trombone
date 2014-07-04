@@ -7,15 +7,20 @@ module Trombone.Parse
     ) where
 
 import Control.Monad
+import Data.Aeson                                      ( decode )
 import Data.Maybe                                      ( catMaybes )
 import Data.Text                                       ( Text, pack, unpack )
+import Data.Text.Encoding                              ( encodeUtf8 )
 import Network.HTTP.Types.Method
 import Text.ParserCombinators.Parsec
 import Trombone.Db.Parse
 import Trombone.Db.Reflection
 import Trombone.Db.Template
+import Trombone.Response
 import Trombone.Route
 import Trombone.RoutePattern
+
+import qualified Data.ByteString.Lazy.Char8            as L8
 
 -- | Parse a HTTP method.
 method :: GenParser Char st Method
@@ -72,6 +77,7 @@ route = do
 action :: GenParser Char st RouteAction
 action = try sqlRoute
      <|> try pipelineRoute
+     <|> try staticRoute
      <|> nodeJsRoute
 
 -- | A database query route.
@@ -177,6 +183,14 @@ sqlCount = symbolSqlCount >> blankspaces >> result Count
 pipelineRoute :: GenParser Char st RouteAction
 pipelineRoute = symbolPipeline >> arg RoutePipes
 
+-- | Parse a static route.
+staticRoute :: GenParser Char st RouteAction
+staticRoute = symbolStatic >> arg f
+  where f :: Text -> RouteAction
+        f x = case decode $ L8.fromStrict $ encodeUtf8 x of
+                Just v -> RouteStatic $ RouteResponse 200 v
+                Nothing -> error "Failed to parse JSON data in static route pattern."
+
 -- | Parse a nodejs route.
 nodeJsRoute :: GenParser Char st RouteAction
 nodeJsRoute = symbolNodeJs >> arg RouteNodeJs
@@ -229,6 +243,11 @@ symbolNodeJs = skip1 $ string "<js>"
 -- e.g., GET /resource  ||  some-system
 symbolPipeline :: GenParser Char st ()
 symbolPipeline = skip1 $ string "||" 
+
+-- | Symbol to denote a static route.
+-- e.g., GET /resource {..} {"hello":"is it me you're looking for?"}
+symbolStatic :: GenParser Char st ()
+symbolStatic = skip1 $ string "{..}" 
 
 -- | Zero or more blank spaces (unlike spaces, this combinator accepts only
 -- "true" spaces).
