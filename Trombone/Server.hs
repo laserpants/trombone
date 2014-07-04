@@ -18,7 +18,7 @@ import Data.Text                                       ( Text )
 import Data.Text.Encoding                              ( encodeUtf8 )
 import Database.Persist.Postgresql                     ( ConnectionString, PersistValue(..), rawExecute, rawQuery, withPostgresqlConn, withPostgresqlPool )
 import Database.PostgreSQL.Simple                      ( SqlError(..) )
-import Network.Wai                                     ( Middleware )
+import Network.Wai                                     ( Middleware, Response, responseLBS )
 import Network.Wai.Handler.Warp                        ( run )
 import System.Console.GetOpt
 import System.Environment                              ( getArgs )
@@ -85,6 +85,7 @@ runWithArgs = do
             putStrLn $ usageInfo "Usage: trombone [OPTION...]" options
         run cfg = do
             (_,(_,c)) <- flip runStateT (cfg, nullConf) $ do
+                setupLogger
                 setupAmqp
                 setupCors
                 setupPipes
@@ -107,9 +108,9 @@ runWithConf ServerConf
     } = 
     withPostgresqlPool (buildConnectionString dbconf) pconns $ \pool -> do
         putStrLn $ "Trombone listening on port " ++ show port ++ "."
-        run port $ foldr ($) `flip` midware $ \request -> do
+        run port $ foldr ($) `flip` midware $ \request app -> do
             let context = Context pool request routes hconf pipes
-            liftM sendJsonResponseOr404 $ runReaderT runRoutes context
+            runReaderT runRoutes context >>= app . sendJsonResponseOr404 
 
 setupLogger :: StateT (Config, ServerConf) IO ()
 setupLogger = do

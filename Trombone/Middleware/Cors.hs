@@ -3,10 +3,13 @@ module Trombone.Middleware.Cors
     ( cors 
     ) where
 
+import Data.ByteString
 import Data.List.Utils
 import Database.Persist.Types
+import Network.HTTP.Types.Header             ( HeaderName )
 import Network.HTTP.Types.Status
-import Network.Wai                           ( Middleware
+import Network.Wai                           ( Application
+                                             , Middleware
                                              , Request
                                              , Response
                                              , requestHeaders
@@ -14,31 +17,20 @@ import Network.Wai                           ( Middleware
                                              , responseLBS )
 import Network.Wai.Internal
 
-cors :: (Request -> IO Response) -> Request -> IO Response
-cors app req = do
-    let head = requestHeaders req
-        hdrs = responseHeaders (lookup "Origin" head) 
-                               (lookup "Access-Control-Request-Headers" head)
-    case requestMethod req of
-        "OPTIONS" -> 
-            -- Cross-site preflight request
-            return $ responseLBS ok200 hdrs ""
-        _ -> do
-            -- Add 'Access-Control-Allow-Origin' header
-            resp <- app req
-            return $ case lookup "Origin" (requestHeaders req) of
-                Nothing  -> resp
-                Just org -> 
-                    case resp of
-                        ResponseFile s headers fp m -> 
-                                    ResponseFile s (modified headers org) fp m
-                        ResponseBuilder s headers b -> 
-                                    ResponseBuilder s (modified headers org) b
-                        ResponseSource s headers st -> 
-                                    ResponseSource s (modified headers org) st
-                        _ -> resp
-  where modified = flip addToAL "Access-Control-Allow-Origin" 
-        responseHeaders origin headers = 
+cors :: Middleware
+cors app req cback = do
+     let head = requestHeaders req
+         hdrs = responseHeaders (lookup "Origin" head) 
+                                (lookup "Access-Control-Request-Headers" head)
+     case requestMethod req of
+         "OPTIONS" -> -- Cross-site preflight request
+             cback $ responseLBS ok200 hdrs ""
+         _         -> -- Add 'Access-Control-Allow-Origin' header
+             app req $ \resp -> 
+                cback $ case lookup "Origin" (requestHeaders req) of
+                          Nothing  -> resp
+                          Just org -> addHeader org resp
+  where responseHeaders origin headers = 
             let h = case (origin, headers) of
                         (Just origin', Just headers') -> 
                             [ ("Access-Control-Allow-Origin",  origin')
@@ -49,4 +41,18 @@ cors app req = do
                , ("Access-Control-Max-Age",       "1728000")
                , ("Content-Type",                 "text/plain") 
                ] ++ h
+
+addHeader :: ByteString -> Response -> Response
+addHeader org (ResponseFile    s headers fp m) = 
+               ResponseFile    s (modified headers org) fp m
+addHeader org (ResponseBuilder s headers b)    = 
+               ResponseBuilder s (modified headers org) b
+addHeader org (ResponseStream  s headers b)    = 
+               ResponseStream  s (modified headers org) b
+addHeader org (ResponseRaw     s resp)         = 
+               ResponseRaw     s (addHeader org resp)
+
+modified :: [(HeaderName, a)] -> a -> [(HeaderName, a)]
+{-# INLINE modified #-}
+modified = flip addToAL "Access-Control-Allow-Origin" 
 

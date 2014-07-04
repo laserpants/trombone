@@ -35,16 +35,15 @@ connectAmqp user pass = do
 -- | The AMQP middleware is an asynchronous messaging subsystem based on the 
 -- Advanced Message Queuing Protocol. It allows consumer applications to receive
 -- asynchronous notifications when server resources are modified.
-amqp :: Channel -> (Request -> IO Response) -> Request -> IO Response
-amqp chan app req@Request{..} = do
-    resp <- app req
+amqp :: Channel -> Middleware
+amqp chan app req@Request{..} cback = app req $ \resp -> do
     when (effectful && status resp == 200) $
         publishMsg chan "trombone" "api" 
-                newMsg { msgBody         = fromStrict $ encodeUtf8 body
-                       , msgDeliveryMode = Just Persistent }
-    return resp
+            newMsg { msgBody         = fromStrict $ encodeUtf8 body
+                   , msgDeliveryMode = Just Persistent }
+    cback resp
   where effectful = requestMethod `elem` ["POST", "PUT", "DELETE", "PATCH"]
         body = Text.concat $ [decodeUtf8 requestMethod, " "] 
-             ++ intersperse "/" pathInfo
+             ++ intersperse "/" pathInfo 
         status = statusCode . responseStatus 
 
