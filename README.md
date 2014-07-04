@@ -17,6 +17,8 @@ trombone2
 
 #### Response codes
 
+### Authentication
+
 ### Middleware
 
 ### Pipelines
