@@ -35,7 +35,7 @@ method = try ( string "GET"     >> return "GET"    )
 uri :: GenParser Char st RoutePattern
 uri = do
     optional $ char '/'
-    liftM RoutePattern $ sepEndBy1 (variable <|> atom) $ char '/'
+    liftM RoutePattern $ sepEndBy (variable <|> atom) $ char '/'
 
 -- | Parse a uri variable segment.
 variable :: GenParser Char st RouteSegment
@@ -186,11 +186,14 @@ pipelineRoute = symbolPipeline >> arg RoutePipes
 
 -- | Parse a static route.
 staticRoute :: GenParser Char st RouteAction
-staticRoute = symbolStatic >> arg f
-  where f :: Text -> RouteAction
-        f x = case decode $ L8.fromStrict $ encodeUtf8 x of
-                Just v -> RouteStatic $ RouteResponse 200 v
-                Nothing -> error "Failed to parse JSON data in static route pattern."
+staticRoute = do
+    symbolStatic 
+    blankspaces
+    liftM f $ many (noneOf "\n\r") 
+   where f :: String -> RouteAction
+         f x = case decode $ L8.pack x of
+                 Just v -> RouteStatic $ RouteResponse 200 v
+                 Nothing -> error "Failed to parse JSON data in static route pattern."
 
 -- | Parse a nodejs route.
 nodeJsRoute :: GenParser Char st RouteAction
