@@ -7,7 +7,7 @@ trombone2
 
 ### Hello, world!
 
-### REST 101
+### REST
 
 ### JSON
 
