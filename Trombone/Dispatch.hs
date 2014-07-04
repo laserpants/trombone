@@ -21,7 +21,7 @@ dispatch :: RouteAction -> [(Text, EscapedText)] -> Dispatch RouteResponse
 dispatch route ps = do
     Context{ dispatchRequest = r, dispatchMesh = table } <- ask
     --body <- liftIO $ mconcat <$> (requestBody r $$ CL.consume)
-    body <- liftIO $ requestBody r -- as of wai 3.0.0
+    body <- liftIO $ requestBody r -- as of wai-3.0.0
     auth <- authenticate body
     case auth of
         Left resp -> return resp

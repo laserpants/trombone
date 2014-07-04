@@ -58,7 +58,7 @@ run (DbQuery ret tpl) ps =
                   \Arguments missing: "
                 , Text.concat $ intersperse ", " $ map arg e, "." ]
         Right q -> do
-            liftIO $ print q
+            {- liftIO $ print q -}
             res <- try $ getDbResponse ret q 
             return $ case res of   
                        Left  e -> catchDbErrors e -- An SQL exception occured

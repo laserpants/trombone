@@ -20,6 +20,7 @@ import Database.Persist.Postgresql                     ( ConnectionString, Persi
 import Database.PostgreSQL.Simple                      ( SqlError(..) )
 import Network.Wai                                     ( Middleware, Response, responseLBS )
 import Network.Wai.Handler.Warp                        ( run )
+import Network.Wai.Middleware.Static
 import System.Console.GetOpt
 import System.Environment                              ( getArgs )
 import Trombone.Db.Execute
@@ -87,6 +88,7 @@ runWithArgs = do
             (_,(_,c)) <- flip runStateT (cfg, nullConf) $ do
                 setupLogger
                 setupAmqp
+                setupStatic
                 setupCors
                 setupPipes
                 setupDbConf
@@ -125,6 +127,12 @@ setupAmqp = do
     when configEnAmqp $ do
         (_, channel) <- lift $ connectAmqp configAmqpUser configAmqpPass
         put (c, setup{ serverMiddleware = amqp channel:mw })
+
+setupStatic :: StateT (Config, ServerConf) IO ()
+setupStatic = do
+    let static = staticPolicy (noDots >-> addBase "public")
+    modify $ \(c@Config{..}, setup@ServerConf{ serverMiddleware = mw }) -> 
+        (c, setup{ serverMiddleware = static:mw })
 
 setupCors :: StateT (Config, ServerConf) IO ()
 setupCors = do
