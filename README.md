@@ -14,7 +14,7 @@ trombone2
     
 ### Non-SQL route symbols
     
-     ||   A request pipeline.
-    <js>  A nodejs route.
-    {..}  A static route. Followed by a JSON object. 
+     ||   A request pipeline. (Followed by a pipeline name.)
+    <js>  A nodejs route. (Followed by a relative file path to the script.)
+    {..}  A static route. (Followed by a JSON object.) 
 
