@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Trombone.Db.Execute
     ( Sql
     , getCount
@@ -11,9 +12,11 @@ module Trombone.Db.Execute
 import Control.Monad                                   ( liftM )
 import Control.Monad.Logger
 import Control.Monad.Trans.Resource
+import Data.ByteString                                 ( ByteString )
 import Data.Conduit
 import Data.Maybe                                      ( listToMaybe )
-import Data.Text
+import Data.Text                                       ( Text )
+import Data.Text.Encoding                              ( encodeUtf8 )
 import Database.Persist
 import Database.Persist.Postgresql              hiding ( Sql )
 

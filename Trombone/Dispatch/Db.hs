@@ -201,6 +201,7 @@ catchException e =
       Just e1 -> catchDbErrors e1
       Nothing -> error "Uncaught exception."
  
+catchDbErrors :: SqlError -> RouteResponse
 catchDbErrors SqlError{ sqlState = sqls } = 
     case sqls of
       "23503" -> errorResponse ErrorSqlConstraintViolation 

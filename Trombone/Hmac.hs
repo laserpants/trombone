@@ -10,6 +10,7 @@ import Data.Text.Encoding                              ( decodeUtf8 )
 import Network.Socket
 import Trombone.Dispatch.Core
 import Trombone.Response
+import Trombone.Server.Config
 
 import qualified Data.ByteString.Char8       as C8
 import qualified Data.HashMap                as Map

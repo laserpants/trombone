@@ -4,10 +4,7 @@ module Trombone.Dispatch.Core
     , Context(..)
     , Dispatch(..)
     , HmacKeyConf(..)
-    , allowLocal
-    , buildHmacConf
     , filterNot
-    , lookupKey
     , params
     , quoute
     , requestObj
@@ -20,7 +17,6 @@ import Data.Aeson
 import Data.ByteString                                 ( ByteString )
 import Data.ByteString.Lazy                            ( fromStrict )
 import Data.Char                                       ( isAlphaNum )
-import Data.HashMap                                    ( Map )
 import Data.Maybe                                      ( listToMaybe, maybeToList, fromMaybe, mapMaybe )
 import Data.Text                                       ( Text )
 import Database.Persist.Postgresql
@@ -30,23 +26,9 @@ import Trombone.Db.Template                   as Core  ( EscapedText )
 import Trombone.Pipeline
 import Trombone.Response                      as Core
 import Trombone.Route                         as Core
+import Trombone.Server.Config
 
 import qualified Data.Text                    as Text
-import qualified Data.HashMap                 as Map
-
--- | HMAC authentication configuration data.
-data HmacKeyConf = HmacKeyConf 
-    (Map ByteString ByteString)  -- ^ Hash map with client keys
-    Bool                         -- ^ Bypass authentication for localhost?
-
-buildHmacConf :: [(ByteString, ByteString)] -> Bool -> Maybe HmacKeyConf
-buildHmacConf keys = Just . HmacKeyConf (Map.fromList keys) 
-
-lookupKey :: ByteString -> HmacKeyConf -> Maybe ByteString
-lookupKey key (HmacKeyConf hm _) = Map.lookup key hm
-
-allowLocal :: HmacKeyConf -> Bool
-allowLocal (HmacKeyConf _ a) = a
 
 -- | Various state required to process a request.
 data Context = Context

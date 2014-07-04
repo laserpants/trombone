@@ -34,4 +34,5 @@ dispatch route ps = do
                             $ Text.concat ["Unknown pipeline: '", pipe , "'."]
                         Just s -> dispatchPipeline s ps obj
                 RouteNodeJs js -> dispatchNodeJs js body
+                RouteStatic resp -> return resp
 

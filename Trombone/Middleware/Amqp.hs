@@ -23,7 +23,7 @@ import qualified Data.Text                    as Text
 import Prelude                                hiding ( filter )
 
 -- | Connect to the AMQP service. Called prior to starting the server in order
--- to obtain the connection-channel pair.
+-- to acquire the connection-channel pair.
 connectAmqp :: Text -> Text -> IO (Connection, Channel)
 connectAmqp user pass = do
     conn <- openConnection "127.0.0.1" "/" user pass

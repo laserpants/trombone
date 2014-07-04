@@ -83,6 +83,7 @@ runProcessor (Processor pid fields mtd uri exp) msgs conns = do
                     return $ broadcast conns r
                 Just (Route _ _ (RoutePipes  _), ps) -> return [] -- @todo
                 Just (Route _ _ (RouteNodeJs _), ps) -> return [] -- @todo
+                Just (Route _ _ (RouteStatic _), ps) -> return [] -- @todo
         _ -> return msgs
 
 fill :: RoutePattern -> Object -> Maybe Text
