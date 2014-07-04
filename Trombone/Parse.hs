@@ -22,13 +22,14 @@ import Trombone.RoutePattern
 
 import qualified Data.ByteString.Lazy.Char8            as L8
 
--- | Parse a HTTP method.
+-- | Parse an HTTP method.
 method :: GenParser Char st Method
-method = try ( string "GET"    >> return "GET"    )
-     <|> try ( string "POST"   >> return "POST"   )
-     <|> try ( string "PUT"    >> return "PUT"    )
-     <|> try ( string "PATCH"  >> return "PATCH"  )
-     <|>     ( string "DELETE" >> return "DELETE" )
+method = try ( string "GET"     >> return "GET"    )
+     <|> try ( string "POST"    >> return "POST"   )
+     <|> try ( string "PUT"     >> return "PUT"    )
+     <|> try ( string "PATCH"   >> return "PATCH"  )
+     <|> try ( string "DELETE"  >> return "DELETE" )
+     <|>     ( string "OPTIONS" >> return "OPTIONS" )
 
 -- | Parse a route pattern.
 uri :: GenParser Char st RoutePattern

@@ -22,10 +22,10 @@ cors app req cback = do
      let head = requestHeaders req
          hdrs = responseHeaders (lookup "Origin" head) 
                                 (lookup "Access-Control-Request-Headers" head)
-     case requestMethod req of
-         "OPTIONS" -> -- Cross-site preflight request
+     case (requestMethod req, hasKeyAL "Access-Control-Request-Method" head) of
+         ("OPTIONS", True) -> -- Cross-site preflight request
              cback $ responseLBS ok200 hdrs ""
-         _         -> -- Add 'Access-Control-Allow-Origin' header
+         _ -> -- Add 'Access-Control-Allow-Origin' header
              app req $ \resp -> 
                 cback $ case lookup "Origin" (requestHeaders req) of
                           Nothing  -> resp
