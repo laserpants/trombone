@@ -8,7 +8,7 @@ trombone2
      --   An SQL statement which does not return a result. 
      >>   A query of a type that returns a collection.
      ~>   A query that returns a single item.
-     ->   Same as ~> except that a 'Ok' status message is added to the result.
+     ->   Same as ~> except that an 'Ok' status message is added to the result.
      <>   An INSERT statement that should return a 'last insert id'. 
      ><   A statement that returns a row count result.
     
