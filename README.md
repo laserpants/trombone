@@ -20,8 +20,8 @@ trombone2
 ##### Database routes
 
 | Symbol | Explanation
---------------------
-| a | b
+| ------ | -----------
+| a      | b
 
 ##### Non-SQL routes
 
