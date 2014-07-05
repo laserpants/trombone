@@ -61,6 +61,16 @@ A possible use case for static routes is to provide documentation of a web servi
 
 ### Command line flags
 
+| Flag |           | Description
+| ---- | --------- | --------------------------------------------
+| -V   | --version | display version number and exit
+
+#### Default values
+
+| Option | Default value  
+| ------ | --------- 
+| x      | todo
+
 ### Conventions
 
 #### PATCH is your friend
