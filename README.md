@@ -34,10 +34,10 @@ Comments begin with a single octothorpe (#) character and may appear at the end 
 
 ###### Examples
 
-    GET photo/:id   >>  select * from photo   # retreive all photos
+    GET photo       >>  select * from photo   # Retreive all photos.
 
-    # return a specific photo
-    GET photo   >>  select * from photo where id = {{:id}}
+    # Return a specific photo.
+    GET photo/:id   ->  select * from photo where id = {{:id}}
     
 ##### BNF grammar
 
