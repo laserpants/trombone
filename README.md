@@ -61,15 +61,21 @@ A possible use case for static routes is to provide documentation of a web servi
 
 ### Command line flags
 
-| Flag |             | Description
-| ---- | ----------- | --------------------------------------------
-| `-V` | `--version` | display version number and exit
+| Flag | Long option      | Description
+| ---- | ---------------- | --------------------------------------------
+| `-V` | `--version`      | display version number and exit
+| `-?` | `--help`         | 
+| `-x` | `--disable-hmac` | 
+
+**todo**
 
 #### Default values
 
 | Option | Default value  
 | ------ | --------- 
-| x      | todo
+| x      | 
+
+**todo**
 
 ### Conventions
 
