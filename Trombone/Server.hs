@@ -61,11 +61,12 @@ data ServerConf = ServerConf
     , serverRoutes     :: [Route]            -- ^ Application routes
     , serverHmacConf   :: Maybe HmacKeyConf  -- ^ HMAC configuration
     , serverPipelines  :: [(Text, Pipeline)] -- ^ Pipeline map
+    , serverVerbose    :: Bool               -- ^ Log output to stdout
     }
 
 nullConf :: ServerConf
 {-# INLINE nullConf #-}
-nullConf = ServerConf 0 0 (DbConf "" 0 "" "" "") [] [] Nothing []
+nullConf = ServerConf 0 0 (DbConf "" 0 "" "" "") [] [] Nothing [] False
 
 buildConnectionString :: DbConf -> ConnectionString
 buildConnectionString DbConf{..} =
@@ -95,8 +96,9 @@ runWithArgs = do
                 setupDbConf
                 setupHmac
                 setupRoutes 
-            runWithConf $ c { serverPoolSize = configPoolSize cfg
-                            , serverPort     = configServerPort cfg }
+            runWithConf $ c { serverPoolSize = configPoolSize   cfg
+                            , serverPort     = configServerPort cfg 
+                            , serverVerbose  = configVerbose    cfg }
 
 -- | Run the server with provided configuration.
 runWithConf :: ServerConf -> IO ()
@@ -108,11 +110,12 @@ runWithConf ServerConf
     , serverRoutes     = routes
     , serverHmacConf   = hconf
     , serverPipelines  = pipes 
+    , serverVerbose    = loud
     } = 
     withPostgresqlPool (buildConnectionString dbconf) pconns $ \pool -> do
         putStrLn $ "Trombone listening on port " ++ show port ++ "."
         run port $ foldr ($) `flip` midware $ \request app -> do
-            let context = Context pool request routes hconf pipes
+            let context = Context pool request routes hconf pipes loud
             runReaderT runRoutes context >>= app . sendJsonResponseOr404 
 
 type ServerState = StateT (Config, ServerConf) IO 

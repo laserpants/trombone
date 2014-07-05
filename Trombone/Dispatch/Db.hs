@@ -49,7 +49,8 @@ dispatchDbAction q ps (Object o) =
 dispatchDbAction q ps _ = run q ps
 
 run :: DbQuery -> [(Text, EscapedText)] -> Dispatch RouteResponse
-run (DbQuery ret tpl) ps = 
+run (DbQuery ret tpl) ps = do
+    Context pool _ _ _ _ loud <- ask
     case instantiate tpl ps of
         Left e -> 
             -- 400 Bad request: Request parameters did not match template
@@ -58,7 +59,7 @@ run (DbQuery ret tpl) ps =
                   \Arguments missing: "
                 , Text.concat $ intersperse ", " $ map arg e, "." ]
         Right q -> do
-            {- liftIO $ print q -}
+            when loud $ liftIO $ print q  -- Verbose output
             res <- try $ getDbResponse ret q 
             return $ case res of   
                        Left  e -> catchDbErrors e -- An SQL exception occured

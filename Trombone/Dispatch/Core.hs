@@ -37,6 +37,7 @@ data Context = Context
     , dispatchRoutes  :: [Route]            -- ^ Application routes
     , dispatchKeys    :: Maybe HmacKeyConf  -- ^ HMAC authentication keys
     , dispatchMesh    :: [(Text, Pipeline)] -- ^ Mesh lookup table
+    , dispatchVerbose :: Bool               -- ^ Server output?
     }
 
 -- | Monad transformer in which requests are dispatched.
@@ -48,6 +49,7 @@ requestObj = fromMaybe Null . decode . fromStrict
 
 -- | Enclose a text value in single quoutes.
 quoute :: Text -> Text
+{-# INLINE quoute #-}
 quoute = flip Text.snoc '\'' . Text.cons '\'' 
 
 filterNot :: (a -> Bool) -> [a] -> [a]

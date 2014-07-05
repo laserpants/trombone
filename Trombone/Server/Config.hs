@@ -62,6 +62,8 @@ data Config = Config
     -- ^ Skip HMAC authentication for requests originating from localhost?
     , configPoolSize   :: Int
     -- ^ The number of connections to keep in PostgreSQL connection pool.
+    , configVerbose    :: Bool
+    -- ^ Print debug information to stdout.
     , configShowVer    :: Bool
     -- ^ Show version number?
     , configShowHelp   :: Bool
@@ -90,6 +92,7 @@ defaultConfig = Config
     , configPipesFile  = "pipelines.conf"
     , configTrustLocal = False
     , configPoolSize   = 10
+    , configVerbose    = False
     , configShowVer    = False
     , configShowHelp   = False
     }
@@ -160,7 +163,10 @@ options =
     , Option [] ["pool-size"]
       (ReqArg (\p opts -> opts { configPoolSize = read p }) "SIZE")
       "number of connections to keep in PostgreSQL connection pool"
-    ]
+    , Option [] ["verbose"]
+      (NoArg $ \opts -> opts { configVerbose = True })
+      "print various debug information to stdout"
+     ]
   where amqpOpts Nothing  opts = amqpOpts (Just "guest:guest") opts
         amqpOpts (Just d) opts = let [u, p] = pair $ split ":" d
                                  in  opts { configEnAmqp   = True
