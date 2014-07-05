@@ -103,6 +103,8 @@ A typical response will then be:
 
 > The DELETE method is idempotent. This implies that the server must return response code 200 (OK) even if the server deleted the resource in a previous request. (http://shop.oreilly.com/product/9780596801694.do)
 
+![equation](http://latex.codecogs.com/gif.latex?1%2Bsin%28mc%5E2%29%0D%0A)
+
 ### Authentication
 
 ### Middleware
