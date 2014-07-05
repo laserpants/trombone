@@ -72,7 +72,7 @@ A possible use case for static routes is to provide documentation of a web servi
 
 > This method allows the client to determine the options and/or requirements associated with a resource, or the capabilities of a server, without implying a resource action or initiating a resource retrieval.
 
-Static JSON response routes support a special `<Allow`> keyword which can be used for this purpose: 
+Static JSON response routes support a special `<Allow>` keyword which can be used for this purpose: 
 
     OPTIONS /photo  {..}  {"<Allow>":"GET,POST,OPTIONS","GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
 
