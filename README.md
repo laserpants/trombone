@@ -88,6 +88,12 @@ A typical response will then be:
 
 ### Middleware
 
+#### AMQP
+
+#### CORS
+
+#### Logging
+
 ### Pipelines
 
 ### Node.js integration
