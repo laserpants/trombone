@@ -7,6 +7,12 @@ Trombone is a JSON-server that facilitates RESTful single-point data access. Usi
 
 ### Hello, world!
 
+A Trombone configuration file consists of a number of route patterns. The format of a route is described by the following high-level grammar. 
+
+    <route> ::= <method> <uri> <symbol> <action>
+
+When a request is dispatched, the server will look through the list of routes to try to find a match, based on the request's uri components and the HTTP method. 
+
 `routes.conf:`
 
     GET    photo              >>  select * from photo order by id
@@ -24,6 +30,15 @@ Trombone is a JSON-server that facilitates RESTful single-point data access. Usi
 
 ##### Comments
 
+Comments begin with a single octothorpe (#) character and may appear at the end of a route definition, or span across an entire line. 
+
+###### Examples
+
+    GET photo/:id   >>  select * from photo   # retreive all photos
+
+    # return a specific photo
+    GET photo   >>  select * from photo where id = {{:id}}
+    
 ##### BNF grammar
 
 #### Types of routes
