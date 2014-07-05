@@ -37,7 +37,7 @@ stabilize sys@(Pipeline _ _ mq) = do
                [] -> return $ errorResponse ErrorServerGeneric 
                                 "Bad pipeline. (Null response)"
                msgs -> let o = combine msgs
-                        in return $ RouteResponse 
+                        in return $ RouteResponse []
                             (returnCode $ HMS.lookup "responseCode" o) 
                             (Object o)
         else stabilize s
@@ -79,7 +79,7 @@ runProcessor (Processor pid fields mtd uri exp) msgs conns = do
             case r of
                 Nothing -> return []
                 Just (Route _ _ (RouteSql    q), ps) -> do
-                    RouteResponse _ r <- dispatchDbAction q ps v
+                    RouteResponse _ _ r <- dispatchDbAction q ps v
                     return $ broadcast conns r
                 Just (Route _ _ (RoutePipes  _), ps) -> return [] -- @todo
                 Just (Route _ _ (RouteNodeJs _), ps) -> return [] -- @todo

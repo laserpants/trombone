@@ -5,7 +5,7 @@ trombone2
 
 ### Introduction
 
-Trombone is a JSON-server that facilitates RESTful single-point data access and uses PostgreSQL as storage backend. Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using standard HTTP response codes.
+Trombone is a JSON-server that facilitates RESTful single-point data access, using PostgreSQL as storage backend. Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using standard HTTP response codes.
 
 ### Hello, world!
 
@@ -32,14 +32,14 @@ Trombone is a JSON-server that facilitates RESTful single-point data access and 
 
 ##### Database routes
 
-| Symbol | Explanation
-| ------ | -----------
-| &dash;&dash; | An SQL statement which does not return a result. 
-| >>     | A query of a type that returns a collection.
-| ~>     | A query that returns a single item.
-| ->     | Same as `~>` except that an 'Ok' status message is added to the result.
-| <>     | An `INSERT` statement that should return a 'last insert id'.
-| ><     | A statement that returns a row count result.
+| Symbol   | Explanation
+| -------- | -----------
+| `--`     | An SQL statement which does not return any result. 
+| `>>`     | A query of a type that returns a collection.
+| `~>`     | A query that returns a single item.
+| `->`     | Same as `~>` except that an 'Ok' status message is added to the result.
+| `<>`     | An `INSERT` statement that should return a 'last insert id'.
+| `><`     | A statement that returns a row count result.
 
 ##### Non-SQL routes
 

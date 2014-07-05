@@ -193,7 +193,7 @@ staticRoute = do
     liftM f $ many (noneOf "\n\r") 
    where f :: String -> RouteAction
          f x = case decode $ L8.pack x of
-                 Just v -> RouteStatic $ RouteResponse 200 v
+                 Just v -> RouteStatic $ RouteResponse [] 200 v
                  Nothing -> error "Failed to parse JSON data in static route pattern."
 
 -- | Parse a nodejs route.

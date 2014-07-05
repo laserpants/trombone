@@ -12,6 +12,7 @@ import Trombone.Dispatch.Core
 import Trombone.Dispatch.Db
 import Trombone.Dispatch.NodeJs
 import Trombone.Dispatch.Pipeline
+import Trombone.Dispatch.Static
 import Trombone.Hmac
 
 import qualified Data.Conduit.List                     as CL
@@ -34,5 +35,5 @@ dispatch route ps = do
                             $ Text.concat ["Unknown pipeline: '", pipe , "'."]
                         Just s -> dispatchPipeline s ps obj
                 RouteNodeJs js -> dispatchNodeJs js body
-                RouteStatic resp -> return resp
+                RouteStatic resp -> dispatchStatic resp
 

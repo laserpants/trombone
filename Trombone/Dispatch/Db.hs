@@ -38,12 +38,12 @@ dispatchDbAction :: DbQuery
 dispatchDbAction q ps (Array a) = 
     -- Run a sequence of actions and collect the results
     liftM resp $ mapM (dispatchDbAction q ps) (Vect.toList a)
-  where val (RouteResponse _ x) = x
+  where val (RouteResponse _ _ x) = x
         -- Using response code 202 is to indicate that the result
         -- of each individual request must be considered separately
         -- and that no claim is made as to the state of success 
         -- w.r.t. these.
-        resp = RouteResponse 202 . Array . Vect.fromList . map val
+        resp = RouteResponse [] 202 . Array . Vect.fromList . map val
 dispatchDbAction q ps (Object o) = 
     run q $ ps ++ map (second escVal) (HMS.toList o)
 dispatchDbAction q ps _ = run q ps
@@ -87,18 +87,18 @@ getDbResponse (Item ns) q = do
               Nothing -> return $ errorResponse ErrorServerConfiguration
                   "Invalid query template: The number of return \
                   \parameters is different from actual result."
-              Just ok -> return $ RouteResponse 200 ok
+              Just ok -> return $ RouteResponse [] 200 ok
 -- Ok response with default message and status properties
 getDbResponse (ItemOk ns) q = do 
     r <- getDbResponse (Item ns) q
     case r of
-        RouteResponse 200 (Object o) -> return $ RouteResponse 200 $ f o
-        _                            -> return r
+        RouteResponse hs 200 (Object o) -> return $ RouteResponse hs 200 $ f o
+        _                               -> return r
   where f o = Object $ HMS.union o $ HMS.fromList [ ("message", "Ok.")
                                                   , ("status", Bool True) ]
 -- Respond with a collection.
 getDbResponse (Collection ns) q = liftM f $ runDbDispatch (getResult q)
-  where f = RouteResponse 200 . Array . fromList . mapMaybe (row ns)
+  where f = RouteResponse [] 200 . Array . fromList . mapMaybe (row ns)
 -- Respond with "last insert id"
 getDbResponse (LastInsert table seq) q = do
     runDbDispatch (noResult q) 
