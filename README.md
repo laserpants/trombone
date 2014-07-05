@@ -34,7 +34,7 @@ trombone2
 
 | Symbol | Explanation
 | ------ | -----------
-| ` || ` | A request pipeline. (Followed by a pipeline name.)
+|        | A request pipeline. (Followed by a pipeline name.)
 | `<js>` | A nodejs route. (Followed by a relative file path to the script.)
 | `{..}` | A static route. (Followed by a JSON object.) 
   
