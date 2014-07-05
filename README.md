@@ -17,6 +17,14 @@ trombone2
 
 #### Types of routes
 
+##### Database routes
+
+| Symbol | Explanation
+--------------------
+| a | b
+
+##### Non-SQL routes
+
 #### Response codes
 
 ### Authentication
