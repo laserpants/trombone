@@ -3,7 +3,7 @@ Trombone
 
 ### Introduction
 
-Trombone is a JSON-server that facilitates RESTful single-point data access. Using PostgreSQL as storage backend, its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using standard HTTP response codes and error conventions.
+Trombone is a JSON-server that facilitates RESTful single-point data access. Using PostgreSQL as storage backend, its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using the standard HTTP response codes and error conventions.
 
 A Trombone configuration file consists of a number of route patterns. The format of a route is described by the following high-level grammar. 
 
@@ -79,8 +79,24 @@ A possible use case for static routes is to provide documentation as part of a w
 | Flag | Long option      | Description
 | ---- | ---------------- | --------------------------------------------
 | `-V` | `--version`      | display version number and exit
-| `-?` | `--help`         | 
-| `-x` | `--disable-hmac` | 
+| `-?` | `--help`         | display this help and exit
+| `-x` | `--disable-hmac` | disable message integrity authentication (HMAC)
+| `-C` | `--cors`         | enable support for cross-origin resource sharing
+| `-A[USER:PASS]` | `--amqp[=USER:PASS]` | enable RabbitMQ messaging middleware [username:password]
+| `-i[FILE]` | `--pipelines[=FILE]` | enable request pipelines [configuration file]
+| `-s PORT`  | `--port=PORT`        | server port
+| `-l[FILE]` | `--access-log[=FILE]` | enable logging to file [log file]
+|            | `--size=SIZE`         | log file size
+| `-h HOST`  | `--db-host=HOST`      | database host
+| `-d DB`    | `--db-name=DB`       | database name
+| `-u USER`  | `--db-user=USER`     | database user
+| `-p PASS`  | `--db-password=PASS` | database password
+| `-P PORT`  | `--db-port=PORT`     | database port
+| `-r FILE`  | `--routes-file=FILE` | route pattern configuration file
+| `-t`       | `--trust-localhost`  | skip HMAC authentication for requests from localhost
+|            | `--pool-size=SIZE`   | number of connections to keep in PostgreSQL connection pool
+|            | `--verbose`          | print various debug information to stdout
+
 
 **todo**
 
@@ -128,7 +144,7 @@ A typical response will then be:
 
 #### AMQP
 
-The AMQP component integrates Trombone with RabbitMQ --- a messaging system based on the Advanced Message Queuing Protocol. The AMQP middleware allows consumer applications to receive asynchronous notifications when server resources are modified.
+The AMQP component integrates Trombone with RabbitMQ — a messaging system based on the Advanced Message Queuing Protocol. The AMQP middleware allows consumer applications to receive asynchronous notifications when server resources are modified.
 
 #### CORS
 
