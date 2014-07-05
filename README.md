@@ -1,11 +1,9 @@
-trombone2
-=========
-
--- under construction --
+Trombone
+========
 
 ### Introduction
 
-Trombone is a JSON-server that facilitates RESTful single-point data access, using PostgreSQL as storage backend. Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using standard HTTP response codes.
+Trombone is a JSON-server that facilitates RESTful single-point data access. Using PostgreSQL as storage backend, its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using standard HTTP response codes.
 
 ### Hello, world!
 
@@ -58,10 +56,6 @@ Trombone is a JSON-server that facilitates RESTful single-point data access, usi
 A possible use case for static routes is to provide documentation of a web service, using the `OPTIONS` HTTP method.
 
     OPTIONS /photo  {..}  {"GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
-
-**todo**: The "Allow" HTTP header should be set when responding to OPTIONS requests. Perhaps "extract" this value from the JSON object, e.g.:
-
-    OPTIONS /photo  {..}  {"<Allow>":"GET,POST,OPTIONS","GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
   
 #### Response codes
 
@@ -71,7 +65,24 @@ A possible use case for static routes is to provide documentation of a web servi
 
 #### PATCH is your friend
 
+> The HTTP method PATCH can be used to update partial resources. For instance, when you only need to update one field of the resource, PUTting a complete resource representation might be cumbersome and utilizes more bandwidth. See more at: http://restcookbook.com/HTTP%20Methods/patch/#sthash.14B7n34z.dpuf
+
+
 #### OPTIONS could be your friend
+
+> This method allows the client to determine the options and/or requirements associated with a resource, or the capabilities of a server, without implying a resource action or initiating a resource retrieval.
+
+Static JSON response routes support a special `<Allow`> keyword which can be used for this purpose: 
+
+    OPTIONS /photo  {..}  {"<Allow>":"GET,POST,OPTIONS","GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
+
+A typical response will then be:
+
+    < HTTP/1.1 200
+    < Allow: 'GET,POST,OPTIONS'
+    < Content-Type: application/json; charset=utf-8
+    {"GET":{"description":"Retreive a list of all customers."},"POST":{"description":"Create a new customer."}}
+
 
 ### Authentication
 
