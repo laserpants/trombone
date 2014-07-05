@@ -99,6 +99,9 @@ A typical response will then be:
     < Content-Type: application/json; charset=utf-8
     {"GET":{"description":"Retreive a list of all customers."},"POST":{"description":"Create a new customer."}}
 
+#### DELETE non-existing resource is 200 OK
+
+> The DELETE method is idempotent. This implies that the server must return response code 200 (OK) even if the server deleted the resource in a previous request. (http://shop.oreilly.com/product/9780596801694.do)
 
 ### Authentication
 
