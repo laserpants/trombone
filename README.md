@@ -105,9 +105,7 @@ A typical response will then be:
 
 ##### Idempotency in a nutshell
 
-Let *f* be an endofunction on a set *S*. Then *f* is idempotent, iff,
-
-![equation](http://latex.codecogs.com/gif.latex?%5Cforall%5C+x%5C+%5Cin%5C+S%5C+%3A%5C+f%28f%28x%29%29%3Df%28x%29.)
+Let *f* be an endofunction on a set *S*. Then *f* is idempotent, iff, ![equation](http://latex.codecogs.com/gif.latex?%5Cforall%5C+x%5C+%5Cin%5C+S%5C+%3A%5C+f%28f%28x%29%29%3Df%28x%29.)
 
 ### Authentication
 
