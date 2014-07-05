@@ -5,8 +5,6 @@ Trombone
 
 Trombone is a JSON-server that facilitates RESTful single-point data access. Using PostgreSQL as storage backend, its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using standard HTTP response codes and error conventions.
 
-### Hello, world!
-
 A Trombone configuration file consists of a number of route patterns. The format of a route is described by the following high-level grammar. 
 
     <route> ::= <method> <uri> <symbol> <action>
