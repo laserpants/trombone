@@ -11,6 +11,8 @@ A Trombone configuration file consists of a number of route patterns. The format
 
 When a request is dispatched, the server will look through the list of routes to try to find a match, based on the request's uri components and the HTTP method. 
 
+### Hello, world!
+
 `routes.conf:`
 
     GET    photo              >>  select * from photo order by id
