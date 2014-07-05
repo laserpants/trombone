@@ -68,7 +68,7 @@ Comments begin with a single octothorpe (#) character and may appear at the end 
 
 ##### Static routes
 
-A possible use case for static routes is to provide documentation of a web service, using the `OPTIONS` HTTP method.
+A possible use case for static routes is to provide documentation as part of a web service, using the `OPTIONS` HTTP method.
 
     OPTIONS /photo  {..}  {"GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
   
