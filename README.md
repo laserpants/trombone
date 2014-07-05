@@ -128,6 +128,8 @@ A typical response will then be:
 
 #### AMQP
 
+The AMQP component integrates Trombone with RabbitMQ --- a messaging system based on the Advanced Message Queuing Protocol. The AMQP middleware allows consumer applications to receive asynchronous notifications when server resources are modified.
+
 #### CORS
 
 #### Logging
