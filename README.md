@@ -21,9 +21,14 @@ trombone2
 
 | Symbol | Explanation
 | ------ | -----------
+| `a`    | b
 | a      | b
 
 ##### Non-SQL routes
+
+| Symbol | Explanation
+| ------ | -----------
+| a      | b
 
 #### Response codes
 
