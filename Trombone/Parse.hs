@@ -155,8 +155,9 @@ inspect res = do
     q <- many $ noneOf "\n\r"
     let tpl = parseDbTemplate $ pack q
     case probeTemplate tpl of
-        (_, Just cs) -> resultFromTemplate (res cs) tpl
-        _            -> error 
+        (Just tbl, Just ["*"]) -> resultFromTemplate (res ["*", tbl]) tpl
+        (_, Just cs)           -> resultFromTemplate (res cs) tpl
+        _                      -> error 
                 "Unable to extract column names from SQL statement. \
                 \Add parameter hints to configuration."
 

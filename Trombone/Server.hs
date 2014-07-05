@@ -14,7 +14,7 @@ import Control.Exception.Lifted                        ( SomeException, try, fro
 import Control.Monad
 import Data.ByteString                                 ( ByteString )
 import Data.Conduit
-import Data.Text                                       ( Text )
+import Data.Text                                       ( Text, replace )
 import Data.Text.Encoding                              ( encodeUtf8 )
 import Database.Persist.Postgresql                     ( ConnectionString, PersistValue(..), rawExecute, rawQuery, withPostgresqlConn, withPostgresqlPool )
 import Database.PostgreSQL.Simple                      ( SqlError(..) )
@@ -24,6 +24,7 @@ import Network.Wai.Middleware.Static
 import System.Console.GetOpt
 import System.Environment                              ( getArgs )
 import Trombone.Db.Execute
+import Trombone.Db.Reflection                          ( uscToCamel )
 import Trombone.Dispatch.Core
 import Trombone.Middleware.Amqp
 import Trombone.Middleware.Cors
@@ -114,39 +115,41 @@ runWithConf ServerConf
             let context = Context pool request routes hconf pipes
             runReaderT runRoutes context >>= app . sendJsonResponseOr404 
 
-setupLogger :: StateT (Config, ServerConf) IO ()
+type ServerState = StateT (Config, ServerConf) IO 
+
+setupLogger :: ServerState ()
 setupLogger = do
     (c@Config{..}, setup@ServerConf{ serverMiddleware = mw }) <- get
     when configEnLogging $ do
         logger <- lift $ buildLogger configLogBufSize configLogFile
         put (c, setup{ serverMiddleware = logger:mw })
 
-setupAmqp :: StateT (Config, ServerConf) IO ()
+setupAmqp :: ServerState ()
 setupAmqp = do
     (c@Config{..}, setup@ServerConf{ serverMiddleware = mw }) <- get
     when configEnAmqp $ do
         (_, channel) <- lift $ connectAmqp configAmqpUser configAmqpPass
         put (c, setup{ serverMiddleware = amqp channel:mw })
 
-setupStatic :: StateT (Config, ServerConf) IO ()
+setupStatic :: ServerState ()
 setupStatic = do
     let static = staticPolicy (noDots >-> addBase "public")
     modify $ \(c@Config{..}, setup@ServerConf{ serverMiddleware = mw }) -> 
         (c, setup{ serverMiddleware = static:mw })
 
-setupCors :: StateT (Config, ServerConf) IO ()
+setupCors :: ServerState ()
 setupCors = do
     (c@Config{..}, setup@ServerConf{ serverMiddleware = mw }) <- get
     when configEnCors $ put (c, setup{ serverMiddleware = cors:mw })
 
-setupPipes :: StateT (Config, ServerConf) IO ()
+setupPipes :: ServerState ()
 setupPipes = do
     (c@Config{..}, setup) <- get
     when configEnPipes $ do
         pipes <- lift $ parsePipesFromFile configPipesFile
         put (c, setup{ serverPipelines = pipes })
 
-setupDbConf :: StateT (Config, ServerConf) IO ()
+setupDbConf :: ServerState ()
 setupDbConf = modify $ \(c@Config{..}, setup) -> 
     let dbconf = DbConf { dbHost = configDbHost
                         , dbPort = configDbPort
@@ -155,36 +158,62 @@ setupDbConf = modify $ \(c@Config{..}, setup) ->
                         , dbName = configDbName } 
     in (c, setup{ serverDbConf = dbconf })
 
-setupHmac :: StateT (Config, ServerConf) IO ()
+setupHmac :: ServerState ()
 setupHmac = do
     (c@Config{..}, setup@ServerConf{..}) <- get
     when configEnHmac $ do
-        hc <- lift $ readKeysFromDb $ buildConnectionString serverDbConf
+        hc <- readKeysFromDb
         put (c, setup{ serverHmacConf = buildHmacConf hc configTrustLocal })
 
-readKeysFromDb :: ConnectionString -> IO [(ByteString, ByteString)]
-readKeysFromDb conn = do
-    res <- try $ withPostgresqlConn conn $ \c -> 
-        flip runDbConn c $ do
-            rawExecute "CREATE TABLE IF NOT EXISTS trombone_keys \
+readKeysFromDb :: ServerState [(ByteString, ByteString)]
+readKeysFromDb = liftM (concatMap f) (runStatement q)
+  where q = rawExecute "CREATE TABLE IF NOT EXISTS trombone_keys \
                        \(id serial PRIMARY KEY, \
                        \client character varying(40), \
                        \key character varying(40));" []
-            res <- rawQuery "SELECT client, key FROM \
-                           \trombone_keys" [] $$ CL.consume
-            return $ concatMap f res
-    case res :: Either SqlError [(ByteString, ByteString)] of
-        Left  e -> error $ "SQL error: " ++ C8.unpack (sqlErrorMsg e)
-        Right r -> return r
-  where f [PersistText c, PersistText k] = [(encodeUtf8 c, encodeUtf8 k)]
+            >> rawQuery "SELECT client, key FROM \
+                       \trombone_keys;" [] $$ CL.consume
+        f [PersistText c, PersistText k] = [(encodeUtf8 c, encodeUtf8 k)]
         f _ = []
 
-setupRoutes :: StateT (Config, ServerConf) IO ()
+-- | Run a database statement in the ServerState monad and return its result.
+runStatement :: Sql a -> ServerState a
+runStatement sql = do
+    (_, ServerConf{..}) <- get
+    let conn = buildConnectionString serverDbConf
+    res <- try $ lift $ withPostgresqlConn conn $ runDbConn sql
+    case res of
+      Left  e -> error $ "SQL error: " ++ C8.unpack (sqlErrorMsg e)
+      Right r -> return r
+
+setupRoutes :: ServerState ()
 setupRoutes = do
     (c@Config{..}, setup) <- get
     routes <- lift $ parseRoutesFromFile configRoutesFile
     -- Add a simple /ping response route
-    let ping = Route "GET" (decompose "ping") 
-                    (RouteStatic $ okResponse [("message", "Pong!")])
-    put (c, setup{ serverRoutes = ping:routes })
+    let pong = RouteStatic $ okResponse [("message", "Pong!")]
+        ping = Route "GET" (decompose "ping") pong
+    rs <- mapM insertColNames routes
+    put (c, setup{ serverRoutes = ping:rs })
 
+-- Look up and insert column names for 'SELECT * FROM' type of queries.
+insertColNames:: Route -> ServerState Route
+insertColNames (Route m p (RouteSql (DbQuery q t))) = do
+    r <- f q
+    return $ Route m p (RouteSql (DbQuery r t))
+  where f :: DbResult -> ServerState DbResult
+        f (Item       ["*", tbl]) = fmap Item       $ columns tbl
+        f (ItemOk     ["*", tbl]) = fmap ItemOk     $ columns tbl
+        f (Collection ["*", tbl]) = fmap Collection $ columns tbl
+        f x                       = return x 
+insertColNames r = return r
+
+-- | Find column names for a given table.
+columns :: Text -> ServerState [Text]
+columns table = liftM (reverse . concatMap txt) $ do
+    runStatement $ rawQuery (replace "%" table q) [] $$ CL.consume
+  where q = "SELECT column_name FROM information_schema.columns \
+            \WHERE table_name = '%';"
+        txt [PersistText n] = [uscToCamel n]
+        txt _               = []
+ 

@@ -45,6 +45,7 @@ extractFromList (SelectList _ xs) = concatMap extract xs
 
 -- | Extract the name components from a SELECT item.
 extract :: SelectItem -> [Text]
+extract ( SelExp     _ (Star _)   ) = ["*"]
 extract ( SelExp     _ s          ) = f s
   where f (Identifier  _ (Nmc n)  ) = [pack n]
         f (QIdentifier _ xs       ) = map (pack . ncStr) xs
