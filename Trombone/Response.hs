@@ -84,7 +84,8 @@ okResponse r = RouteResponse [] i (decorate v)
 -- | Send a JSON response from the supplied response object.
 sendJsonResponse :: RouteResponse -> Response
 sendJsonResponse (RouteResponse hs st val) = responseLBS (Status st "") headers body
-  where headers = hs ++ [("Content-Type", "application/json; charset=utf-8")]
+  where headers = hs ++ [ ("Content-Type", "application/json; charset=utf-8")
+                       , ("Server", "Trombone/0.8") ]
         body = encode val
 
 -- | Same as sendJsonResponse, but operates on a Maybe type, with the behavior
