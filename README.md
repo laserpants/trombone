@@ -5,13 +5,19 @@ Trombone
 
 ### Introduction
 
-Trombone is a JSON-server which facilitates RESTful single-point data access to a PostgreSQL database. Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against the database, with results returned in JSON, using the standard HTTP response codes and error conventions.
+Trombone is a RESTful, JSON-driven data access-server for PostgreSQL. Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using   standard HTTP response codes and error conventions.
 
-A Trombone configuration file consists of a collection of route patterns. The format of a single route is described by the following high-level grammar. 
+A Trombone configuration file consists of a collection of route patterns.
+
+    GET resource/:id  ->  select * from resource where id = {{:id}}
+
+The format of a single route is described by the following (high-level) grammar. 
 
     <route> ::= <method> <uri> <symbol> <action>
 
 During dispatch, the server will look through the list of routes for a possible match, based on the request's uri components and the HTTP method used. 
+
+The `->` arrow symbol specifies the type of route and format to use in the response object. See below for an explanation of these symbols. This particular arrow denotes a SQL query with a single item in its result.
 
 ### Hello, world!
 
@@ -34,7 +40,7 @@ During dispatch, the server will look through the list of routes for a possible 
 
 ##### Placeholders
 
-Trombone templates acknowledge two types of placeholders, both denoted by a double pair of surrounding  curly-braces (inspired by Handlebars.js):
+Trombone templates acknowledge two types of placeholder variables, both denoted by a double pair of surrounding  curly-braces (inspired by Handlebars.js):
 
 * Uri segment `{{:variables}}` and
 * JSON value `{{placeholders}}`.
@@ -43,7 +49,7 @@ Trombone templates acknowledge two types of placeholders, both denoted by a doub
 
     GET customer/:id   ->   select * from customer where id = {{:id}}
 
-A uri variable must also be present in the route's uri pattern, where it is bound to a specific path segment. Such variable can only contain alphanumeric characters, hyphens and underscores. It is always prefixed with a single colon, to distinguish it from ordinary JSON placeholders (see below).    
+A uri variable must also be present in the route's uri pattern, where it is bound to a specific path segment. Such variable can only contain alphanumeric characters, hyphens and underscores. It is prefixed with a single colon to distinguish it from ordinary JSON placeholders (see below).    
 
 ###### JSON values
 
@@ -63,7 +69,7 @@ When a request body is available, the server will first parse the raw body to JS
 
     insert into customer (name, address, phone) values ('OCP', 'Delta City', '555-MEGACORP')
 
-Use the `--verbose` command-line option to inspect the query string after a template is instantiated.
+> Use the `--verbose` command-line option to inspect the query string after a template is instantiated.
 
 ##### Comments
 
@@ -101,13 +107,13 @@ Trombone assumes that database table and column names follow the normal `lowerca
 
 ##### Parameter hints (rarely needed)
 
-With complex queries, the server can sometimes have difficulties figuring out the attribute names to return from a `SELECT` query. In such cases, and in situations where more control is needed, it is possible to specify an explicit list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
+With complex queries, the server can sometimes have difficulties figuring out the attribute names to return from a `SELECT` query. In such cases, and in situations where more control is needed, it is  therefore possible to specify an explicit list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
 
 ###### Example
 
     GET /customer  >>  (id, name, phone) select a.a, a.b, a.c from customer as a join something as b
 
-A similar syntax is available for `INSERT` statements. This can be used when the server is unable to infer the table name and sequence to use in order to obtain the last inserted id.
+A similar syntax is available for `INSERT` statements. This can be used when the server is unable to infer the table name and sequence necessary to obtain the last inserted id.
 
     POST /customer  <>  (tbl_name, sequence) insert into...
    
@@ -131,7 +137,26 @@ A possible use-case for static routes is to provide documentation as part of a w
 
 #### Response codes
 
-### Command line flags
+### Running the server
+
+#### Ping
+
+    http://localhost:3000/ping
+
+...
+
+```
+< HTTP/1.1 200 
+< Transfer-Encoding: chunked
+< Content-Type: application/json; charset=utf-8
+< Server: Trombone/0.8
+{
+   "status":true,
+   "message":"Pong!"
+}
+```
+
+#### Command line flags
 
 | Flag | Long option      | Description
 | ---- | ---------------- | --------------------------------------------
