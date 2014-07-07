@@ -73,7 +73,7 @@ When a request body is available, the server will first parse the raw body to JS
 
 ##### Comments
 
-Comments begin with a single octothorpe (#) character and may appear at the end of a route definition,  
+Comments start with a single octothorpe (#) character and may appear at the end of a route definition,  
 
     GET photo       >>  select * from photo   # Retreive all photos.
 
@@ -279,11 +279,13 @@ File server | (always enabled)
 
 #### AMQP
 
-The AMQP component integrates Trombone with RabbitMQ — a messaging system based on the Advanced Message Queuing Protocol. It allows consumer applications to receive asynchronous notifications when server resources are modified.
+The AMQP component integrates Trombone with RabbitMQ — a messaging system based on the Advanced Message Queuing Protocol. This middleware allows consumer applications to receive asynchronous notifications when server resources are modified.
 
 ##### AMQP endpoint
 
     /exchange/trombone/api
+
+##### Using AMQP in JavaScript applications
 
 #### CORS
 
@@ -305,7 +307,9 @@ Apache-style logging.
 
 ### Static file serving
 
-Trombone can also be used as a simple file server. Files located under the `public` directory, or any of its subdirectories, are automatically accessible via HTTP. 
+Trombone can also be used as a simple file server. Files located under the `public` directory or any of its subdirectories, are HTTP accessible to everyone. E.g.,
+
+    public/image.png   <~>   http://localhost:3000/image.png
 
 ### About Trombone
 
