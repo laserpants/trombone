@@ -279,7 +279,7 @@ File server | (always enabled)
 
 #### AMQP
 
-The AMQP component integrates Trombone with RabbitMQ — a messaging system based on the Advanced Message Queuing Protocol. This middleware allows consumer applications to receive asynchronous notifications when server resources are modified.
+RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol (AMQP) — an emerging standard for asynchronous message passing. The AMQP middleware integrates Trombone with RabbitMQ, and allows consumer applications to receive notifications when server resources are modified.
 
 ##### AMQP endpoint
 
