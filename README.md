@@ -5,7 +5,7 @@ Trombone
 
 ### Introduction
 
-Trombone is a RESTful, JSON-driven [data access-server](http://en.wikipedia.org/wiki/Data_access_layer) for PostgreSQL. Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using   standard HTTP response codes and error conventions.
+Trombone is a [REST](http://en.wikipedia.org/wiki/Representational_state_transfer)ful, [JSON](http://json.org/)-driven [data access-server](http://en.wikipedia.org/wiki/Data_access_layer) for [PostgreSQL](www.postgresql.org). Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using   standard HTTP response codes and error conventions.
 
 A Trombone configuration file consists of a collection of route patterns.
 
