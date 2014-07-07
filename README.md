@@ -9,7 +9,7 @@ Trombone is a [REST](http://en.wikipedia.org/wiki/Representational_state_transfe
 
 A Trombone configuration file consists of a collection of route patterns.
 
-    GET resource/:id  ->  select * from resource where id = {{:id}}
+    GET resource/:id  ->  select * from some_table where id = {{:id}}
 
 The format of a single route is described by the following (high-level) grammar. 
 
