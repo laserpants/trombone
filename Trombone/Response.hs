@@ -12,6 +12,7 @@ module Trombone.Response
 
 import Data.Aeson
 import Data.HashMap.Strict                             ( fromList, union )
+import Data.List.Utils                                 ( addToAL )
 import Data.Maybe                                      ( fromMaybe )
 import Data.Text                                       ( Text, pack )
 import Network.HTTP.Types                              
@@ -84,8 +85,10 @@ okResponse r = RouteResponse [] i (decorate v)
 -- | Send a JSON response from the supplied response object.
 sendJsonResponse :: RouteResponse -> Response
 sendJsonResponse (RouteResponse hs st val) = responseLBS (Status st "") headers body
-  where headers = hs ++ [ ("Content-Type", "application/json; charset=utf-8")
-                       , ("Server", "Trombone/0.8") ]
+  where headers = foldr f [ ("Content-Type", "application/json; charset=utf-8")
+                          , ("Server", "Trombone/0.8") ] hs
+        -- Insert request headers and replace any existing keys
+        f (k, v) a = addToAL a k v
         body = encode val
 
 -- | Same as sendJsonResponse, but operates on a Maybe type, with the behavior
