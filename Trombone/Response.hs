@@ -7,7 +7,7 @@ module Trombone.Response
     , okResponse_
     , responseCode
     , sendJsonResponse
-    , sendJsonResponseOr404
+    , responseOr404
     ) where
 
 import Data.Aeson
@@ -91,9 +91,9 @@ sendJsonResponse (RouteResponse hs st val) = responseLBS (Status st "") headers 
         f (k, v) a = addToAL a k v
         body = encode val
 
--- | Same as sendJsonResponse, but operates on a Maybe type, with the behavior
--- that Nothing values are translated to a standard 404 message.
-sendJsonResponseOr404 :: Maybe RouteResponse -> Response
-{-# INLINE sendJsonResponseOr404 #-}
-sendJsonResponseOr404 = sendJsonResponse . fromMaybe (errorResponse ErrorNotFound "Resource not found.") 
+-- | Pull out a RouteResponse from the Maybe monad using a standard 404 error
+-- message for Nothing values.
+responseOr404 :: Maybe RouteResponse -> RouteResponse
+-- {-# INLINE responseOr404 #-}
+responseOr404 = fromMaybe (errorResponse ErrorNotFound "Resource not found.") 
 

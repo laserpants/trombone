@@ -26,6 +26,7 @@ import System.Environment                              ( getArgs )
 import Trombone.Db.Execute
 import Trombone.Db.Reflection                          ( uscToCamel )
 import Trombone.Dispatch.Core
+import Trombone.Encryption
 import Trombone.Middleware.Amqp
 import Trombone.Middleware.Cors
 import Trombone.Middleware.Logger
@@ -116,7 +117,9 @@ runWithConf ServerConf
         putStrLn $ "Trombone listening on port " ++ show port ++ "."
         run port $ foldr ($) `flip` midware $ \request app -> do
             let context = Context pool request routes hconf pipes loud
-            runReaderT runRoutes context >>= app . sendJsonResponseOr404 
+            --runReaderT runRoutes context >>= app . sendJsonResponseOr404 
+            runReaderT runRoutes context >>= app . encrypted . responseOr404
+            --app $ sendJsonResponse $ responseOr404 r
 
 type ServerState = StateT (Config, ServerConf) IO 
 
