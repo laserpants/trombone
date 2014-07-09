@@ -134,7 +134,7 @@ escVal (Bool False) = EscapedText "'false'"
 -- Comma-separate array elements and surround the output with parentheses.
 escVal (Array a) = listify a
   where f v = let (EscapedText t) = escVal v in t
-        listify = EscapedText . quoute . Text.concat . intersperse "," 
+        listify = EscapedText . Text.concat . intersperse "," 
                               . map f  . Vect.toList 
 escVal _ = EscapedText empty
 
