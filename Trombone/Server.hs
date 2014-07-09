@@ -117,9 +117,9 @@ runWithConf ServerConf
         putStrLn $ "Trombone listening on port " ++ show port ++ "."
         run port $ foldr ($) `flip` midware $ \request app -> do
             let context = Context pool request routes hconf pipes loud
-            --runReaderT runRoutes context >>= app . sendJsonResponseOr404 
-            runReaderT runRoutes context >>= app . encrypted . responseOr404
-            --app $ sendJsonResponse $ responseOr404 r
+            flip runReaderT context $ runRoutes
+                >>= encrypted . responseOr404 
+                >>= lift . app 
 
 type ServerState = StateT (Config, ServerConf) IO 
 

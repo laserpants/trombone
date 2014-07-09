@@ -8,6 +8,7 @@ module Trombone.Server.Config
     , lookupKey
     , options
     , translOpts 
+    , versionH
     ) where
 
 import Data.ByteString                                 ( ByteString )
@@ -15,12 +16,17 @@ import Data.HashMap                                    ( Map )
 import Data.List.Utils                                 ( split )
 import Data.Maybe                                      ( catMaybes, fromMaybe )
 import Data.Text                                       ( Text, pack, unpack )
+import Network.HTTP.Types                              ( HeaderName )
 import System.Console.GetOpt
 import Trombone.Middleware.Logger
 import Trombone.Pipeline
 
 import qualified Data.ByteString.Char8        as BS
 import qualified Data.HashMap                 as Map
+
+-- | Response header with server description.
+versionH :: (HeaderName, ByteString)
+versionH = ("Server", "Trombone/0.8")
 
 -- | Server startup configuration parameters.
 data Config = Config

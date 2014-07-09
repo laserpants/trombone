@@ -1,9 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Trombone.Hmac where
+module Trombone.Hmac 
+    ( authenticate
+    , generateHmac
+    ) where
 
-import Data.ByteString                                 ( ByteString )
-import Data.ByteString.Lazy                            ( fromStrict )
-import Data.Digest.Pure.SHA
+import Crypto.Hash                 
+import Data.ByteString                                 ( ByteString, unpack )
+import Data.ByteString.Lazy                            ( fromStrict, toStrict )
+import Data.Byteable
 import Data.Monoid                                     ( mconcat )
 import Data.Text                                       ( Text )
 import Data.Text.Encoding                              ( decodeUtf8 )
@@ -33,31 +37,31 @@ authenticate body = do
           if isLocalhost (remoteHost req) && allowLocal conf
               then return $ Right Local
               else case lookup "API-Access" $ requestHeaders req of
-                     Nothing -> if isPing req
-                                   -- Allow "ping" requests to pass through
-                                   then return $ Right Anonymous
-                                   else liftM Left unauthorized 
+                     Nothing -> return $ if isPing req
+                                            -- Allow "ping" requests to pass through
+                                            then Right Anonymous
+                                            else Left unauthorized 
                      Just h  -> case C8.split ':' h of
                                 [client, code] -> 
                                     case lookupKey client conf of
                                         Just key -> authorize client code key
-                                        Nothing  -> liftM Left unauthorized 
-                                _ -> liftM Left unauthorized
+                                        Nothing  -> return $ Left unauthorized 
+                                _ -> return $ Left unauthorized
         authorize client code key = 
-            let secret = fromStrict key
-                msg    = fromStrict body in
-            if showDigest (hmacSha1 secret msg) /= C8.unpack code
-                then liftM Left unauthorized
-                else return $ Right $ Client (decodeUtf8 client)
+            return $ if generateHmac key body /= code
+                         then Left unauthorized
+                         else Right $ Client (decodeUtf8 client)
   
+-- | Compute a MAC using the SHA1 cryptographic algorithm.
+generateHmac :: ByteString -> ByteString -> ByteString
+generateHmac key msg = digestToHexByteString $ hmacGetDigest $ sha1Hmac key msg
+  where sha1Hmac :: ByteString -> ByteString -> HMAC SHA1
+        sha1Hmac = hmac
+ 
 isPing :: Request -> Bool
 {-# INLINE isPing #-}
 isPing req = not (null info) && "ping" == head info
   where info = pathInfo req
-
-unauthorized :: Dispatch RouteResponse
-{-# INLINE unauthorized #-}
-unauthorized = return $ errorResponse ErrorUnauthorized "Unauthorized."
 
 isLocalhost :: SockAddr -> Bool
 {-# INLINE isLocalhost #-}
