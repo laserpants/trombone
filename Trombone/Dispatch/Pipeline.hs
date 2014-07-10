@@ -30,7 +30,8 @@ dispatchPipeline (Pipeline pcs conns _) ps obj = do
 
 stabilize :: Pipeline -> Dispatch RouteResponse
 stabilize sys@(Pipeline _ _ mq) = do
-    liftIO $ print mq
+    Context pool _ _ _ _ loud <- ask
+    when loud $ liftIO $ print mq
     s@(Pipeline _ _ mq') <- integrate sys 
     if mq == mq'  -- Has the message queue changed?
         then case processorMsgs Out mq of
