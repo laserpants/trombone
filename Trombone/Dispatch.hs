@@ -14,6 +14,7 @@ import Trombone.Dispatch.NodeJs
 import Trombone.Dispatch.Pipeline
 import Trombone.Dispatch.Static
 import Trombone.Hmac
+import Trombone.Response
 
 import qualified Data.Conduit.List                     as CL
 import qualified Data.Text                             as Text
@@ -26,14 +27,16 @@ dispatch route ps = do
     case auth of
         Left resp -> return resp
         Right _   -> 
-            let obj = requestObj body in
-            case route of
-                RouteSql query -> dispatchDbAction query ps obj
-                RoutePipes pipe -> 
-                    case lookup pipe table of
-                        Nothing -> return $ errorResponse ErrorServerConfiguration
-                            $ Text.concat ["Unknown pipeline: '", pipe , "'."]
-                        Just s -> dispatchPipeline s ps obj
-                RouteNodeJs js -> dispatchNodeJs js body
-                RouteStatic resp -> dispatchStatic resp
+            case requestObj body of
+                Nothing  -> return $ errorResponse ErrorBadRequest "Malformed JSON." 
+                Just obj -> 
+                    case route of
+                      RouteSql query -> dispatchDbAction query ps obj
+                      RoutePipes pipe -> 
+                          case lookup pipe table of
+                              Nothing -> return $ errorResponse ErrorServerConfiguration
+                                  $ Text.concat ["Unknown pipeline: '", pipe , "'."]
+                              Just s -> dispatchPipeline s ps obj
+                      RouteNodeJs js -> dispatchNodeJs js body
+                      RouteStatic resp -> dispatchStatic resp
 

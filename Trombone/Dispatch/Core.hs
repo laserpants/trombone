@@ -1,4 +1,4 @@
-{-# LANGUAGE PackageImports #-}
+{-# LANGUAGE OverloadedStrings, PackageImports #-}
 module Trombone.Dispatch.Core
     ( module Core
     , Context(..)
@@ -44,8 +44,9 @@ data Context = Context
 type Dispatch = ReaderT Context IO
 
 -- | Parse the raw request body to JSON.
-requestObj :: ByteString -> Value
-requestObj = fromMaybe Null . decode . fromStrict 
+requestObj :: ByteString -> Maybe Value
+requestObj bs | bs == ""   = Just Null
+              | otherwise = decode $ fromStrict bs 
 
 -- | Enclose a text value in single quoutes.
 quoute :: Text -> Text

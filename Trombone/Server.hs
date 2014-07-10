@@ -76,7 +76,7 @@ buildConnectionString DbConf{..} =
               , "password=" ,                         dbPass , " "
               , "dbname="   ,                         dbName ]
 
--- | Run the server with configuration as specified by command line arguments.
+-- | Run the server with configuration as indicated by command line arguments.
 runWithArgs :: IO ()
 runWithArgs = do
     args <- getArgs
