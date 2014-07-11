@@ -250,7 +250,7 @@ To establish the authenticity of a request, the server performs a message integr
 
 Authentication is enabled by default. A client application that wishes to access the service must therefore,
 
-1. be present in the `trombone_keys` database table with a unique identifier and secure token; as well as
+1. be present in the `trombone_keys` database table with a unique identifier and the secure token; as well as
 * supply the following HTTP header with each request:
 
 ```
