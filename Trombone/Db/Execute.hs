@@ -9,6 +9,7 @@ module Trombone.Db.Execute
     , runDbConn
     ) where
 
+import Control.Exception.Lifted                        ( SomeException, try, fromException )
 import Control.Monad                                   ( liftM )
 import Control.Monad.Logger
 import Control.Monad.Trans.Resource
@@ -19,6 +20,7 @@ import Data.Text                                       ( Text )
 import Data.Text.Encoding                              ( encodeUtf8 )
 import Database.Persist
 import Database.Persist.Postgresql              hiding ( Sql )
+import Database.PostgreSQL.Simple                      ( SqlError(..), ExecStatus(..) )
 
 import qualified Data.Conduit.List                     as CL
 import qualified Data.Text                             as Text
@@ -43,9 +45,19 @@ noResult query = rawExecute query []
 -- Example use: 
 --     runDb (getResult "select * from customer") pool >>= print
 runDb :: Sql a -> ConnectionPool -> IO a
-runDb sql = runNoLoggingT . runResourceT . runSqlPool sql
+runDb sql = catchExceptions . runNoLoggingT . runResourceT . runSqlPool sql
 
 -- | Same as runDb except that a single connection is used instead of a pool.
 runDbConn :: Sql a -> Connection -> IO a
-runDbConn sql = runNoLoggingT . runResourceT . runSqlConn sql
+runDbConn sql = catchExceptions . runNoLoggingT . runResourceT . runSqlConn sql
+
+catchExceptions :: IO a -> IO a
+catchExceptions sql = try sql >>= excp
+  where excp (Right r) = return r
+        excp (Left  e) =
+            case fromException e of
+              Just e1 -> rethrow e1
+              Nothing -> throwM $ SqlError "" FatalError "unknown sql error" "" ""
+        rethrow :: SqlError -> IO a
+        rethrow = throwM
 
