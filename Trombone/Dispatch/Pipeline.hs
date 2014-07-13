@@ -4,9 +4,10 @@ module Trombone.Dispatch.Pipeline where
 import Control.Applicative                             ( (<$>) )
 import Data.Conduit
 import Data.Scientific
+import Data.Text                                       ( isPrefixOf )
 import Network.HTTP.Types                              
 import Trombone.Dispatch.Core
-import Trombone.Dispatch.Db                            ( escVal', dispatchDbAction )
+import Trombone.Dispatch.Db                            ( dispatchDbAction )
 import Trombone.Pipeline
 import Trombone.RoutePattern
 
@@ -72,10 +73,12 @@ integrate (Pipeline pcs conns mq) =
 
 runProcessor :: Processor -> [Message] -> [Connection] -> Dispatch [Message]
 runProcessor (Processor pid fields mtd uri exp) msgs conns = do
+    Context _ _ _ _ _ loud <- ask
     let o = buildJsonRequest msgs
         v = expand exp o
     case (saturated fields v, fill uri o) of
         (True, Just x) -> do
+            when loud $ liftIO $ putStrLn (show mtd ++ " " ++ Text.unpack x)
             r <- lookupRoute mtd x
             case r of
                 Nothing -> return []
@@ -89,13 +92,18 @@ runProcessor (Processor pid fields mtd uri exp) msgs conns = do
 
 fill :: RoutePattern -> Object -> Maybe Text
 fill (RoutePattern rp) o = Text.intercalate "/" <$> f rp []
-  where f [] ps = Just ps
+  where f [] ps = Just $ reverse ps
         f (Atom a:xs) ps = f xs (a:ps)
         f (Variable v:xs) ps = 
-            case HMS.lookup v o of
-                Nothing -> Nothing
-                Just x  -> f xs $ escVal' x:ps
-        
+            case HMS.lookup (Text.cons ':' v) o of
+                Just (String x)  -> f xs (strip x:ps) 
+                _                -> Nothing
+
+strip :: Text -> Text
+strip = s . Text.reverse . s . Text.reverse 
+  where s t |  "'" `isPrefixOf` t = Text.tail t
+            | otherwise           = t
+
 saturated :: [Text] -> Value -> Bool
 saturated [] _ = True
 saturated (x:xs) (Object o) | HMS.member x o = saturated xs (Object o)
