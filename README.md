@@ -116,9 +116,9 @@ Trombone assumes that database table and column names follow the normal `lowerca
 
     select * from photo
 
-##### Parameter hints (rarely needed)
+##### Parameter hints
 
-With complex queries, the server can sometimes have difficulties figuring out the attribute names to return from a `SELECT` query. In such cases, and in situations where more control is needed, it is  therefore possible to specify an explicit list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
+With joins, and more complex queries, the server can sometimes have difficulties figuring out the attribute names to return from a `SELECT` query. In such cases, and in situations where more control is needed, it is  therefore possible to specify an explicit list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
 
 ###### Example
 
