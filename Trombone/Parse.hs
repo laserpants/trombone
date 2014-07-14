@@ -277,7 +277,7 @@ parseRoutesFromFile file = do
 preprocess :: String -> String
 preprocess str = let ls = map trimLine $ lines str in foldr f "" ls ++ "\n"
   where f a b | null a || null b = a ++ b
-              | '\\' == head b && '\\' == last a = init a ++ (' ':tail b)
+              | '\\' == head b && '\\' == last a = trimLine (init a) ++ ' ':trimLine (tail b)
               | otherwise = a ++ ('\n':b)
 
 trimLine :: String -> String
