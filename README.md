@@ -81,6 +81,17 @@ or span across an entire line.
 
     # Return a specific photo.
     GET photo/:id   ->  select * from photo where id = {{:id}}
+
+##### Multi-line expressions
+
+```
+GET resource            >>  select name,          \
+                          \        address,       \
+                          \        phone,         \
+                          \        shoe_size      \
+                          \ from customer         \
+                          \ order by id
+```
     
 ##### BNF grammar
 
