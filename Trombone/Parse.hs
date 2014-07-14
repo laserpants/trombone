@@ -269,7 +269,22 @@ eol = try (string "\n\r")
 parseRoutesFromFile :: FilePath -> IO [Route]
 parseRoutesFromFile file = do
     r <- readFile file
-    case parse (many line) "" r of
+    case parse (many line) "" (preprocess r) of
         Left e   -> error $ show e
         Right xs -> return $ catMaybes xs
+
+-- | Collapse multi-line expressions.
+preprocess :: String -> String
+preprocess str = let ls = map trimLine $ lines str in foldr f "" ls ++ "\n"
+  where f a b | null a || null b = a ++ b
+              | '\\' == head b && '\\' == last a = init a ++ (' ':tail b)
+              | otherwise = a ++ ('\n':b)
+
+trimLine :: String -> String
+trimLine = trimLeft . reverse . trimLeft . reverse 
+
+trimLeft :: String -> String
+trimLeft "" = ""
+trimLeft (x:xs) | ' ' == x   = trimLeft xs
+                | otherwise = x:xs
 
