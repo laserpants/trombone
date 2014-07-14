@@ -259,7 +259,7 @@ To establish the authenticity of a request, the server performs a message integr
 
     API-Access: client:hash
 
-Authentication is enabled by default. A client application that wishes to access the service must therefore,
+Authentication is enabled by default. A client application that wishes to consume the service must therefore,
 
 1. be present in the `trombone_keys` database table with a unique identifier and the secure token; as well as
 * supply the following HTTP header with each request:
