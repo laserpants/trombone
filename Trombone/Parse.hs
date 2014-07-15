@@ -104,7 +104,11 @@ elements = sepBy cell $ char ','
 
 -- | A list item.
 cell :: GenParser Char st String
-cell = spaces >> many (noneOf ",\n\r)")
+cell = do
+    spaces 
+    s <- many (noneOf ",\n\r) ") 
+    spaces
+    return s
 
 result :: DbResult -> GenParser Char st RouteAction
 result res = liftM (RouteSql . mkQuery res) (many $ noneOf "\n\r") 
