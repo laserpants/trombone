@@ -37,6 +37,7 @@ dispatch route ps = do
                               Nothing -> return $ errorResponse ErrorServerConfiguration
                                   $ Text.concat ["Unknown pipeline: '", pipe , "'."]
                               Just s -> dispatchPipeline s ps obj
+                      RouteInline p -> dispatchPipeline p ps obj
                       RouteNodeJs js -> dispatchNodeJs js body
                       RouteStatic resp -> dispatchStatic resp
 

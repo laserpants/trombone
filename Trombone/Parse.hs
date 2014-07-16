@@ -7,7 +7,7 @@ module Trombone.Parse
     ) where
 
 import Control.Monad
-import Data.Aeson                                      ( decode )
+import Data.Aeson                                      ( decode, eitherDecode )
 import Data.Maybe                                      ( catMaybes )
 import Data.Text                                       ( Text, pack, unpack )
 import Data.Text.Encoding                              ( encodeUtf8 )
@@ -16,6 +16,7 @@ import Text.ParserCombinators.Parsec
 import Trombone.Db.Parse
 import Trombone.Db.Reflection
 import Trombone.Db.Template
+import Trombone.Pipeline.Json
 import Trombone.Response
 import Trombone.Route
 import Trombone.RoutePattern
@@ -78,6 +79,7 @@ route = do
 action :: GenParser Char st RouteAction
 action = try sqlRoute
      <|> try pipelineRoute
+     <|> try inlineRoute
      <|> try staticRoute
      <|> nodeJsRoute
 
@@ -188,6 +190,13 @@ sqlCount = symbolSqlCount >> blankspaces >> result Count
 -- | Parse a pipeline route.
 pipelineRoute :: GenParser Char st RouteAction
 pipelineRoute = symbolPipeline >> arg RoutePipes
+
+-- | Parse an inline route.
+inlineRoute :: GenParser Char st RouteAction
+inlineRoute = symbolInline >> many (noneOf "\n\r") 
+    >>= f . eitherDecode . L8.pack 
+ where f (Left  e) = error  $ "Error parsing pipeline : " ++ e
+       f (Right p) = return $ RouteInline p
 
 -- | Parse a static route.
 staticRoute :: GenParser Char st RouteAction

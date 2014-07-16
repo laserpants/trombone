@@ -79,11 +79,12 @@ instance FromJSON Pipeline where
     parseJSON _ = mzero
 
 parsePipesFromFile :: FilePath -> IO [(Text, Pipeline)]
-parsePipesFromFile file = do
-    f <- readFile file
-    case eitherDecode (L8.pack f) of
-               Left  e -> error  $ "Error in pipeline configuration file: " ++ e
-               Right p -> return $ HMS.toList p
+parsePipesFromFile file = liftM (parsePipes . L8.pack ) (readFile file) 
+
+parsePipes :: L8.ByteString -> [(Text, Pipeline)]
+parsePipes p = case eitherDecode p of
+                 Left  e -> error  $ "Error parsing pipeline : " ++ e
+                 Right p -> HMS.toList p
 
 instance FromJSON RoutePattern where
     parseJSON (String o) = return $ decompose o
