@@ -6,12 +6,14 @@ module Trombone.Route
 import Data.Text                                       ( Text )
 import Network.HTTP.Types.Method                       ( Method )
 import Trombone.Db.Template                            ( DbQuery )
+import Trombone.Pipeline
 import Trombone.Response
 import Trombone.RoutePattern
 
 -- | A target action associated with a route.
 data RouteAction = RouteSql    DbQuery
                  | RoutePipes  Text
+                 | RouteInline Pipeline
                  | RouteNodeJs Text
                  | RouteStatic RouteResponse
     deriving (Show)

@@ -253,6 +253,11 @@ symbolNodeJs = skip1 $ string "<js>"
 symbolPipeline :: GenParser Char st ()
 symbolPipeline = skip1 $ string "||" 
 
+-- | Symbol which indicates that the route is an inline pipeline.
+-- e.g., GET /resource  |>  {"processors":[...],"connections":[...]}
+symbolInline :: GenParser Char st ()
+symbolInline = skip1 $ string "|>" 
+
 -- | Symbol to denote a static route.
 -- e.g., GET /resource {..} {"hello":"is it me you're looking for?"}
 symbolStatic :: GenParser Char st ()
