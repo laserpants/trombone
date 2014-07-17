@@ -16,6 +16,7 @@ import Text.ParserCombinators.Parsec
 import Trombone.Db.Parse
 import Trombone.Db.Reflection
 import Trombone.Db.Template
+import Trombone.Pipeline
 import Trombone.Pipeline.Json
 import Trombone.Response
 import Trombone.Route
@@ -193,10 +194,23 @@ pipelineRoute = symbolPipeline >> arg RoutePipes
 
 -- | Parse an inline route.
 inlineRoute :: GenParser Char st RouteAction
-inlineRoute = symbolInline >> many (noneOf "\n\r") 
-    >>= f . eitherDecode . L8.pack 
- where f (Left  e) = error  $ "Error parsing pipeline : " ++ e
-       f (Right p) = return $ RouteInline p
+inlineRoute = do
+    symbolInline >> blankspaces >> eol >> firstline
+    liftM (route . eitherDecode . L8.pack . wrap . concat) lines
+  where route :: Either String Pipeline -> RouteAction
+        route (Left  e) = error  $ "Error parsing pipeline : " ++ e
+        route (Right p) = RouteInline p
+        lines = many jsonLine >>= \p -> lastline >> return p
+        firstline = char '{' >> blankspaces >> eol
+        lastline  = char '}' >> blankspaces >> eol
+        wrap x = '{':x ++ "}"
+
+jsonLine :: GenParser Char st String
+jsonLine = do
+    x  <- noneOf "}"
+    xs <- many (noneOf "\n\r")
+    eol
+    return (x:xs)
 
 -- | Parse a static route.
 staticRoute :: GenParser Char st RouteAction
@@ -293,14 +307,19 @@ parseRoutesFromFile file = do
 
 -- | Collapse multi-line expressions.
 preprocess :: String -> String
-preprocess str = let ls = map trimLine $ lines str in foldr f "" ls ++ "\n"
+preprocess str = foldr f "" (lines str) ++ "\n"
   where f a b | null a || null b = a ++ b
-              | '\\' == head b && '\\' == last a = trimLine (init a) 
-                                          ++ ' ':trimLine (tail b)
+              | '\\' == head b' && '\\' == last a' = trimLine (init a')
+                                            ++ ' ':trimLine (tail b')
               | otherwise = a ++ ('\n':b)
+          where a' = trimRight a
+                b' = trimLeft b
 
 trimLine :: String -> String
 trimLine = trimLeft . reverse . trimLeft . reverse 
+
+trimRight :: String -> String
+trimRight = reverse . trimLeft . reverse 
 
 trimLeft :: String -> String
 trimLeft "" = ""
