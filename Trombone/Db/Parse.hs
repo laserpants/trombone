@@ -29,7 +29,8 @@ parseDbTemplate = DbTemplate . consume . tokenize . endlchar
 
 -- | Append a semicolon at the end of the string, unless one is already present.
 endlchar :: Text -> Text
-endlchar x | ';' == Text.last x = x
+endlchar x | Text.null x       = "" 
+           | ';' == Text.last x = x
            | otherwise         = Text.append x ";"
 
 -- | Create an "arbitrary" template instance (for the purpose of extracting
