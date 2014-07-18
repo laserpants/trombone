@@ -305,24 +305,20 @@ parseRoutesFromFile file = do
         Left e   -> error $ show e
         Right xs -> return $ catMaybes xs
 
--- | Collapse multi-line expressions.
 preprocess :: String -> String
-preprocess str = foldr f "" (lines str) ++ "\n"
-  where f a b | null a || null b = a ++ b
-              | '\\' == head b' && '\\' == last a' = trimLine (init a')
-                                            ++ ' ':trimLine (tail b')
-              | otherwise = a ++ ('\n':b)
-          where a' = trimRight a
-                b' = trimLeft b
-
-trimLine :: String -> String
-trimLine = trimLeft . reverse . trimLeft . reverse 
-
-trimRight :: String -> String
-trimRight = reverse . trimLeft . reverse 
+preprocess str = foldr (\x -> (++) (trimRight x) . f x) "" (lines str) ++ "\n"
+  where f a b | null a || null b             = b
+              | ' ' == head b && '{' /= head a = ' ':trimLine b
+              | otherwise                   = '\n':b
 
 trimLeft :: String -> String
 trimLeft "" = ""
 trimLeft (x:xs) | ' ' == x   = trimLeft xs
                 | otherwise = x:xs
+
+trimRight :: String -> String
+trimRight = reverse . trimLeft . reverse
+
+trimLine :: String -> String
+trimLine = trimLeft . trimRight
 
