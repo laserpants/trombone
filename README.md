@@ -40,7 +40,7 @@ The `->` arrow symbol specifies the type of route and format to use in the respo
 
 ##### Placeholders
 
-Trombone templates acknowledge two types of placeholder variables, both denoted by a double pair of surrounding  curly-braces (inspired by Handlebars.js):
+Trombone templates acknowledge two types of placeholder variables, both denoted by a double pair of surrounding  curly-braces (similar to Handlebars.js):
 
 * Uri segment `{{:variables}}` and
 * JSON value `{{placeholders}}`.
@@ -84,13 +84,43 @@ or span across an entire line, as in,
 
 ##### Multi-line expressions
 
+Expressions are allowed to stretch across multiple lines, as long as each subsequent, non-empty line is indented with, at least, one blank space; as in the example below.
+
+
 ```
-GET resource            >>  select name,          \
-                          \        address,       \
-                          \        phone,         \
-                          \        shoe_size      \
-                          \ from customer         \
-                          \ order by id
+GET resource  >>  
+
+      select name,           
+             address,        
+             phone,          
+             shoe_size       
+      from customer          
+      order by id
+```
+
+This, however, is not valid:
+
+```
+GET resource  >>  
+
+select name,           
+       address,        
+       phone,          
+       shoe_size       
+from customer          
+order by id
+```
+
+Except from the "single-space" requirement, indentation does not matter. Hence, the following is also valid.
+
+```
+GET resource  >>  select name           
+                       , address        
+                       , phone          
+                       , shoe_size       
+                  from customer          
+                  order by 
+                    id
 ```
     
 ##### BNF grammar
