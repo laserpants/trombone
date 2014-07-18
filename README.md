@@ -1,7 +1,7 @@
 Trombone
 ========
 
--- documentation under construction --
+-- under construction --
 
 ### Introduction
 
@@ -49,13 +49,13 @@ Trombone templates acknowledge two types of placeholder variables, both denoted 
 
     GET customer/:id   ->   select * from customer where id = {{:id}}
 
-This type of variable must also be present in the route's uri pattern, where it is bound to a specific path segment. A uri variable can only contain alphanumeric characters, hyphens and underscores. It is prefixed with a single colon to distinguish it from ordinary JSON placeholders (see below).    
+This type of variable must also be present in the route's uri pattern, where it is bound to a specific path segment. A uri variable can only contain alphanumeric characters, hyphens and underscores. It is prefixed with a single colon. This is to distinguish it from ordinary request body placeholders, which are explained below.    
 
 ###### JSON values
 
     POST /customer  <>  insert into customer (name, address, phone) values ({{name}}, {{address}}, {{phone}})
 
-When a request body is available, the server will first parse the raw body to JSON  and substitute any placeholders in the template with those values in the JSON object whose keys match the names of the placeholders in question. 
+When a JSON-formatted request body is available, the server will first parse the raw body to JSON  and substitute any placeholders in the template with those values in the JSON object whose keys match the names of the placeholders in question. 
 
 ```
 {
@@ -73,11 +73,11 @@ When a request body is available, the server will first parse the raw body to JS
 
 ##### Comments
 
-Comments start with a single octothorpe (#) character and may appear at the end of a route definition,  
+Comments start with a single octothorpe (#) character and may appear at the end of a route definition,
 
     GET photo       >>  select * from photo   # Retreive all photos.
 
-or span across an entire line.
+or span across an entire line, as in,
 
     # Return a specific photo.
     GET photo/:id   ->  select * from photo where id = {{:id}}
@@ -110,7 +110,7 @@ GET resource            >>  select name,          \
 
 ##### Naming conventions
 
-Trombone assumes that database table and column names follow the normal `lowercase_separated_by_underscores`  convention and that JSON objects use `camelCase` formatting. Conversion between the two is automatic.
+Trombone assumes that database table and column names follow the usual `lowercase_separated_by_underscores`  convention and that JSON objects use `camelCase` formatting. Conversion between the two is implicit.
 
 ##### SELECT * FROM
 
@@ -133,10 +133,39 @@ A similar syntax is available for `INSERT` statements. This can be used if the s
 | Symbol | Explanation
 | ------ | -----------
 |  &#124;&#124; | A request pipeline. (Followed by a pipeline name.)
+|  &#124;>      | An inline request pipeline. (Followed by a pipeline definition.)
 | &lt;js&gt;    | A node.js route. (Followed by a  file path to the script.)
 | {..}          | A static route. (Followed by a JSON object.) 
 
 ##### Pipelines
+
+###### Inline
+
+```
+POST          !resource  |>
+{
+   "processors": [
+      {
+         "id": 1,
+         "method": "POST",
+         "uri": "resource",
+         "fields": ["name"]
+      }
+   ],
+   "connections": [
+      {
+         "destination": 1,
+         "filters": [],
+         "transformers": []
+      },
+      {
+         "source": 1,
+         "filters": [],
+         "transformers": []
+      }
+   }
+}
+```
 
 ##### Node.js
 
@@ -198,7 +227,7 @@ Many of these settings have sensible default values:
 | ------------- | --------- 
 | AMQP user 	  | "guest"
 | AMQP password | "guest"
-| Server port   | 3000
+| Server port   | 3010
 | Log file 	  | "log/access.log"
 | Log size 	  | 4,096 bytes
 | DB-host       | "localhost"
@@ -221,7 +250,7 @@ Many of these settings have sensible default values:
 
 > This method allows the client to determine the options and/or requirements associated with a resource, or the capabilities of a server, without implying a resource action or initiating a resource retrieval.
 
-Static JSON response routes support a special `<Allow>` keyword, suitable for this purpose: 
+Static JSON response routes support a special `<Allow>` keyword for this purpose: 
 
     OPTIONS /photo  {..}  {"<Allow>":"GET,POST,OPTIONS","GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
 
@@ -244,7 +273,7 @@ A typical response will then be:
 
 ### Authentication
 
-To establish the authenticity of a request, the server performs a message integrity check, using a cryptographic primitive known as a HMAC (hash-based message authentication code). A MAC code is attached to the request in the form of an `API-Access` header. A second code is then computed from the request object using a token associated with the client application. The result of this operation is then compared to the MAC attached to the request in order to verify its authenticity.
+To establish the authenticity of a request, the server normally performs a message integrity check, using a cryptographic primitive known as a HMAC (hash-based message authentication code). A MAC code is attached to the request in the form of an `API-Access` header. A second code is computed from the request object using a token associated with the client application. The result of this operation is then compared to the MAC attached to the request in order to verify its authenticity.
 
 ##### Table schema
 
