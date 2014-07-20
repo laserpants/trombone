@@ -71,6 +71,10 @@ When a JSON-formatted request body is available, the server will first parse the
 
 > Use the `--verbose` command-line option to inspect the query string after a template is instantiated.
 
+##### Lower-case
+
+...
+
 ##### Comments
 
 Comments start with a single octothorpe (#) character and may appear at the end of a route definition,
@@ -84,7 +88,7 @@ or span across an entire line, as in,
 
 ##### Multi-line expressions
 
-Expressions are allowed to stretch across multiple lines, as long as each subsequent, non-empty line is indented with, at least, one blank space; as in the example below.
+SQL statements are allowed to stretch across multiple lines, as long as each subsequent, non-empty line is indented with, at least, one blank space; as in the example below.
 
 
 ```
