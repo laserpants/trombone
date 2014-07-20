@@ -273,7 +273,7 @@ Many of these settings have sensible default values:
 | Pipelines file | "pipelines.conf"
 | Pool size 	  | 10
 
-### Conventions
+### REST Conventions
 
 #### PATCH is your friend
 
