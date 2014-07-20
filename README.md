@@ -365,9 +365,13 @@ RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol 
 
 The CORS component provides support for cross-domain requests.
 
-To enable CORS support, use the `-C` or `--cors` command line option.
+> JavaScript and the web programming has grown by leaps and bounds over the years, but the same-origin policy still remains. This prevents JavaScript from making requests across domain boundaries, and has spawned various hacks for making cross-domain requests.
 
-For more information about cross-origin resource sharing, please see: http://www.w3.org/TR/cors/.
+> CORS introduces a standard mechanism that can be used by all browsers for implementing cross-domain requests. The spec defines a set of headers that allow the browser and server to communicate about which requests are (and are not) allowed. CORS continues the spirit of the open web by bringing API access to all.
+
+For more information about cross-origin resource sharing, please see: http://enable-cors.org.
+
+To enable CORS support, use the `-C` or `--cors` command line option.
 
 #### Logging
 
