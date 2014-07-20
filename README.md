@@ -17,7 +17,7 @@ The format of a single route is described by the following (high-level) grammar.
 
 During dispatch, the server will look through the list of routes for a possible match, based on the request's uri components and the HTTP method used. 
 
-The `->` arrow symbol specifies the type of route and format to use in the response object. See below for an explanation of these symbols. This particular arrow denotes a SQL query with a single item in its result.
+The `->` arrow symbol specifies the type of route and format to use in the response object. See below for an explanation of these symbols. This particular arrow denotes a SQL query with a singleton result.
 
 ### Hello, world!
 
