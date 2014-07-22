@@ -23,11 +23,13 @@ dispatchPipeline (Pipeline pcs conns _) ps obj = do
   where initMq = do
             Context{ dispatchRequest = r } <- ask
             -- Set up preliminary message queue from incoming connections
-            return $ broadcast (outgoingConns In conns) $ foldr inject obj ps
+            return $ broadcast (outgoingConns In conns) start
         inject :: (Text, EscapedText) -> Value -> Value
         inject   (k, EscapedText v) (Object o) = Object $ HMS.insert k (String v) o
         inject p@(k, EscapedText v) (Array  a) = Array  $ Vect.map (inject p) a
+        inject   (k, EscapedText v) Null       = Object $ HMS.insert k (String v) HMS.empty
         inject _                            x  = x
+        start                                  = foldr inject obj ps
 
 stabilize :: Pipeline -> Dispatch RouteResponse
 stabilize sys@(Pipeline _ _ mq) = do
@@ -35,7 +37,7 @@ stabilize sys@(Pipeline _ _ mq) = do
     when loud $ liftIO $ print mq
     s@(Pipeline _ _ mq') <- integrate sys 
     if mq == mq'  -- Has the message queue changed?
-        then case processorMsgs Out mq of
+        then case processorMsgs Out mq' of
                [] -> return $ errorResponse ErrorServerGeneric 
                                 "Bad pipeline. (Null response)"
                msgs -> let o = combine msgs
@@ -72,6 +74,7 @@ integrate (Pipeline pcs conns mq) =
                 runProcessor p msgs $ outgoingConns pid conns
 
 runProcessor :: Processor -> [Message] -> [Connection] -> Dispatch [Message]
+runProcessor _ [] _ = return []
 runProcessor (Processor pid fields mtd uri exp) msgs conns = do
     Context _ _ _ _ _ loud <- ask
     let o = buildJsonRequest msgs

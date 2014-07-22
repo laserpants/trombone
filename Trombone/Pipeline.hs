@@ -89,6 +89,7 @@ broadcast conns (Object o) = mapMaybe f conns
                     <*> (foldr runTransformer <$> applyFilters o filters 
                                               <*> Just funs)
 broadcast conns (Array a) = concatMap (broadcast conns) (Vect.toList a)
+broadcast conns Null      = broadcast conns (Object HMS.empty)
 broadcast _ _             = []
 
 applyFilters :: Object -> [Filter] -> Maybe Object

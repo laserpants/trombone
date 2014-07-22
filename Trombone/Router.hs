@@ -12,7 +12,7 @@ import qualified Data.Text                             as Text
 runRoutes :: Dispatch (Maybe RouteResponse)
 runRoutes = do
     Context pool Request{..} routes _ _ loud <- ask
-    when loud $ liftIO $ print pathInfo 
+    when loud $ liftIO $ putStrLn $ show requestMethod ++ " " ++ show pathInfo 
     run loud routes requestMethod $ filterNot Text.null pathInfo
   where run v [] _ _ = do
             when v $ liftIO $ print "(no match)"
