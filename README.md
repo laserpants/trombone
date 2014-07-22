@@ -385,7 +385,7 @@ Apache-style logging.
 
 ### Static file serving
 
-Trombone can also be used as a simple file server. Files located under the `public` directory or any of its subdirectories, are HTTP accessible to everyone. E.g.,
+Trombone can also act as a simple file server. Files located under the `public` directory or any of its subdirectories, are HTTP accessible to everyone. E.g.,
 
     public/image.png   <~>   http://localhost:3000/image.png
 
