@@ -273,7 +273,7 @@ Many of these settings have sensible default values:
 | Pipelines file | "pipelines.conf"
 | Pool size 	  | 10
 
-### Conventions
+### REST Conventions
 
 #### PATCH is your friend
 
@@ -365,9 +365,13 @@ RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol 
 
 The CORS component provides support for cross-domain requests.
 
-To enable CORS support, use the `-C` or `--cors` command line option.
+> JavaScript and the web programming has grown by leaps and bounds over the years, but the same-origin policy still remains. This prevents JavaScript from making requests across domain boundaries, and has spawned various hacks for making cross-domain requests.
 
-For more information about cross-origin resource sharing, please see: http://www.w3.org/TR/cors/.
+> CORS introduces a standard mechanism that can be used by all browsers for implementing cross-domain requests. The spec defines a set of headers that allow the browser and server to communicate about which requests are (and are not) allowed. CORS continues the spirit of the open web by bringing API access to all.
+
+For more information about cross-origin resource sharing, please see: http://enable-cors.org.
+
+To enable CORS support, use the `-C` or `--cors` command line option.
 
 #### Logging
 
@@ -381,10 +385,12 @@ Apache-style logging.
 
 ### Static file serving
 
-Trombone can also be used as a simple file server. Files located under the `public` directory or any of its subdirectories, are HTTP accessible to everyone. E.g.,
+Trombone can also act as a simple file server. Files located under the `public` directory or any of its subdirectories, are HTTP accessible to everyone. E.g.,
 
     public/image.png   <~>   http://localhost:3000/image.png
 
 ### About Trombone
 
-Trombone is written in Haskell using the Warp HTTP server, and WAI — a common protocol for communication between web applications and web servers. Trombone is licensed under the BSD license.
+Trombone is written in Haskell using the Warp HTTP server, and WAI — a common protocol for communication between web applications and web servers. 
+
+This software library is available for use under the BSD license.
