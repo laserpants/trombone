@@ -146,6 +146,10 @@ GET resource  >>  select name
 
 Trombone assumes that database table and column names follow the usual `lowercase_separated_by_underscores`  convention and that JSON objects use `camelCase` formatting. Conversion between the two is implicit.
 
+##### Arrays
+
+...
+
 ##### SELECT * FROM
 
     select * from photo
