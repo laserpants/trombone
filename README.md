@@ -162,7 +162,7 @@ With joins, and more complex queries, the server can sometimes have some difficu
 
     GET /customer  >>  (id, name, phone) select a.a, a.b, a.c from customer as a join something as b
 
-A similar syntax is available for `INSERT` statements. This can be used if the server is unable to infer the table name and sequence necessary to obtain the last inserted id.
+Incidentally, a similar syntax is available for `INSERT` statements. This can be used if the server is unable to infer the table name and sequence necessary to obtain the last inserted id.
 
     POST /customer  <>  (tbl_name, sequence) insert into...
    
