@@ -29,7 +29,7 @@ The arrow symbol specifies the type of route and format to use in the response o
     GET    photo/:id          ->  select * from photo where id = {{:id}}
     POST   photo              <>  insert into photo (url, description) values ('{{url}}', '{{description}}')
     PUT    photo/:id          ><
-    PATCH  photo/:id          --
+    PATCH  photo/:id          ><
     DELETE photo              --
 
     GET    comment/photo/:id
