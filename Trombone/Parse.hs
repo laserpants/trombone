@@ -301,29 +301,26 @@ eol = try (string "\n\r")
 parseRoutesFromFile :: FilePath -> IO [Route]
 parseRoutesFromFile file = do
     putStr "Reading configuration\n|"
-    chars 80 ' '
-    putStr "|"
-    chars 81 '\b'
+    chars 80 ' ' >> putStr "|" >> chars 81 '\b'
     r <- readFile file
-    let ls = index $ preprocess r
-        g = f $ length ls
-    x <- liftM catMaybes (mapM g ls)
+    let ls = preprocess r
+    x <- liftM catMaybes $ mapM go $ zip (dots $ length ls) ls
     putChar '\n'
     return x
-  where f :: Int -> (Int, String) -> IO (Maybe Route)
-        f n (i,x) = do
-            let pc = div (80 * i) n
-            chars pc '.'
-            chars pc '\b'
+  where go :: (String, String) -> IO (Maybe Route)
+        go (dots,x) = 
             case parse line "" (x ++ "\n") of
-                Left e   -> error $ show e ++ "\n" ++ x
-                Right xs -> return xs
+                Left e   -> error $ show e ++ '\n':x
+                Right xs -> putStr dots >> return xs
         chars n = putStr . replicate n 
-
-index :: [a] -> [(Int, a)]
-index xs = f xs [] 1
-  where f [] ys _ = reverse ys
-        f (x:xs) ys n = f xs ((n,x):ys) $ succ n
+        dots n = f 0 0 [] ""
+          where f i y xs d | i == 81 = xs
+                f i y xs d = let y' = div (i*n) 80 
+                                 f' = flip f y' $ succ i in 
+                    if y' == y 
+                        then f' xs $ '.':d
+                        else f' (d:fill y y' ++ xs) "."
+                fill x x' = replicate (x' - x - 1) ""
 
 preprocess :: String -> [String]
 preprocess str = let (a, xs) = foldr f ("", []) $ lines str in a:xs
