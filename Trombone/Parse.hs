@@ -286,7 +286,7 @@ symbolInline = skip1 $ string "|>"
 symbolStatic :: GenParser Char st ()
 symbolStatic = skip1 $ string "{..}" 
 
--- | Zero or more blank spaces (unlike the default 'spaces', this combinator 
+-- | Zero or more blank spaces (unlike the default "spaces", this combinator 
 -- accepts only "true" spaces).
 blankspaces :: GenParser Char st ()
 blankspaces = skipMany (char ' ')
