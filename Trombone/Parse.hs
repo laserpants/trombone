@@ -8,7 +8,7 @@ module Trombone.Parse
 
 import Control.Monad
 import Data.Aeson                                      ( decode, eitherDecode )
-import Data.Maybe                                      ( catMaybes )
+import Data.Maybe                                      ( catMaybes, mapMaybe )
 import Data.Text                                       ( Text, pack, unpack )
 import Data.Text.Encoding                              ( encodeUtf8 )
 import Network.HTTP.Types.Method
@@ -286,8 +286,8 @@ symbolInline = skip1 $ string "|>"
 symbolStatic :: GenParser Char st ()
 symbolStatic = skip1 $ string "{..}" 
 
--- | Zero or more blank spaces (unlike spaces, this combinator accepts only
--- "true" spaces).
+-- | Zero or more blank spaces (unlike the default 'spaces', this combinator 
+-- accepts only "true" spaces).
 blankspaces :: GenParser Char st ()
 blankspaces = skipMany (char ' ')
 
@@ -300,16 +300,39 @@ eol = try (string "\n\r")
 -- | Read and parse routes from a configuration file.
 parseRoutesFromFile :: FilePath -> IO [Route]
 parseRoutesFromFile file = do
+    putStr "Reading configuration\n|"
+    chars 80 ' '
+    putStr "|"
+    chars 81 '\b'
     r <- readFile file
-    case parse (many line) "" (preprocess r) of
-        Left e   -> error $ show e
-        Right xs -> return $ catMaybes xs
+    let ls = index $ preprocess r
+        g = f $ length ls
+    x <- liftM catMaybes (mapM g ls)
+    putChar '\n'
+    return x
+  where f :: Int -> (Int, String) -> IO (Maybe Route)
+        f n (i,x) = do
+            let pc = div (80 * i) n
+            chars pc '.'
+            chars pc '\b'
+            case parse line "" (x ++ "\n") of
+                Left e   -> error $ show e ++ "\n" ++ x
+                Right xs -> return xs
+        chars n = putStr . replicate n 
 
-preprocess :: String -> String
-preprocess str = foldr (\x -> (++) (trimRight x) . f x) "" (lines str) ++ "\n"
-  where f a b | null a || null b             = b
-              | ' ' == head b && '{' /= head a = ' ':trimLine b
-              | otherwise                   = '\n':b
+index :: [a] -> [(Int, a)]
+index xs = f xs [] 1
+  where f [] ys _ = reverse ys
+        f (x:xs) ys n = f xs ((n,x):ys) $ succ n
+
+preprocess :: String -> [String]
+preprocess str = let (a, xs) = foldr f ("", []) $ lines str in a:xs
+  where f a (b, xs) | null a || null b             = (a' ++ b, xs)
+                    | ' ' == head b && '{' /= head a = (a' ++ ' ':trimLine b, xs)
+                    | '{' == head a || '}' == head b = (a' ++ "\n" ++ b, xs)
+                    | '{' == head b                = ("", (a' ++ '\n':b ++ "\n"):xs)
+                    | otherwise                   = (a', b:xs)
+            where a' = trimRight a 
 
 trimLeft :: String -> String
 trimLeft "" = ""
