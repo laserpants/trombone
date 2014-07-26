@@ -297,7 +297,8 @@ eol = try (string "\n\r")
   <|> string "\n"
   <|> string "\r"
 
--- | Read and parse routes from a configuration file.
+-- | Read and parse routes from a configuration file with a progress bar
+-- being printed to stdout.
 parseRoutesFromFile :: FilePath -> IO [Route]
 parseRoutesFromFile file = do
     putStr "Reading configuration\n|"
@@ -317,19 +318,19 @@ parseRoutesFromFile file = do
           where f i y xs d | i == 81 = xs
                 f i y xs d = let y' = div (i*n) 80 
                                  f' = flip f y' $ succ i in 
-                    if y' == y 
-                        then f' xs $ '.':d
-                        else f' (d:fill y y' ++ xs) "."
+                    if y' == y then f' xs ('.':d) 
+                              else f' (d:fill y y' ++ xs) "."
                 fill x x' = replicate (x' - x - 1) ""
 
 preprocess :: String -> [String]
 preprocess str = let (a, xs) = foldr f ("", []) $ lines str in a:xs
-  where f a (b, xs) | null a || null b             = (a' ++ b, xs)
-                    | ' ' == head b && '{' /= head a = (a' ++ ' ':trimLine b, xs)
-                    | '{' == head a || '}' == head b = (a' ++ "\n" ++ b, xs)
-                    | '{' == head b                = ("", (a' ++ '\n':b ++ "\n"):xs)
-                    | otherwise                   = (a', b:xs)
+  where f a (b, xs) | null a || null b             = ( a' ++ b              , xs   )
+                    | ' ' == head b && '{' /= head a = ( a' ++ ' ':trimLine b , xs   )
+                    | '{' == head a || '}' == head b = ( a' ++ "\n" ++ b       , xs   )
+                    | '{' == head b                = ( ""                  , x:xs )
+                    | otherwise                   = ( a'                  , b:xs )
             where a' = trimRight a 
+                  x  = a' ++ '\n':b ++ "\n"
 
 trimLeft :: String -> String
 trimLeft "" = ""

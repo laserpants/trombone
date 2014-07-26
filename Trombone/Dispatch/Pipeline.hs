@@ -7,7 +7,9 @@ import Data.Scientific
 import Data.Text                                       ( isPrefixOf )
 import Network.HTTP.Types                              
 import Trombone.Dispatch.Core
-import Trombone.Dispatch.Db                            ( dispatchDbAction )
+import Trombone.Dispatch.Db                            ( dispatchDbAction, escVal' )
+import Trombone.Dispatch.NodeJs
+import Trombone.Dispatch.Static
 import Trombone.Pipeline
 import Trombone.RoutePattern
 
@@ -84,14 +86,16 @@ runProcessor (Processor pid fields mtd uri exp) msgs conns = do
             when loud $ liftIO $ putStrLn (show mtd ++ " " ++ Text.unpack x)
             r <- lookupRoute mtd x
             case r of
-                Nothing -> return []
-                Just (Route _ _ (RouteSql    q), ps) -> do
-                    RouteResponse _ _ r <- dispatchDbAction q ps v
-                    return $ broadcast conns r
-                Just (Route _ _ (RoutePipes  _), ps) -> return [] -- @todo
-                Just (Route _ _ (RouteNodeJs _), ps) -> return [] -- @todo
-                Just (Route _ _ (RouteStatic _), ps) -> return [] -- @todo
+                Nothing    -> return []
+                Just route -> do
+                    (RouteResponse _ _ val) <- disp route v
+                    return $ broadcast conns val
         _ -> return msgs
+
+disp :: (Route, [(Text, EscapedText)]) -> Value -> Dispatch RouteResponse
+disp (Route _ _ (RouteSql    q   ) , ps) v = dispatchDbAction q ps v
+disp (Route _ _ (RouteStatic resp) , _ ) _ = dispatchStatic resp
+disp _                                   _ = return $ RouteResponse [] 500 Null
 
 fill :: RoutePattern -> Object -> Maybe Text
 fill (RoutePattern rp) o = Text.intercalate "/" <$> f rp []
@@ -100,6 +104,7 @@ fill (RoutePattern rp) o = Text.intercalate "/" <$> f rp []
         f (Variable v:xs) ps = 
             case HMS.lookup (Text.cons ':' v) o of
                 Just (String x)  -> f xs (strip x:ps) 
+                Just n           -> f xs (escVal' n:ps)
                 _                -> Nothing
 
 strip :: Text -> Text
