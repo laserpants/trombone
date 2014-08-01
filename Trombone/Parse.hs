@@ -50,7 +50,7 @@ atom = liftM Atom literal
 -- | Parse a string consisting strictly of alphanumeric characters, dashes, 
 -- underscores or exclamation marks.
 literal :: GenParser Char st Text
-literal = liftM pack $ many1 (alphaNum <|> oneOf "-_!")
+literal = liftM pack $ many1 (alphaNum <|> oneOf "-_!~")
 
 -- | Parse a single line of input, which may be a comment, a blank line, or 
 -- a valid route description.
