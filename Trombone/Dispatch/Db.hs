@@ -136,6 +136,7 @@ escVal (Array a) = listify a
   where f v = let (EscapedText t) = escVal v in t
         listify = EscapedText . Text.concat . intersperse "," 
                               . map f  . Vect.toList 
+escVal Null = EscapedText "NULL"
 escVal _ = EscapedText empty
 
 escVal' :: Value -> Text
