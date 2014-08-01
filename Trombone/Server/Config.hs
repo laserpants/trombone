@@ -131,7 +131,7 @@ options =
       (OptArg (\d opts -> opts 
             { configEnPipes   = True
             , configPipesFile = fromMaybe "pipelines.conf" d }) "FILE")
-      "enable request pipelines [configuration file]"
+      "read request pipelines from external [configuration file]"
     , Option "s" ["port"]
       (ReqArg (\p opts -> opts { configServerPort = read p }) "PORT")
       "server port"
