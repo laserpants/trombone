@@ -8,6 +8,7 @@ module Trombone.Parse
 
 import Control.Monad
 import Data.Aeson                                      ( decode, eitherDecode )
+import Data.List.Utils                                 ( split )
 import Data.Maybe                                      ( catMaybes, mapMaybe )
 import Data.Text                                       ( Text, pack, unpack )
 import Data.Text.Encoding                              ( encodeUtf8 )
@@ -323,7 +324,7 @@ parseRoutesFromFile file = do
                 fill x x' = replicate (x' - x - 1) ""
 
 preprocess :: String -> [String]
-preprocess str = let (a, xs) = foldr f ("", []) $ lines str in a:xs
+preprocess str = let (a, xs) = foldr (f . g) ("", []) (lines str) in a:xs
   where f a (b, xs) | null a || null b             = ( a' ++ b              , xs   )
                     | ' ' == head b && '{' /= head a = ( a' ++ ' ':trimLine b , xs   )
                     | '{' == head a || '}' == head b = ( a' ++ "\n" ++ b       , xs   )
@@ -331,6 +332,8 @@ preprocess str = let (a, xs) = foldr f ("", []) $ lines str in a:xs
                     | otherwise                   = ( a'                  , b:xs )
             where a' = trimRight a 
                   x  = a' ++ '\n':b ++ "\n"
+        g "" = ""
+        g s  = head $ split "#" s
 
 trimLeft :: String -> String
 trimLeft "" = ""
