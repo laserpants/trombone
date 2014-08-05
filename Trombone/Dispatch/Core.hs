@@ -16,7 +16,7 @@ import Control.Arrow                                   ( (***) )
 import Data.Aeson
 import Data.ByteString                                 ( ByteString )
 import Data.ByteString.Lazy                            ( fromStrict )
-import Data.Char                                       ( isAlphaNum )
+import Data.Char                                       ( isAlphaNum, isNumber )
 import Data.Maybe                                      ( listToMaybe, maybeToList, fromMaybe, mapMaybe )
 import Data.Text                                       ( Text )
 import Database.Persist.Postgresql
@@ -59,7 +59,11 @@ filterNot f = filter (not . f)
  
 params :: [(Text, Text)] -> [(Text, EscapedText)]
 params = map (prefix *** escape) 
-  where escape = EscapedText . quoute . sanitize
+  where escape = EscapedText . q . sanitize
+        q :: Text -> Text
+        q s = if Text.all isNumber s
+                  then s
+                  else quoute s
 
 prefix :: Text -> Text
 {-# INLINE prefix #-}
