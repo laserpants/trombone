@@ -16,5 +16,6 @@ buildLogger :: BufSize        -- ^ Buffer size
             -> IO Middleware
 buildLogger bufsize path = do
     file <- newFileLoggerSet bufsize path
-    mkRequestLogger def { destination = Logger file }
+    mw   <- mkRequestLogger def { destination = Logger file }
+    return (file, mw)
 

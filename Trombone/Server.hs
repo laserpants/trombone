@@ -62,6 +62,7 @@ data ServerConf = ServerConf
     , serverHmacConf   :: Maybe HmacKeyConf  -- ^ HMAC configuration
     , serverPipelines  :: [(Text, Pipeline)] -- ^ Pipeline map
     , serverVerbose    :: Bool               -- ^ Log output to stdout
+    , serverLogger     :: Maybe LoggerSet
     }
 
 nullConf :: ServerConf
@@ -111,6 +112,7 @@ runWithConf ServerConf
     , serverHmacConf   = hconf
     , serverPipelines  = pipes 
     , serverVerbose    = loud
+    , serverLogger     = logger
     } = 
     withPostgresqlPool (buildConnectionString dbconf) pconns $ \pool -> do
         putStrLn $ "Trombone listening on port " ++ show port ++ "."
@@ -125,8 +127,9 @@ setupLogger :: ServerState ()
 setupLogger = do
     (c@Config{..}, setup@ServerConf{ serverMiddleware = mw }) <- get
     when configEnLogging $ do
-        logger <- lift $ buildLogger configLogBufSize configLogFile
-        put (c, setup{ serverMiddleware = logger:mw })
+        (logger, m) <- lift $ buildLogger configLogBufSize configLogFile
+        put (c, setup{ serverMiddleware = m:mw 
+                     , serverLogger     = Just logger })
 
 setupAmqp :: ServerState ()
 setupAmqp = do

@@ -21,6 +21,7 @@ import Data.Maybe                                      ( listToMaybe, maybeToLis
 import Data.Text                                       ( Text )
 import Database.Persist.Postgresql
 import Network.Wai.Internal                   as Core  ( Request(..) )
+import System.Log.FastLogger                           ( LoggerSet )
 import Trombone.Db.Template
 import Trombone.Db.Template                   as Core  ( EscapedText ) 
 import Trombone.Pipeline
@@ -38,6 +39,7 @@ data Context = Context
     , dispatchKeys    :: Maybe HmacKeyConf  -- ^ HMAC authentication keys
     , dispatchMesh    :: [(Text, Pipeline)] -- ^ Mesh lookup table
     , dispatchVerbose :: Bool               -- ^ Server output?
+    , dispatchLogger  :: Maybe LoggerSet
     }
 
 -- | Monad transformer in which requests are dispatched.
