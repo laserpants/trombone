@@ -62,12 +62,12 @@ data ServerConf = ServerConf
     , serverHmacConf   :: Maybe HmacKeyConf  -- ^ HMAC configuration
     , serverPipelines  :: [(Text, Pipeline)] -- ^ Pipeline map
     , serverVerbose    :: Bool               -- ^ Log output to stdout
-    , serverLogger     :: Maybe LoggerSet
+    , serverLogger     :: Maybe LoggerSet    -- ^ FastLogger instance
     }
 
 nullConf :: ServerConf
 {-# INLINE nullConf #-}
-nullConf = ServerConf 0 0 (DbConf "" 0 "" "" "") [] [] Nothing [] False
+nullConf = ServerConf 0 0 (DbConf "" 0 "" "" "") [] [] Nothing [] False Nothing
 
 buildConnectionString :: DbConf -> ConnectionString
 buildConnectionString DbConf{..} =
@@ -117,7 +117,7 @@ runWithConf ServerConf
     withPostgresqlPool (buildConnectionString dbconf) pconns $ \pool -> do
         putStrLn $ "Trombone listening on port " ++ show port ++ "."
         run port $ foldr ($) `flip` midware $ \request app -> do
-            let context = Context pool request routes hconf pipes loud
+            let context = Context pool request routes hconf pipes loud logger
             flip runReaderT context $ runRoutes 
                 >>= lift . app . sendJsonResponse . responseOr404 
 

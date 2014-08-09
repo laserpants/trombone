@@ -39,7 +39,7 @@ data Context = Context
     , dispatchKeys    :: Maybe HmacKeyConf  -- ^ HMAC authentication keys
     , dispatchMesh    :: [(Text, Pipeline)] -- ^ Mesh lookup table
     , dispatchVerbose :: Bool               -- ^ Server output?
-    , dispatchLogger  :: Maybe LoggerSet
+    , dispatchLogger  :: Maybe LoggerSet    -- ^ FastLogger instance
     }
 
 -- | Monad transformer in which requests are dispatched.

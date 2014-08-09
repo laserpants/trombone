@@ -78,7 +78,7 @@ integrate (Pipeline pcs conns mq) =
 runProcessor :: Processor -> [Message] -> [Connection] -> Dispatch [Message]
 runProcessor _ [] _ = return []
 runProcessor (Processor pid fields mtd uri exp) msgs conns = do
-    Context _ _ _ _ _ loud <- ask
+    Context _ _ _ _ _ loud _ <- ask
     let o = buildJsonRequest msgs
         v = expand exp o
     case (saturated fields v, fill uri o) of
