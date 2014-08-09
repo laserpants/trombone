@@ -26,7 +26,7 @@ import qualified Data.HashMap                 as Map
 
 -- | Response header with server description.
 versionH :: (HeaderName, ByteString)
-versionH = ("Server", "Trombone/0.8.1")
+versionH = ("Server", "Trombone/0.8.2")
 
 -- | Server startup configuration parameters.
 data Config = Config

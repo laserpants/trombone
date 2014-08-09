@@ -84,7 +84,7 @@ runWithArgs = do
     translOpts args >>= \(args, _) -> run args
   where run :: Config -> IO ()
         run Config{ configShowVer  = True } = 
-            putStrLn "Trombone server version 0.8.1" 
+            putStrLn "Trombone server version 0.8.2" 
         run Config{ configShowHelp = True } = 
             putStrLn $ usageInfo "Usage: trombone [OPTION...]" options
         run cfg = do
