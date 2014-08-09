@@ -10,6 +10,7 @@ import Control.Exception.Lifted                        ( SomeException, try, fro
 import Data.Aeson
 import Data.List                                       ( intersperse )
 import Data.Maybe                                      ( listToMaybe, maybeToList, fromMaybe, mapMaybe )
+import Data.Monoid                                     ( (<>) )
 import Data.Scientific
 import Data.Text                                       ( Text, pack, empty )
 import Data.Text.Encoding
@@ -22,6 +23,8 @@ import Database.Persist
 import Database.Persist.Postgresql              hiding ( Sql )
 import Database.PostgreSQL.Simple                      ( SqlError(..) )
 import Network.Wai.Internal                            ( Request(..) )
+import System.Log.FastLogger                           ( pushLogStr, toLogStr )
+import Trombone.Db.Colorize
 import Trombone.Db.Execute
 import Trombone.Db.Template
 import Trombone.Dispatch.Core
