@@ -55,16 +55,18 @@ tokens = concatMap f
 
 label :: Text -> Label
 label t | isKeyword t = Keyword t
-        | isDelim   t = Delim   t
+        | isDelimOp t = Delim   t
         | otherwise   = Default t
 
-isDelim :: Text -> Bool
-isDelim t = t `elem`
+isDelimOp :: Text -> Bool
+isDelimOp t = t `elem`
     [ "="
     , ","
     , ";"
     , "("
     , ")"
+    , "+"
+    , "-"
     , "<>"
     , ">"
     , ">="
@@ -81,6 +83,7 @@ isKeyword t = t `elem`
      , "into"
      , "values"
      , "where"
+     , "set"
      , "order"
      , "by"
      , "in"
