@@ -19,6 +19,10 @@ import qualified Data.Text                             as Text
 import qualified Data.Vector                           as Vect
 
 dispatchPipeline :: Pipeline -> [(Text, EscapedText)] -> Value -> Dispatch RouteResponse
+dispatchPipeline q ps (Array a) =
+    liftM resp $ mapM (dispatchPipeline q ps) (Vect.toList a)
+  where val (RouteResponse _ _ x) = x
+        resp = RouteResponse [] 202 . Array . Vect.fromList . map val
 dispatchPipeline (Pipeline pcs conns _) ps obj = do
     mq <- initMq
     stabilize (Pipeline pcs conns mq) 
