@@ -62,8 +62,9 @@ run (DbQuery ret tpl) ps = do
                   \Arguments missing: "
                 , Text.concat $ intersperse ", " $ map arg e, "." ]
         Right q -> do
-            let pretty = colorize $ Text.stripStart q
-            when loud $ liftIO $ putStrLn $ Text.unpack pretty -- Verbose output
+            let q' = Text.stripStart q
+                pretty = colorize q'
+            when loud $ liftIO $ putStrLn $ Text.unpack q' -- Verbose output
             case logger of 
                 Nothing -> return ()
                 Just lg -> liftIO $ pushLogStr lg $ toLogStr $ pretty <> "\n"
