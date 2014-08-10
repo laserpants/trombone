@@ -85,6 +85,7 @@ isKeyword t = t `elem`
      , "into"
      , "values"
      , "where"
+     , "and"
      , "set"
      , "order"
      , "by"
