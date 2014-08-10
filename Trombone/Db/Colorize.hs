@@ -20,6 +20,7 @@ data Label = Keyword   Text
   deriving (Show)
 
 colorCode :: ColorIntensity -> Color -> Text
+{-# INLINE colorCode #-}
 colorCode i c = pack $ setSGRCode [SetColor Foreground i c]
 
 encode :: [Label] -> Text
@@ -54,6 +55,7 @@ tokens = concatMap f
         bup c = filter (/= "") . intersperse (pack [c]) . Text.split (== c) 
 
 label :: Text -> Label
+{-# INLINE label #-}
 label t | isKeyword t = Keyword t
         | isDelimOp t = Delim   t
         | otherwise   = Default t
@@ -102,5 +104,6 @@ takeApart s = filter nonempty $ reverse $ f s' [] SqlItem StringItem
         nonempty _               = True
 
 colorize :: Text -> Text
+{-# INLINE colorize #-}
 colorize = encode . tokens . takeApart
 
