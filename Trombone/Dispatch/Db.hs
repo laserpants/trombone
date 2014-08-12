@@ -58,7 +58,7 @@ run (DbQuery ret tpl) ps = do
         Left e -> 
             -- 400 Bad request: Request parameters did not match template
             return $ errorResponse ErrorBadRequest $ Text.concat
-                [ "Invalid route: Template parameter list undersaturated. \
+                [ "Error: Template parameter list undersaturated. \
                   \Arguments missing: "
                 , Text.concat $ intersperse ", " $ map arg e, "." ]
         Right q -> do
