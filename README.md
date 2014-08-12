@@ -51,11 +51,11 @@ Trombone templates acknowledge two types of placeholder variables, both denoted 
 
 This type of variable must also be present in the route's uri pattern, where it is bound to a specific path segment. A uri variable can only contain alphanumeric characters, hyphens and underscores. It is prefixed with a single colon. This is to distinguish it from ordinary request body placeholders, which are explained below.    
 
-###### JSON values
+###### Request body JSON values
 
     POST /customer  <>  insert into customer (name, address, phone) values ({{name}}, {{address}}, {{phone}})
 
-When a JSON-formatted request body is available, the server will first parse the raw body to JSON  and substitute any placeholders in the template with those values in the JSON object whose keys match the names of the placeholders in question. 
+When a JSON-formatted request body is available, the server will first parse the raw body to JSON  and substitute any placeholders in the template with matching values in the JSON object whose keys correspond to the names of the placeholders in question. 
 
 ```
 {
