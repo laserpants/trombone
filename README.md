@@ -395,6 +395,6 @@ Trombone can also act as a simple file server. Files located under the `public` 
 
 ### About Trombone
 
-Trombone is written in Haskell using the Warp HTTP server, and WAI — a common protocol for communication between web applications and web servers. 
+Trombone is written in Haskell using the Warp HTTP server library, and WAI — a common protocol for communication between web applications and web servers. 
 
 This software library is available for use under the BSD license.
