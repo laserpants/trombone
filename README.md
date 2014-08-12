@@ -77,7 +77,7 @@ Note that all SQL keywords (`select`, `from`, `insert`, `into` etc.) must be wri
 
 ##### Comments
 
-Comments start with a single octothorpe (#) character and may appear at the end of a route definition;
+Comments start with a single [octothorpe](http://en.wikipedia.org/wiki/Number_sign) (#) character and may appear at the end of a route definition;
 
     GET photo       >>  select * from photo   # Retreive all photos.
 
