@@ -40,7 +40,7 @@ The arrow symbol specifies the type of route and format to use in the response o
 
 ##### Placeholders
 
-Trombone templates acknowledge two types of placeholder variables, both denoted by a double pair of surrounding  curly-braces (similar to Handlebars.js):
+Trombone templates acknowledge two types of placeholder variables, both denoted by a double pair of surrounding  curly-braces (mimicking Handlebars.js):
 
 * Uri segment `{{:variables}}` and
 * JSON value `{{placeholders}}`.
@@ -49,7 +49,7 @@ Trombone templates acknowledge two types of placeholder variables, both denoted 
 
     GET customer/:id   ->   select * from customer where id = {{:id}}
 
-This type of variable must also be present in the route's uri pattern, where it is bound to a specific path segment. A uri variable can only contain alphanumeric characters, hyphens and underscores. It is prefixed with a single colon. This is to distinguish it from ordinary request body placeholders, which are explained below.    
+This type of variable must also be present in the route's uri pattern, where it is bound to a specific path segment. A uri variable can only contain alphanumeric characters, hyphens and underscores. It is always prefixed with a single colon to make the distinction clear from ordinary request body placeholders, which are explained next.    
 
 ###### Request body JSON values
 
