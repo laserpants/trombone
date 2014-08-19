@@ -153,7 +153,7 @@ escVal' v = t
 
 -- | A list of from-and-to character sequences used to escape SQL parameters.
 escapeChars :: [(Text, Text)]
-escapeChars = [("\"", "\\\""), ("'", "\\'")]
+escapeChars = [("\"", "\\\""), ("'", "''")]
 
 -------------------------------------------------------------------------------
 -- Type conversion helper functions
