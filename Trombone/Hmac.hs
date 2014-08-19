@@ -54,7 +54,7 @@ authenticate body = do
   
 -- | Compute a MAC using the SHA1 cryptographic algorithm.
 generateHmac :: ByteString -> ByteString -> ByteString
-generateHmac key msg = digestToHexByteString $ hmacGetDigest $ sha1Hmac key msg
+generateHmac key = digestToHexByteString . hmacGetDigest . sha1Hmac key 
   where sha1Hmac :: ByteString -> ByteString -> HMAC SHA1
         sha1Hmac = hmac
  
