@@ -16,13 +16,25 @@ import Trombone.Dispatch.Static
 import Trombone.Hmac
 import Trombone.Response
 
+import qualified Data.ByteString                       as BS
+import qualified Data.ByteString.Lazy.Char8            as L8
+import qualified Data.ByteString.Lazy.Internal         as LI
 import qualified Data.Conduit.List                     as CL
 import qualified Data.Text                             as Text
+
+strictRequestBody_ :: Request -> IO BS.ByteString
+strictRequestBody_ req = loop id
+  where 
+    loop front = do
+      bs <- requestBody req
+      if BS.null bs
+          then return $ L8.toStrict $ front LI.Empty
+          else loop (front . LI.Chunk bs)
 
 dispatch :: RouteAction -> [(Text, EscapedText)] -> Dispatch RouteResponse
 dispatch route ps = do
     Context{ dispatchRequest = r, dispatchMesh = table } <- ask
-    body <- liftIO $ requestBody r -- (as of wai-3.0.0)
+    body <- liftIO $ strictRequestBody_ r 
     auth <- authenticate body
     case auth of
         Left resp -> return resp
