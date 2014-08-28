@@ -190,7 +190,7 @@ runStatement sql = do
     let conn = buildConnectionString serverDbConf
     res <- try $ lift $ withPostgresqlConn conn $ runDbConn sql
     case res of
-      Left  e -> error $ "SQL error: " ++ C8.unpack (sqlErrorMsg e)
+      Left  e -> error $ "SQL error. " ++ C8.unpack (sqlErrorMsg e)
       Right r -> return r
 
 setupRoutes :: ServerState ()
