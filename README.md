@@ -213,6 +213,29 @@ A possible use-case for static routes is to provide documentation as part of you
 
     OPTIONS /photo  {..}  {"GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
 
+##### A note about `where like %` queries
+
+String values are always wrapped in single quotation marks before inserted into a template, hence the following is not going to work as intended,
+
+```
+select * from customer where customer.name like ('%{{q}}%')
+```
+
+Instead, define your template as
+
+```
+select * from customer where customer.name like ({{q}})
+
+```
+
+and insert the %-characters in the string within the object sent to the server:
+
+```
+{
+   "q": "%Mega-corp%"
+}
+```
+
 #### Response codes
 
 ### Running the server
