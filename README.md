@@ -17,7 +17,7 @@ The format of a single route is described by the following (high-level) grammar.
 
 During dispatch, the server will look through the list of routes for a possible match, based on the request's uri components and the HTTP method used. 
 
-The arrow symbol specifies the type of route and format to use in the response object. See below for an explanation of these symbols. The particular arrow used here; `->`, denotes an SQL query with a singleton result.
+The arrow symbol specifies the type of route and the response object's expected format. See below for an explanation of these symbols. The particular arrow used here; `->`, denotes an SQL query with a singleton result.
 
 ### Hello, world!
 
@@ -156,7 +156,7 @@ Trombone assumes that database table and column names follow the usual `lowercas
 
 ##### Parameter hints
 
-With joins, and more complex queries, the server can sometimes have some difficulty figuring out the attribute names to return from a `SELECT` query. In such cases, and in situations where more control is needed, it is  therefore possible to explicitly specify a list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
+With joins, and more complex queries, the server can sometimes have some difficulty figuring out the attribute names to return. In such cases, and in situations where more control is needed, it is  therefore possible to explicitly specify a list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
 
 ###### Example
 
