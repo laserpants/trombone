@@ -215,16 +215,16 @@ A possible use-case for static routes is to provide documentation as part of you
 
 ##### A note about wildcard operators
 
-Since string values are always wrapped in single quotation marks before inserted into a template, the following will not work as intended,
+Since string values are always wrapped in single quotation marks before they are inserted into a template, the following will not work as intended,
 
 ```
-select * from customer where customer.name like ('%{{q}}%')
+select * from customer where customer.name like '%{{q}}%'
 ```
 
-Instead, define your template as
+Instead, simply define your template as
 
 ```
-select * from customer where customer.name like ({{q}})
+select * from customer where customer.name like {{q}}
 
 ```
 
