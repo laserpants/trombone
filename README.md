@@ -81,14 +81,14 @@ Comments start with a single [octothorpe](http://en.wikipedia.org/wiki/Number_si
 
     GET photo       >>  select * from photo   # Retreive all photos.
 
-or span across an entire line; 
+or stretch over an entire line; 
 
     # Return a specific photo.
     GET photo/:id   ->  select * from photo where id = {{:id}}
 
 ##### Multi-line expressions
 
-SQL statements are allowed to stretch across multiple lines, as long as each subsequent, non-empty line is indented with, at least, one blank space; as in the example below.
+SQL statements are allowed to span across multiple lines, as long as each subsequent, non-empty line is indented with, at least, one blank space; as in the example below.
 
 
 ```
