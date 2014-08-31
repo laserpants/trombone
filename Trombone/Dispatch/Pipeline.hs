@@ -99,6 +99,7 @@ runProcessor (Processor pid fields mtd uri exp) msgs conns = do
 disp :: (Route, [(Text, EscapedText)]) -> Value -> Dispatch RouteResponse
 disp (Route _ _ (RouteSql    q   ) , ps) v = dispatchDbAction q ps v
 disp (Route _ _ (RouteStatic resp) , _ ) _ = dispatchStatic resp
+disp (Route _ _ (RouteInline pl  ) , ps) v = dispatchPipeline pl ps v
 disp _                                   _ = return $ RouteResponse [] 500 Null
 
 fill :: RoutePattern -> Object -> Maybe Text
