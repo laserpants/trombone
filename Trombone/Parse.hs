@@ -8,6 +8,7 @@ module Trombone.Parse
 
 import Control.Monad
 import Data.Aeson                                      ( decode, eitherDecode )
+import Data.List                                       ( foldl' )
 import Data.List.Utils                                 ( split )
 import Data.Maybe                                      ( catMaybes, mapMaybe )
 import Data.Text                                       ( Text, pack, unpack )
@@ -203,7 +204,7 @@ inlineRoute = do
         route (Right p) = RouteInline p
         lines = many jsonLine >>= \p -> lastline >> return p
         firstline = char '{' >> blankspaces >> eol
-        lastline  = char '}' >> blankspaces >> eol
+        lastline  = char '}' >> blankspaces >> eol >> blankspaces
         wrap x = '{':x ++ "}"
 
 jsonLine :: GenParser Char st String
@@ -328,16 +329,26 @@ parseRoutesFromFile file = do
                 fill x x' = replicate (x' - x - 1) ""
 
 preprocess :: String -> [String]
-preprocess str = let (a, xs) = foldr (f . g) ("", []) (lines str) in a:xs
-  where f a (b, xs) | null a || null b             = ( a' ++ b              , xs   )
-                    | ' ' == head b && '{' /= head a = ( a' ++ ' ':trimLine b , xs   )
-                    | '{' == head a || '}' == head b = ( a' ++ "\n" ++ b       , xs   )
-                    | '{' == head b                = ( ""                  , x:xs )
-                    | otherwise                   = ( a'                  , b:xs )
-            where a' = trimRight a 
-                  x  = a' ++ '\n':b ++ "\n"
-        g "" = ""
-        g s  = head $ split "#" s
+preprocess xs = 
+    let (_, ys) = foldl' f ("", []) $ lines xs ++ ["\n"] 
+    in filter notNull $ reverse ys 
+  where 
+    f :: (String, [String]) -> String -> (String, [String])
+    f (x, xs) y | null y       = (x' ++ y       , xs)
+                | null x       = (x  ++ y'      , xs)
+                | '{' == head y = (x' ++ "\n{\n" , xs)
+                | '}' == head y = (x' ++ "\n}\n" , xs)
+                | ind y        = (x' ++ y'      , xs)
+                | otherwise    = (y', trimLine x:xs)
+      where
+        x' = trimLine x 
+        y' = ' ':trimLine (rc y) 
+        ind y = ' ' == head y 
+        rc "" = ""
+        rc x  = head (split "#" x)
+
+notNull :: String -> Bool
+notNull = not . null
 
 trimLeft :: String -> String
 trimLeft "" = ""
