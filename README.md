@@ -5,7 +5,7 @@ Trombone
 
 ### Introduction
 
-Trombone is a [REST](http://en.wikipedia.org/wiki/Representational_state_transfer)ful, [JSON](http://json.org/)-driven [data access server](http://en.wikipedia.org/wiki/Data_access_layer) for [PostgreSQL](www.postgresql.org). Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using   standard HTTP response codes and error conventions.
+Trombone is a [REST](http://en.wikipedia.org/wiki/Representational_state_transfer)ful, [JSON](http://json.org/)-driven [data access server](http://en.wikipedia.org/wiki/Data_access_layer) for [PostgreSQL](http://www.postgresql.org). Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using   standard HTTP response codes and error conventions.
 
 A Trombone configuration file consists of a collection of route patterns.
 
@@ -17,7 +17,7 @@ The format of a single route is described by the following (high-level) grammar.
 
 During dispatch, the server will look through the list of routes for a possible match, based on the request's uri components and the HTTP method used. 
 
-The arrow symbol specifies the type of route and format to use in the response object. See below for an explanation of these symbols. The particular arrow used here; `->`, denotes an SQL query with a singleton result.
+The arrow symbol specifies the type of route and the response object's expected format. See below for an explanation of these symbols. The particular arrow used here; `->`, denotes an SQL query with a singleton result.
 
 ### Hello, world!
 
@@ -81,14 +81,14 @@ Comments start with a single [octothorpe](http://en.wikipedia.org/wiki/Number_si
 
     GET photo       >>  select * from photo   # Retreive all photos.
 
-or span across an entire line; 
+or stretch over an entire line; 
 
     # Return a specific photo.
     GET photo/:id   ->  select * from photo where id = {{:id}}
 
 ##### Multi-line expressions
 
-SQL statements are allowed to stretch across multiple lines, as long as each subsequent, non-empty line is indented with, at least, one blank space; as in the example below.
+SQL statements are allowed to span across multiple lines, as long as each subsequent, non-empty line is indented with, at least, one blank space; as in the example below.
 
 
 ```
@@ -156,7 +156,7 @@ Trombone assumes that database table and column names follow the usual `lowercas
 
 ##### Parameter hints
 
-With joins, and more complex queries, the server can sometimes have some difficulty figuring out the attribute names to return from a `SELECT` query. In such cases, and in situations where more control is needed, it is  therefore possible to explicitly specify a list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
+With joins, and more complex queries, the server can sometimes have some difficulty figuring out the attribute names to return by only looking at the template. In such cases, and in situations where more control is needed, it is  therefore possible (and necessary) to explicitly specify a list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
 
 ###### Example
 
@@ -215,16 +215,16 @@ A possible use-case for static routes is to provide documentation as part of you
 
 ##### A note about wildcard operators
 
-Since string values are always wrapped in single quotation marks before inserted into a template, the following will not work as intended,
+Since string values are always wrapped in single quotation marks before they are inserted into a template, the following will not work as intended,
 
 ```
-select * from customer where customer.name like ('%{{q}}%')
+select * from customer where customer.name like '%{{q}}%'
 ```
 
-Instead, define your template as
+Instead, simply define your template as
 
 ```
-select * from customer where customer.name like ({{q}})
+select * from customer where customer.name like {{q}}
 
 ```
 
