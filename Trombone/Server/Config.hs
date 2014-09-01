@@ -16,7 +16,9 @@ import Data.HashMap                                    ( Map )
 import Data.List.Utils                                 ( split )
 import Data.Maybe                                      ( catMaybes, fromMaybe )
 import Data.Text                                       ( Text, pack, unpack )
+import Data.Version                                    ( showVersion )
 import Network.HTTP.Types                              ( HeaderName )
+import Paths_trombone                                  ( version )
 import System.Console.GetOpt
 import Trombone.Middleware.Logger
 import Trombone.Pipeline
@@ -26,7 +28,7 @@ import qualified Data.HashMap                 as Map
 
 -- | Response header with server description.
 versionH :: (HeaderName, ByteString)
-versionH = ("Server", "Trombone/0.8.2")
+versionH = ("Server", BS.pack $ "Trombone/" ++ showVersion version)
 
 -- | Server startup configuration parameters.
 data Config = Config

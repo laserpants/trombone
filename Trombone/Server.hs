@@ -16,11 +16,13 @@ import Data.ByteString                                 ( ByteString )
 import Data.Conduit
 import Data.Text                                       ( Text, replace )
 import Data.Text.Encoding                              ( encodeUtf8 )
+import Data.Version                                    ( showVersion )
 import Database.Persist.Postgresql                     ( ConnectionString, PersistValue(..), rawExecute, rawQuery, withPostgresqlConn, withPostgresqlPool )
 import Database.PostgreSQL.Simple                      ( SqlError(..) )
 import Network.Wai                                     ( Middleware, Response, responseLBS )
 import Network.Wai.Handler.Warp                        ( run )
 import Network.Wai.Middleware.Static
+import Paths_trombone                                  ( version )
 import System.Console.GetOpt
 import System.Environment                              ( getArgs )
 import Trombone.Db.Execute
@@ -84,7 +86,7 @@ runWithArgs = do
     translOpts args >>= \(args, _) -> run args
   where run :: Config -> IO ()
         run Config{ configShowVer  = True } = 
-            putStrLn "Trombone server version 0.8.2" 
+            putStrLn $ "Trombone server version " ++ showVersion version 
         run Config{ configShowHelp = True } = 
             putStrLn $ usageInfo "Usage: trombone [OPTION...]" options
         run cfg = do
