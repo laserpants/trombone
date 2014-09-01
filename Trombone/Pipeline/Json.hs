@@ -60,6 +60,7 @@ instance FromJSON Method where
     parseJSON (String "PUT")     = return "PUT"
     parseJSON (String "DELETE")  = return "DELETE"
     parseJSON (String "PATCH")   = return "PATCH"
+    parseJSON (String "OPTIONS") = return "OPTIONS"
     parseJSON _                  = mzero
 
 instance FromJSON Processor where
