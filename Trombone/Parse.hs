@@ -48,8 +48,8 @@ variable = char ':' >> liftM Variable literal
 atom :: GenParser Char st RouteSegment
 atom = liftM Atom literal
 
--- | Parse a string consisting strictly of alphanumeric characters, dashes, 
--- underscores or exclamation marks.
+-- | Parse a string made up strictly of alphanumeric characters together
+-- with a small subset of the special ascii characters.
 literal :: GenParser Char st Text
 literal = liftM pack $ many1 (alphaNum <|> oneOf "-_!~")
 
@@ -166,8 +166,8 @@ inspect res = do
         (Just tbl, Just ["*"]) -> resultFromTemplate (res ["*", tbl]) tpl
         (_, Just cs)           -> resultFromTemplate (res cs) tpl
         _                      -> error 
-                "Unable to extract column names from SQL statement. \
-                \Add parameter hints to configuration."
+                "Unable to extract column names from SQL template. \
+                \An explicit parameter list is required in the route configuration."
 
 -- | A PostgreSQL route of type that returns the last inserted id.
 sqlLastInsert :: GenParser Char st RouteAction
@@ -241,57 +241,61 @@ mkQuery res = DbQuery res . parseDbTemplate . pack
 skip1 :: GenParser Char st a -> GenParser Char st ()
 skip1 = liftM $ const ()
 
+symbol :: String -> GenParser Char st ()
+symbol = skip1 . string 
+
 -- | Symbol to indicate that the route is a PostgreSQL query template of type 
 -- that returns no result.
 symbolSqlNoResult :: GenParser Char st ()
-symbolSqlNoResult = skip1 $ string "--" 
+symbolSqlNoResult = symbol "--" 
 
 -- | Symbol for PostgreSQL query of type that returns a single item.
 symbolSqlItem :: GenParser Char st ()
-symbolSqlItem = skip1 $ string "~>" 
+symbolSqlItem = symbol "~>" 
 
 -- | Symbol for PostgreSQL query of type that returns a single item with
 -- an 'Ok' status message.
 symbolSqlItemOk :: GenParser Char st ()
-symbolSqlItemOk = skip1 $ string "->" 
+symbolSqlItemOk = symbol "->" 
 
 -- | Symbol for PostgreSQL query of type that returns a collection.
 symbolSqlCollection :: GenParser Char st ()
-symbolSqlCollection = skip1 $ string ">>" 
+symbolSqlCollection = symbol ">>" 
 
 -- | Symbol for PostgreSQL query of type that returns the last inserted id.
 symbolSqlLastInsert :: GenParser Char st ()
-symbolSqlLastInsert = skip1 $ string "<>" 
+symbolSqlLastInsert = symbol "<>" 
 
 -- | Symbol for PostgreSQL query of type that returns a row count result.
 symbolSqlCount :: GenParser Char st ()
-symbolSqlCount = skip1 $ string "><" 
+symbolSqlCount = symbol "><" 
 
 -- | Symbol which indicates that the route is a nodejs script.
 -- e.g., GET /resource  <js> myscript
 symbolNodeJs :: GenParser Char st ()
-symbolNodeJs = skip1 $ string "<js>" 
+symbolNodeJs = symbol "<js>" 
 
 -- | Symbol which indicates that the route is a pipeline.
 -- e.g., GET /resource  ||  some-system
 symbolPipeline :: GenParser Char st ()
-symbolPipeline = skip1 $ string "||" 
+symbolPipeline = symbol "||" 
 
 -- | Symbol which indicates that the route is an inline pipeline.
 -- e.g., GET /resource  |>  {"processors":[...],"connections":[...]}
 symbolInline :: GenParser Char st ()
-symbolInline = skip1 $ string "|>" 
+symbolInline = symbol "|>" 
 
 -- | Symbol to denote a static route.
 -- e.g., GET /resource {..} {"hello":"is it me you're looking for?"}
 symbolStatic :: GenParser Char st ()
-symbolStatic = skip1 $ string "{..}" 
+symbolStatic = symbol "{..}" 
 
 -- | Zero or more blank spaces (unlike the default "spaces", this combinator 
 -- accepts only "true" spaces).
 blankspaces :: GenParser Char st ()
 blankspaces = skipMany (char ' ')
 
+-- | End of line.
 eol :: GenParser Char st String
 eol = try (string "\n\r")
   <|> try (string "\r\n")
