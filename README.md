@@ -156,7 +156,7 @@ Trombone assumes that database table and column names follow the usual `lowercas
 
 ##### Parameter hints
 
-With joins, and more complex queries, the server can sometimes have some difficulty figuring out the attribute names to return. In such cases, and in situations where more control is needed, it is  therefore possible to explicitly specify a list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
+With joins, and more complex queries, the server can sometimes have some difficulty figuring out the attribute names to return by only looking at the template. In such cases, and in situations where more control is needed, it is  therefore possible (and necessary) to explicitly specify a list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
 
 ###### Example
 
