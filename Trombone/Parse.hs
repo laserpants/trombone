@@ -9,8 +9,8 @@ module Trombone.Parse
 import Control.Monad
 import Data.Aeson                                      ( decode, eitherDecode )
 import Data.List                                       ( foldl' )
-import Data.List.Utils                                 ( split )
-import Data.Maybe                                      ( catMaybes, mapMaybe )
+import Data.List.Utils                                 ( split, replace )
+import Data.Maybe                                      ( maybeToList, catMaybes, mapMaybe )
 import Data.Text                                       ( Text, pack, unpack )
 import Data.Text.Encoding                              ( encodeUtf8 )
 import Network.HTTP.Types.Method
@@ -56,27 +56,74 @@ literal = liftM pack $ many1 (alphaNum <|> oneOf "-_!~")
 
 -- | Parse a single line of input, which may be a comment, a blank line, or 
 -- a valid route description.
-line :: GenParser Char st (Maybe Route)
+line :: GenParser Char st [Route]
 line = do
     blankspaces
-    r <- optionMaybe route
+    r <- optionMaybe routeOrBlock
     optional comment
     eol
-    return r
+    return $ concat $ maybeToList r
 
 -- | A comment may appear at the end of any line, and starts with a '#'.
 comment :: GenParser Char st ()
 comment = char '#' >> skipMany (noneOf "\n\r") 
 
+routeOrBlock :: GenParser Char st [Route]
+routeOrBlock = try route <|> dryBlock
+
 -- | Parse a route (i.e., method, uri, and action).
-route :: GenParser Char st Route
+route :: GenParser Char st [Route]
 route = do
     m <- method
     blankspaces
     u <- uri
     blankspaces
     a <- action
-    return $ Route m u a
+    return [Route m u a]
+
+dryBlock :: GenParser Char st [Route]
+dryBlock = do
+    string "DRY"
+    blankspaces
+    s <- many (noneOf "\n\r") 
+    eol
+    openingBracket
+    xs <- sepEndBy (item s) (char ';')
+    eol
+    closingBracket
+    return $ concatMap f xs
+  where 
+    f r = case parse route "" r of
+            Left   _ -> []
+            Right rs -> rs
+
+alone :: Char -> GenParser Char st ()
+alone c = do
+    skip1 (char c)
+    blankspaces
+    skip1 eol
+
+openingBracket :: GenParser Char st ()
+openingBracket = alone '{'
+
+closingBracket :: GenParser Char st ()
+closingBracket = alone '}'
+
+item :: String -> GenParser Char st String
+item s = do
+    m <- segm
+    u <- segm
+    a <- segm
+    blankspaces
+    t <- many (noneOf ";\n\r")
+    return $ concat 
+        [ m , " "
+        , u , " "
+        , a , " "
+        , replace "{{..}}" t s
+        , ";" ] 
+  where 
+    segm = blankspaces >> many (noneOf " \n\r")
 
 -- | Any of the valid route action types.
 action :: GenParser Char st RouteAction
@@ -311,10 +358,10 @@ parseRoutesFromFile file = do
     chars 80 ' ' >> putStr "|" >> chars 81 '\b'
     r <- readFile file
     let ls = preprocess r
-    x <- liftM catMaybes $ mapM go $ zip (dots $ length ls) ls
+    x <- liftM concat $ mapM go $ zip (dots $ length ls) ls
     putChar '\n'
     return x
-  where go :: (String, String) -> IO (Maybe Route)
+  where go :: (String, String) -> IO [Route]
         go (dots,x) = 
             case parse line "" (x ++ "\n") of
                 Left e   -> error $ show e ++ '\n':x
