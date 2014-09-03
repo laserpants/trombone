@@ -48,7 +48,8 @@ extract :: SelectItem -> [Text]
 extract ( SelExp     _ (Star _)   ) = ["*"]
 extract ( SelExp     _ s          ) = f s
   where f (Identifier  _ (Nmc n)  ) = [pack n]
-        f (QIdentifier _ xs       ) = map (pack . ncStr) xs
+        -- f (QIdentifier _ xs       ) = map (pack . ncStr) xs
+        f (QIdentifier _ xs       ) = [Text.intercalate "_" $ map (pack . ncStr) xs] 
         f _                         = []
 extract ( SelectItem _ _ (Nmc  a) ) = [pack a]
 extract ( SelectItem _ _ (QNmc a) ) = [pack a]
