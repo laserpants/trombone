@@ -1,11 +1,14 @@
 Trombone
 ========
 
--- under construction --
-
 ### Introduction
 
-Trombone is a [REST](http://en.wikipedia.org/wiki/Representational_state_transfer)ful, [JSON](http://json.org/)-driven [data access server](http://en.wikipedia.org/wiki/Data_access_layer) for [PostgreSQL](http://www.postgresql.org). Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using   standard HTTP response codes and error conventions.
+Trombone is a [REST](http://en.wikipedia.org/wiki/Representational_state_transfer)ful, [JSON](http://json.org/)-driven [data access server](http://en.wikipedia.org/wiki/Data_access_layer) for [PostgreSQL](http://www.postgresql.org). Its purpose is to map HTTP requests to preconfigured SQL templates. These templates are instantiated and executed against a database, with results returned in JSON, using   standard HTTP response codes and error conventions. 
+
+You may find this software useful if,
+
+1. your application infrastructure relies on relational SQL schemas; and
+2. you need to expose some of this data using a web service (using JSON as data exchange format).
 
 A Trombone configuration file consists of a collection of route patterns.
 
@@ -15,19 +18,19 @@ The format of a single route is described by the following (high-level) grammar.
 
     <route> ::= <method> <uri> <symbol> <action>
 
-During dispatch, the server will look through the list of routes for a possible match, based on the request's uri components and the HTTP method used. 
+During dispatch, the server will look through the list of routes for a possible match, based on the uri components and the HTTP method used in the request. 
 
 The arrow symbol specifies the type of route and the response object's expected format. See below for an explanation of these symbols. The particular arrow used here; `->`, denotes an SQL query with a singleton result.
 
 ### Hello, world!
 
-`routes.conf:`
+todo
 
-**todo**
+`routes.conf:`
 
     GET    photo              >>  select * from photo order by id
     GET    photo/:id          ->  select * from photo where id = {{:id}}
-    POST   photo              <>  insert into photo (url, description) values ('{{url}}', '{{description}}')
+    POST   photo              <>  insert into photo (url, description) values ( {{url}}, {{description}} )
     PUT    photo/:id          ><
     PATCH  photo/:id          ><
     DELETE photo              --
@@ -40,20 +43,21 @@ The arrow symbol specifies the type of route and the response object's expected 
 
 ##### Placeholders
 
-Trombone templates acknowledge two types of placeholder variables, both denoted by a double pair of surrounding  curly-braces (mimicking Handlebars.js):
+Trombone templates acknowledge three types of placeholder variables. These are all denoted by a double pair of surrounding  curly-braces (mimicking Handlebars.js). 
 
-* Uri segment `{{:variables}}` and
-* JSON value `{{placeholders}}`.
+* Uri segment `{{:variables}}`;
+* JSON value `{{placeholders}}`; and
+* DRY-block placeholders `{{..}}` (explained under "DRY-block notation").
 
 ###### Uri variables
 
     GET customer/:id   ->   select * from customer where id = {{:id}}
 
-This type of variable must also be present in the route's uri pattern, where it is bound to a specific path segment. A uri variable can only contain alphanumeric characters, hyphens and underscores. It is always prefixed with a single colon to make the distinction clear from ordinary request body placeholders, which are explained next.    
+This type of variable must also be present in the route's uri pattern, where it is bound to a specific path segment. The variable name can only contain alphanumeric characters, hyphens and underscores. It is always prefixed with a single colon to make the distinction clear from ordinary request body placeholders, which are explained next.    
 
 ###### Request body JSON values
 
-    POST /customer  <>  insert into customer (name, address, phone) values ({{name}}, {{address}}, {{phone}})
+    POST /customer  <>  insert into customer (name, address, phone) values ( {{name}}, {{address}}, {{phone}} )
 
 When a JSON-formatted request body is available, the server will first parse the raw body to JSON  and substitute any placeholders in the template with matching values in the JSON object whose keys correspond to the names of the placeholders in question. 
 
@@ -88,7 +92,7 @@ or stretch over an entire line;
 
 ##### Multi-line expressions
 
-SQL statements are allowed to span across multiple lines, as long as each subsequent, non-empty line is indented with, at least, one blank space; as in the example below.
+SQL routes are allowed to span across multiple lines, as long as each subsequent, non-empty line is indented with, at least, one blank space; as in the example below.
 
 
 ```
@@ -102,7 +106,7 @@ GET resource  >>
       order by id
 ```
 
-This, however, is not valid:
+This is not valid:
 
 ```
 GET resource  >>  
@@ -115,7 +119,7 @@ from customer
 order by id
 ```
 
-Except from the "single-space" requirement, indentation does not matter. Hence, the following is also valid.
+Except from this "single-space" requirement, indentation does not matter. Hence, the following is also valid.
 
 ```
 GET resource  >>  select name           
@@ -140,23 +144,31 @@ GET resource  >>  select name
 | `~>`     | A query that returns a single item.
 | `->`     | Identical to `~>` except that an 'Ok' status message is added to the result.
 | `<>`     | An `INSERT` statement that should return a 'last insert id'.
-| `><`     | A statement that returns a row count result.
+| `><`     | A statement that returns a row count result (e.g. `UPDATE`).
 
-##### Naming conventions
-
-Trombone assumes that database table and column names follow the usual `lowercase_separated_by_underscores`  convention and that JSON objects use `camelCase` formatting. Conversion between the two is implicit.
-
-##### Arrays
+##### Data types
 
 ...
+
+##### Request arrays 
+
+```
+curl http://localhost:3010 --verbose -d '[{}, {}]'
+```
+
+...    
 
 ##### SELECT * FROM
 
     select * from photo
 
-##### Parameter hints
+##### Naming conventions
 
-With joins, and more complex queries, the server can sometimes have some difficulty figuring out the attribute names to return by only looking at the template. In such cases, and in situations where more control is needed, it is  therefore possible (and necessary) to explicitly specify a list of parameters. This list should appear immediately before the query template, enclosed in parentheses. 
+Trombone assumes that database table and column names follow the usual `lowercase_separated_by_underscores`  convention and that JSON objects use `camelCase` formatting. Conversion between the two is implicit.
+
+###### Parameter hints
+
+With joins, and more complex queries, the server can sometimes have difficulty figuring out the attribute names to return by only looking at the template. In such cases, and in situations where more control is needed, it is  therefore possible (and necessary) to specify the list of parameter names. This list should appear immediately before the query template, enclosed in parentheses. 
 
 ###### Example
 
@@ -166,7 +178,49 @@ Incidentally, a similar syntax is available for `INSERT` statements. This can be
 
     POST /customer  <>  (tbl_name, sequence) insert into...
    
-##### Non-SQL routes
+#### DRY-block notation
+
+A common pattern is to have multiple database queries that are very similar in one way or another.
+
+    GET customer/all        >>
+       select id, name, phone, address from customer order by id
+
+    GET customer/:id        ->
+       select id, name, phone, address from customer where id = {{:id}}
+
+    GET customer/area/:id   >>
+       select id, name, phone, address from customer where area_id = {{:id}} order by id
+
+To avoid this kind of repetition, the alternative DRY (Don't Repeat Yourself) notation can be used. 
+
+```
+DRY
+     select id, name, phone, address from customer {{..}}
+{
+     GET customer/all       >>  order by id                          ;
+     GET customer/:id       ->  where id = {{:id}}                   ;
+     GET customer/area/:id  >>  where area_id = {{:id}} order by id  ;
+}
+```
+
+A DRY-block consists of a base query template and a number of routes, each with the segment of the statement unique to that particular route (referred to as the *stub*).
+
+    <method> <uri> <symbol> <stub>
+
+* The `{{..}}`-placeholder must appear in the base query to indicate where the stub should be inserted. The preprocessor looks at each item within the block, expands it by inserting the base query with the stub replaced for `{{..}}`. 
+
+* A semi-colon delimiter is required for the stubs within the block. (It may be omitted for the last item.)
+
+* Each block item must be indented with at least one blank space. The opening and closing brackets must appear on their own lines (without indentation):
+
+```
+{
+    GET /..
+    GET /..
+}
+```
+
+#### Non-SQL routes
 
 | Symbol | Explanation
 | ------ | -----------
@@ -175,9 +229,11 @@ Incidentally, a similar syntax is available for `INSERT` statements. This can be
 | &lt;js&gt;    | A node.js route. (Followed by a  file path to the script.)
 | {..}          | A static route. (Followed by a JSON object.) 
 
-##### Pipelines
+#### Pipelines
 
-###### Inline
+> Pipelines are declarative creatures.
+
+##### Inline
 
 ```
 POST          !resource  |>
@@ -205,15 +261,15 @@ POST          !resource  |>
 }
 ```
 
-##### Node.js
+#### Node.js
 
-##### Static routes
+#### Static routes
 
 A possible use-case for static routes is to provide documentation as part of your web service, typically using the `OPTIONS` HTTP method.
 
     OPTIONS /photo  {..}  {"GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
 
-##### A note about wildcard operators
+#### Wildcard operators
 
 Since string values are always wrapped in single quotation marks before they are inserted into a template, the following will not work as intended,
 
@@ -221,7 +277,9 @@ Since string values are always wrapped in single quotation marks before they are
 select * from customer where customer.name like '%{{q}}%'
 ```
 
-Instead, simply define your template as
+E.g., `{"q": "Orville"}` would translate to `customer.name like '%'Orville'%'`.
+
+This is clearly not what we want. Instead, define your template as
 
 ```
 select * from customer where customer.name like {{q}}
@@ -420,4 +478,4 @@ Trombone can also act as a simple file server. Files located under the `public` 
 
 Trombone is written in Haskell using the Warp HTTP server library, and WAI — a common protocol for communication between web applications and web servers. 
 
-This software library is available for use under the BSD license.
+This software is available for use under the BSD license.
