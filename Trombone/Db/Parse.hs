@@ -4,7 +4,7 @@ module Trombone.Db.Parse
     , arbitrary
     ) where
 
-import Data.Text                                       ( Text, pack, unpack )
+import Data.Text                                       ( Text, pack, unpack, toLower )
 import Trombone.Db.Template
 
 import qualified Data.Text                             as Text
@@ -37,7 +37,7 @@ endlchar x | Text.null x       = ""
 -- various meta-data from the statement using the reflection utilities).
 arbitrary :: DbTemplate -> String
 arbitrary (DbTemplate segms) = foldr f "" segms
-  where f (DbSqlStatic    t) b = unpack t ++ b
+  where f (DbSqlStatic    t) b = unpack (toLower t) ++ b
         f (DbSqlUriParam  t) b = "'?'" ++ b
         f (DbSqlJsonValue t) b = "'?'" ++ b
 
