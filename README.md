@@ -279,7 +279,6 @@ This is clearly not what we want. Instead, define your template as
 
 ```
 select * from customer where customer.name like {{q}}
-
 ```
 
 and insert the `%`-characters in a string property of the object sent to the server:
