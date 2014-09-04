@@ -75,10 +75,6 @@ When a JSON-formatted request body is available, the server will first parse the
 
 > Use the `--verbose` command-line option to inspect the query string after a template is instantiated.
 
-##### Gotcha!
-
-Note that all SQL keywords (`select`, `from`, `insert`, `into` etc.) must be written in lowercase!
-
 ##### Comments
 
 Comments start with a single [octothorpe](http://en.wikipedia.org/wiki/Number_sign) (#) character and may appear at the end of a route definition;
