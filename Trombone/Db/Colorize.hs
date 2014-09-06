@@ -3,7 +3,7 @@ module Trombone.Db.Colorize
     ( colorize 
     ) where
 
-import Data.Text                           ( Text, pack, unpack, stripStart )
+import Data.Text                           ( Text, pack, unpack, stripStart, toLower )
 import Data.List                           ( intersperse )
 import System.Console.ANSI
 
@@ -56,9 +56,9 @@ tokens = concatMap f
 
 label :: Text -> Label
 {-# INLINE label #-}
-label t | isKeyword t = Keyword t
-        | isDelimOp t = Delim   t
-        | otherwise   = Default t
+label t | isKeyword (toLower t) = Keyword t
+        | isDelimOp t           = Delim   t
+        | otherwise             = Default t
 
 isDelimOp :: Text -> Bool
 isDelimOp t = t `elem`
