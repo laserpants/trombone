@@ -75,10 +75,6 @@ When a JSON-formatted request body is available, the server will first parse the
 
 > Use the `--verbose` command-line option to inspect the query string after a template is instantiated.
 
-##### Gotcha!
-
-Note that all SQL keywords (`select`, `from`, `insert`, `into` etc.) must be written in lowercase!
-
 ##### Comments
 
 Comments start with a single [octothorpe](http://en.wikipedia.org/wiki/Number_sign) (#) character and may appear at the end of a route definition;
@@ -271,7 +267,7 @@ A possible use-case for static routes is to provide documentation as part of you
 
 #### Wildcard operators
 
-Since string values are always wrapped in single quotation marks before they are inserted into a template, the following will not work as intended,
+Since string values are automatically wrapped in single quotation marks before they are inserted into a template, the following will not work as intended,
 
 ```
 select * from customer where customer.name like '%{{q}}%'
@@ -283,7 +279,6 @@ This is clearly not what we want. Instead, define your template as
 
 ```
 select * from customer where customer.name like {{q}}
-
 ```
 
 and insert the `%`-characters in a string property of the object sent to the server:
