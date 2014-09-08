@@ -358,7 +358,6 @@ parseRoutesFromFile file = do
     chars 80 ' ' >> putStr "|" >> chars 81 '\b'
     r <- readFile file
     let ls = preprocess r
-    mapM_ print ls
     x <- liftM concat $ mapM go $ zip (dots $ length ls) ls
     putChar '\n'
     return x
