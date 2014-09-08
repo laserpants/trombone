@@ -358,6 +358,7 @@ parseRoutesFromFile file = do
     chars 80 ' ' >> putStr "|" >> chars 81 '\b'
     r <- readFile file
     let ls = preprocess r
+    mapM_ print ls
     x <- liftM concat $ mapM go $ zip (dots $ length ls) ls
     putChar '\n'
     return x
@@ -390,7 +391,7 @@ preprocess xs =
       where
         x' = trimLine x 
         y' = ' ':trimLine (rc y) 
-        ind y = ' ' == head y 
+        ind y = ' ' == head y || '#' == head y
         rc "" = ""
         rc x  = head (split "#" x)
 
