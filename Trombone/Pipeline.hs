@@ -33,6 +33,7 @@ data TransType = TransExclude
                | TransInclude
                | TransBind
                | TransRename
+               | TransCopy
                | TransAggregate
     deriving (Eq, Ord, Show)
 
@@ -125,6 +126,10 @@ runTransformer (Transformer TransRename (String from:String to:_)) o =
     case HMS.lookup from o of
       Nothing -> o
       Just v  -> HMS.insert to v $ HMS.delete from o
+runTransformer (Transformer TransCopy (String from:String to:_)) o =
+    case HMS.lookup from o of
+      Nothing -> o
+      Just v  -> HMS.insert to v o
 runTransformer (Transformer TransBind (String key:val:_)) o = HMS.insert key val o
 runTransformer (Transformer TransAggregate (String key:_)) o = HMS.fromList [(key, Object o)]
 runTransformer _ o = o

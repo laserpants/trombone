@@ -30,6 +30,7 @@ instance FromJSON TransType where
     parseJSON (String "include")            = return TransInclude
     parseJSON (String "bind")               = return TransBind
     parseJSON (String "rename")             = return TransRename
+    parseJSON (String "copy")               = return TransCopy
     parseJSON (String "aggregate")          = return TransAggregate
     parseJSON _ = mzero
 
