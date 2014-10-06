@@ -51,8 +51,8 @@ instance FromJSON Connection where
     parseJSON (Object o) 
         = Connection <$> o .:? "source"        .!= In
                      <*> o .:? "destination"   .!= Out
-                     <*> o .:  "transformers"  .!= []
-                     <*> o .:  "filters"       .!= []
+                     <*> o .:? "transformers"  .!= []
+                     <*> o .:? "filters"       .!= []
     parseJSON _ = mzero
 
 instance FromJSON Method where
