@@ -62,13 +62,16 @@ combine = foldr f HMS.empty
   where f (Message _ o1) o2 = 
             case HMS.toList o1 of
               [(key, val)] -> 
-                  let ins a = HMS.insert key (Array $ Vect.cons val a) o2 in
+                  let ins a = HMS.insert key (Array $ Vect.cons val a) o2 ;
+                        o1' = HMS.fromList [(Text.tail key, Array $ Vect.singleton val)] in
                   case HMS.lookup key o2 of
                     Just (Array a) -> ins a 
                     Just v         -> ins (Vect.singleton v) 
-                    Nothing -> o1 `HMS.union` o2
-              _             -> o1 `HMS.union` o2
-   
+                    Nothing -> if "*" `Text.isPrefixOf` key
+                                  then o1' `HMS.union` o2
+                                  else o1  `HMS.union` o2
+              _ -> o1 `HMS.union` o2
+ 
 -- | Run a single integration step on a pipeline.
 integrate :: Pipeline -> Dispatch Pipeline
 integrate s@(Pipeline _ _ []) = return s
