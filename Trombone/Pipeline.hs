@@ -21,7 +21,7 @@ module Trombone.Pipeline
 import Control.Applicative
 import Data.Aeson                            as Pipe
 import Data.Maybe                                      ( fromMaybe, mapMaybe )
-import Data.Text                             as Pipe   ( Text )
+import Data.Text                             as Pipe   ( Text, cons )
 import Network.HTTP.Types                              
 import Trombone.Db.Template                  as Pipe
 import Trombone.RoutePattern
