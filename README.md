@@ -8,7 +8,7 @@ Trombone is a [REST](http://en.wikipedia.org/wiki/Representational_state_transfe
 You may find this software useful if,
 
 1. your application infrastructure relies on relational SQL schemas; and
-2. you need to expose some of this data through a web service (using JSON as data exchange format).
+2. you need to expose data through a web service (using JSON as data exchange format).
 
 A Trombone configuration file consists of a collection of route patterns.
 
