@@ -43,7 +43,7 @@ todo
 
 ##### Placeholders
 
-Trombone templates acknowledge three types of placeholder variables. These are all characterized by a double pair of surrounding  curly-braces (mimicking Handlebars.js). 
+Trombone templates acknowledge three types of placeholder variables. They are distinguished by a double pair of surrounding  curly-braces (mimicking Handlebars.js). 
 
 * Uri segment `{{:variables}}`;
 * JSON value `{{placeholders}}`; and
@@ -433,7 +433,7 @@ File server | (always enabled)
 
 #### AMQP
 
-RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol (AMQP) — an emerging standard for asynchronous message passing. The AMQP middleware integrates Trombone with RabbitMQ, and allows consumer applications to receive notifications when server resources are modified.
+RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol (AMQP) — an emerging standard for multi-purpose asynchronous message passing. The AMQP middleware integrates Trombone with RabbitMQ and allows consumer applications to receive notifications when server resources are modified.
 
 ##### AMQP endpoint
 
@@ -465,7 +465,7 @@ Apache-style logging.
 
 ### Static file serving
 
-Trombone can also act as a simple file server. Files located under the `public` directory or any of its subdirectories, are HTTP accessible to everyone. E.g.,
+Trombone can also act as a simple file server. By convention, files located under the `public` directory or any of its subdirectories are HTTP accessible to everyone. E.g.,
 
     public/image.png   <~>   http://localhost:3000/image.png
 
