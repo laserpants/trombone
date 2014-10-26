@@ -59,7 +59,7 @@ This type of variable has to be present in the route's uri pattern, where it is 
 
     POST /customer  <>  insert into customer (name, address, phone) values ( {{name}}, {{address}}, {{phone}} )
 
-When a JSON-formatted request body is available, the server will first parse the raw body to JSON  and substitute any placeholders in the template with matching values in the JSON object whose keys correspond to the names of the placeholders in question. 
+When a JSON-formatted request body is available, the server will attempt to parse the raw body and substitute any placeholders in the template with matching values in the JSON object whose keys correspond to the names of the placeholders in question. 
 
 ```
 {
@@ -170,7 +170,7 @@ With joins, and more complex queries, the server can occasionally have difficult
 
     GET /customer  >>  (id, name, phone) select a.a, a.b, a.c from customer as a join something as b
 
-Incidentally, a similar syntax is available for `INSERT` statements. This can be used if the server is unable to infer the table name and sequence necessary to obtain the last inserted id.
+A similar syntax is available for `INSERT` statements. This can be used if the server is unable to infer the table name and sequence necessary to obtain the last inserted id.
 
     POST /customer  <>  (tbl_name, sequence) insert into...
    
@@ -187,7 +187,7 @@ A common pattern is to have multiple database queries that are very similar in o
     GET customer/area/:id   >>
        select id, name, phone, address from customer where area_id = {{:id}} order by id
 
-To avoid this kind of repetition, the alternative DRY (Don't Repeat Yourself) notation can be used. 
+To avoid this kind of repetition, the alternative [DRY](http://en.wikipedia.org/wiki/Don%27t_repeat_yourself) notation can be used. 
 
 ```
 DRY
