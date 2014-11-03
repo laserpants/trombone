@@ -160,7 +160,7 @@ curl http://localhost:3010 --verbose -d '[{}, {}]'
 
 ##### Naming conventions
 
-Trombone assumes that database table and column names follow the usual `lowercase_separated_by_underscores`  convention and that JSON objects use `camelCase` formatting. Conversion between the two is implicit.
+Trombone assumes that database table and column names follow the fairly common `lowercase_separated_by_underscores`  convention and that JSON objects use `camelCase` formatting. Conversion between the two is implicit.
 
 ###### Parameter hints
 
