@@ -43,7 +43,7 @@ todo
 
 ##### Placeholders
 
-Trombone templates acknowledge three types of placeholder variables. They are distinguished by a double pair of surrounding  curly-braces (similar to Handlebars.js). 
+Trombone templates acknowledge three types of placeholder variables. They are distinguished by a double pair of surrounding curly-braces (similar to Handlebars.js). 
 
 * Uri segment `{{:variables}}`;
 * JSON value `{{placeholders}}`; and
