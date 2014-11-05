@@ -3,7 +3,7 @@ Trombone
 
 ### Introduction
 
-Trombone is a [REST](http://en.wikipedia.org/wiki/Representational_state_transfer)ful, [JSON](http://json.org/)-driven [data access server](http://en.wikipedia.org/wiki/Data_access_layer) for [PostgreSQL](http://www.postgresql.org). Its purpose is to translate JSON-formatted HTTP requests to SQL statemets. Preconfigured query templates are instantiated and executed against a database, with results returned in JSON, using standard HTTP response codes and error conventions. 
+Trombone is a [REST](http://en.wikipedia.org/wiki/Representational_state_transfer)ful, [JSON](http://json.org/)-driven [data access server](http://en.wikipedia.org/wiki/Data_access_layer) for [PostgreSQL](http://www.postgresql.org). Its chief purpose is to translate JSON-formatted HTTP requests to SQL statemets. Preconfigured query templates are instantiated and executed against a database, with results returned in JSON, using standard HTTP response codes and error conventions. 
 
 You may find this software useful if;
 
