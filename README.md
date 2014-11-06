@@ -187,7 +187,7 @@ A common pattern is to have multiple database queries that are very similar in o
     GET customer/area/:id   >>
        select id, name, phone, address from customer where area_id = {{:id}} order by id
 
-To avoid this kind of repetition, the alternative [DRY](http://en.wikipedia.org/wiki/Don%27t_repeat_yourself) notation can be used. 
+To avoid this kind of repetition, the alternative [DRY](http://en.wikipedia.org/wiki/Don%27t_repeat_yourself) notation can be employed. 
 
 ```
 DRY
