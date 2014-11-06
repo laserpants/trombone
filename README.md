@@ -205,7 +205,7 @@ A DRY-block consists of a base query template and a number of routes, each with 
 
 * The `{{..}}`-placeholder must appear in the base query to indicate where the stub should be inserted. The preprocessor looks at each item within the block, expands it by inserting the base query with the stub replaced for `{{..}}`. 
 
-* A semi-colon delimiter is required for the stubs within the block. (It may be omitted for the last item.)
+* A semi-colon delimiter is required to separate the stubs within the block. (It may be omitted for the last item.)
 
 * Each block item must be indented with at least one blank space. The opening and closing brackets must appear on their own lines (without indentation):
 
