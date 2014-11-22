@@ -2,6 +2,7 @@
 module Trombone.Db.Execute 
     ( SqlT
     , runDb
+    , runDb'
     , collection
     , item
     , executeCount
@@ -10,7 +11,7 @@ module Trombone.Db.Execute
     ) where
 
 import Control.Arrow                                   ( second )
-import Control.Exception                               ( Exception, SomeException, fromException )
+import Control.Exception                               ( Exception, SomeException(..), fromException )
 import Control.Exception.Lifted                        ( try )
 import Control.Monad                                   ( liftM )
 import Control.Monad.Logger                            ( NoLoggingT, runNoLoggingT )
@@ -38,6 +39,9 @@ type SqlT = SqlPersistT (ResourceT (NoLoggingT IO))
 --     runDb (collection "SELECT * FROM customer") pool >>= print
 runDb :: SqlT a -> ConnectionPool -> IO a
 runDb sql = catchExceptions . runNoLoggingT . runResourceT . runSqlPool sql
+ 
+runDb' :: SqlT a -> ConnectionPool -> IO a
+runDb' sql = runNoLoggingT . runResourceT . runSqlPool sql
  
 source :: Text -> Source SqlT [PersistValue]
 {-# INLINE source #-}
@@ -88,16 +92,16 @@ toJsonVal pv =
         PersistUTCTime    u -> showV                    u
         PersistTimeOfDay  t -> showV                    t
         PersistDay        d -> showV                    d
-        PersistList      xs -> fromList                xs
+        PersistList      xs -> fromList_               xs
         PersistNull         -> Null
         _                   -> String "[unsupported SQL type]"
   where
     showV :: Show a => a -> Value
     showV = String . pack . show
 
-fromList :: [PersistValue] -> Value
-{-# INLINE fromList #-}
-fromList = Array . Vect.fromList . map toJsonVal
+fromList_ :: [PersistValue] -> Value
+{-# INLINE fromList_ #-}
+fromList_ = Array . Vect.fromList . map toJsonVal
 
 fromMap :: [(Text, PersistValue)] -> Value
 {-# INLINE fromMap #-}

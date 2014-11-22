@@ -108,7 +108,10 @@ setupRoutes (Config{ .. }, conf@ServerConf{..}) = do
     i <- case configRoutesFile of
             Nothing -> runDbQ (translate . concat) q serverSqlPool 
             Just f  -> TIO.readFile f 
-    routes <- parseRoutes i
+    let routes = parseRoutes i
+
+    print routes
+
     -- Add /ping response route
     let pong = RouteStatic $ okResponse [("message", "Pong!")]
         ping = Route "GET" (decompose "ping") pong
@@ -128,7 +131,7 @@ setupRoutes (Config{ .. }, conf@ServerConf{..}) = do
     translate _ = ""
   
 runDbQ :: (a -> b) -> SqlT a -> ConnectionPool -> IO b
-runDbQ fn q = liftM fn . runDb q 
+runDbQ fn q = liftM fn . runDb' q 
 
 -- | Look up and insert column names for 'SELECT * FROM' type of queries.
 insertColNames :: ConnectionPool -> Route -> IO Route
