@@ -25,7 +25,6 @@ import Network.Wai.Conduit                             ( sourceRequestBody )
 import Trombone.Dispatch.Core
 import Trombone.Hmac
 import Trombone.Route
---import Trombone.Server
 
 import qualified Data.ByteString                       as BS
 import qualified Data.Conduit.List                     as CL

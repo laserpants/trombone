@@ -43,6 +43,7 @@ import qualified Data.ByteString.Lazy                  as BL
 import qualified Data.Conduit.List                     as CL
 import qualified Data.HashMap                          as Map
 import qualified Data.Text                             as Text
+import qualified Data.Text.IO                          as TIO
 import qualified Text.Show.ByteString                  as Show
 import qualified Trombone.Server.Config                as Conf
 
@@ -90,10 +91,8 @@ setupHmac (Config{ .. }, conf@ServerConf{..}) = do
     buildHmacConf keys = Just . HmacKeyConf (Map.fromList keys) 
 
 readKeysFromDb :: ConnectionPool -> IO [(ByteString, ByteString)]
-readKeysFromDb pool = liftM (concatMap f) (runDb q pool)
+readKeysFromDb pool = runDbQ (translate . concat) q pool 
   where 
-    f [PersistText c, PersistText k] = [(encodeUtf8 c, encodeUtf8 k)]
-    f _ = []
     q :: SqlT [[PersistValue]]
     q = rawExecute "CREATE TABLE IF NOT EXISTS trombone_keys \
                    \(id serial PRIMARY KEY, \
@@ -101,18 +100,36 @@ readKeysFromDb pool = liftM (concatMap f) (runDb q pool)
                    \key character varying(40));" [] 
         >> (rawQuery "SELECT client, key FROM trombone_keys;" [] 
                 $$ CL.consume)
+    translate [PersistText c, PersistText k] = [(encodeUtf8 c, encodeUtf8 k)]
+    translate _ = []
 
 setupRoutes :: SetupStep
 setupRoutes (Config{ .. }, conf@ServerConf{..}) = do
-    routes <- case configRoutesFile of
-                Nothing -> undefined
-                Just f  -> parseRoutesFromFile f
+    i <- case configRoutesFile of
+            Nothing -> runDbQ (translate . concat) q serverSqlPool 
+            Just f  -> TIO.readFile f 
+    routes <- parseRoutes i
     -- Add /ping response route
     let pong = RouteStatic $ okResponse [("message", "Pong!")]
         ping = Route "GET" (decompose "ping") pong
     rs <- mapM (insertColNames serverSqlPool) routes 
     return conf { serverRoutes = ping:rs }
- 
+  where
+    q :: SqlT [[PersistValue]]
+    q = rawExecute "CREATE TABLE IF NOT EXISTS trombone_config \
+                   \(id serial PRIMARY KEY, \
+                   \key character varying(40), \
+                   \val text);" []
+        >> (rawQuery "SELECT val FROM trombone_config \
+                    \WHERE key = 'routes';" [] 
+                $$ CL.consume)
+    translate :: [PersistValue] -> Text
+    translate [PersistText v] = v
+    translate _ = ""
+  
+runDbQ :: (a -> b) -> SqlT a -> ConnectionPool -> IO b
+runDbQ fn q = liftM fn . runDb q 
+
 -- | Look up and insert column names for 'SELECT * FROM' type of queries.
 insertColNames :: ConnectionPool -> Route -> IO Route
 insertColNames pool (Route m p (RouteSql (DbQuery q t))) = 
