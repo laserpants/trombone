@@ -18,7 +18,7 @@ import Data.Version                                    ( showVersion )
 import Database.Persist.Postgresql                     
 import Database.PostgreSQL.Simple                      ( SqlError(..) )
 import Monitor.Warp 
-import Paths_graceful                                  ( version )
+import Paths_trombone                                  ( version )
 import System.Console.GetOpt
 import System.Environment                              ( getArgs )
 import Trombone.Db.Execute

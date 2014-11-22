@@ -12,7 +12,7 @@ import Data.Maybe                                      ( fromMaybe )
 import Data.Text                                       ( Text, pack, unpack )
 import Data.Version                                    ( showVersion )
 import Network.HTTP.Types                              ( HeaderName )
-import Paths_graceful                                  ( version )
+import Paths_trombone                                  ( version )
 import System.Console.GetOpt
 import Trombone.Hmac
 import Trombone.Middleware.Logger
