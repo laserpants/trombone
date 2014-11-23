@@ -109,9 +109,6 @@ setupRoutes (Config{ .. }, conf@ServerConf{..}) = do
             Nothing -> runDbQ (translate . concat) q serverSqlPool 
             Just f  -> TIO.readFile f 
     let routes = parseRoutes i
-
-    print routes
-
     -- Add /ping response route
     let pong = RouteStatic $ okResponse [("message", "Pong!")]
         ping = Route "GET" (decompose "ping") pong
