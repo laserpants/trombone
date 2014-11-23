@@ -1,5 +1,6 @@
 site_name: trombone 
 pages: 
-- ['index.md', 'Contents']
+- ['index.md',        'Contents']
 - ['introduction.md', 'Introduction']
+- ['about.md',        'About']
 
