@@ -4,4 +4,3 @@ import Trombone.Server.Init
 
 main :: IO ()
 main = runServer
-
