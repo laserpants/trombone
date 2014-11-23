@@ -14,6 +14,11 @@ A Trombone configuration file consists of a collection of route patterns:
 GET resource/:id  ->  SELECT * FROM some_table WHERE id = {{:id}}
 ```
 
+Documentation
+-------------
+
+- http://trombone.readthedocs.org
+
 Contribute
 ----------
 

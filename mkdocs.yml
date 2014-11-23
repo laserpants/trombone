@@ -18,4 +18,4 @@ pages:
 - ['middleware.md',     'Middleware']
 - ['examples.md',       'Examples']
 - ['about.md',          'About']
-
+theme: readthedocs
