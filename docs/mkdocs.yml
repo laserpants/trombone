@@ -2,20 +2,4 @@ site_name: trombone
 pages: 
 - [index.md, Contents]
 - [introduction.md, Introduction]
-- [install.md, Installation]
-- [configuration.md, Server Configuration]
-- [format.md, Route Format]
-- [dry-block.md, DRY-block Notation]
-- [non-sql.md, Non-SQL Routes]
-- [authentication.md, Authentication]
-- [pipelines.md, Pipelines]
-- [array.md, Array Actions]
-- [wildcard.md, Wildcard Operators]
-- [response.md, Response Codes]
-- [command-line.md, Command Line Flags]
-- [rest.md, REST Conventions]
-- [bnf.md, BNF Grammar]
-- [middleware.md, Middleware]
-- [examples.md, Examples]
-- [about.md, About]
-theme: readthedocs
+
