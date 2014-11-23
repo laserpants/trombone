@@ -31,7 +31,7 @@ dispatchNodeJs path body = do
     return $ case decode $ L8.pack r of
         Just nr -> (RouteResponse [] <$> nodeStatus <*> nodeBody) nr
         Nothing -> errorResponse ErrorServerGeneric 
-                    "Invalid response from nodejs application script."
+                    "Invalid response from node.js application script."
   where 
     transl :: ByteString -> String
     transl = L8.unpack . L8.fromStrict
