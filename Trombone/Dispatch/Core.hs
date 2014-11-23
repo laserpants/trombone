@@ -8,16 +8,21 @@ module Trombone.Dispatch.Core
     , escVal
     , escVal'
     , quoute
+    , filterNot
+    , params
+    , sanitize
     , printS
     , logS
     , logSql
     ) where
 
+import Control.Arrow                                   ( (***) )
 import Control.Monad                                   ( when )
 import Control.Monad.IO.Class                          ( liftIO )
 import Control.Monad.Trans.Reader
 import Data.Aeson
 import Data.ByteString                                 ( ByteString )
+import Data.Char                                       ( isAlphaNum, isNumber )
 import Data.HashMap                                    ( Map )
 import Data.List                                       ( intersperse )
 import Data.Scientific
@@ -62,6 +67,30 @@ quoute :: Text -> Text
 {-# INLINE quoute #-}
 quoute = flip snoc '\'' . cons '\'' 
 
+filterNot :: (a -> Bool) -> [a] -> [a]
+{-# INLINE filterNot #-}
+filterNot f = filter (not . f)
+ 
+params :: [(Text, Text)] -> [(Text, EscapedText)]
+params = map (prefix *** escape) 
+  where 
+    escape = EscapedText . q . sanitize
+    q :: Text -> Text
+    q s = if Text.all isNumber s
+              then s
+              else quoute s
+
+prefix :: Text -> Text
+{-# INLINE prefix #-}
+prefix = Text.cons ':'
+
+sanitize :: Text -> Text
+sanitize = Text.filter pred 
+  where 
+    pred :: Char -> Bool
+    pred c | isAlphaNum c = True
+           | otherwise    = c `elem` "-_!"
+ 
 -- | Translate a JSON value to a format ready to be inserted into an SQL query
 -- template. Special care must be taken w.r.t. string values. 
 escVal :: Value -> EscapedText

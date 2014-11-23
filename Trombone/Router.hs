@@ -37,7 +37,3 @@ routeRequest Request{..} = do
                 Params ps -> return $ RouteResult action ps
                 _ -> run mtd info rs
 
-filterNot :: (a -> Bool) -> [a] -> [a]
-{-# INLINE filterNot #-}
-filterNot f = filter (not . f)
-

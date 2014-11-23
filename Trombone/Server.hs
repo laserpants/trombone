@@ -12,9 +12,14 @@ import Control.Monad                                   ( when )
 import Control.Monad.IO.Class                          ( liftIO ) 
 import Control.Monad.Trans.Reader
 import Data.ByteString                                 ( ByteString )
+import Data.Conduit.Attoparsec                         
 import Data.HashMap                                    ( Map )
 import Data.Text                                       ( Text )
 import Data.Text.Encoding
+import Data.Text.Lazy                                  ( toStrict )
+import Data.Text.Lazy.Builder
+import Data.Text.Lazy.Builder.Int
+import Data.Text.Lazy.Builder.RealFloat
 import Data.Version                                    ( showVersion )
 import Database.Persist.Postgresql
 import Database.PostgreSQL.Simple                    
@@ -23,8 +28,13 @@ import Network.Wai                                     ( Middleware, Response, r
 import Network.Wai.Handler.Warp                        
 import Network.Wai.Internal                            ( Request(..) )
 import System.Environment                              ( getArgs )
-import Trombone.Dispatch
+import Trombone.Db.Template
 import Trombone.Dispatch.Core
+import Trombone.Dispatch.Db
+import Trombone.Dispatch.NodeJs
+import Trombone.Dispatch.Pipeline
+import Trombone.Dispatch.Static
+import Trombone.Hmac
 import Trombone.Pipeline
 import Trombone.RequestJson
 import Trombone.Response
@@ -32,6 +42,7 @@ import Trombone.Route
 import Trombone.Router
 import Trombone.Server.Config
 
+import qualified Data.ByteString                       as BS
 import qualified Data.HashMap                          as Map
 import qualified Data.Text                             as T
 
@@ -123,4 +134,43 @@ catchSqlErrors SqlError{ sqlState = sqls, sqlErrorDetail = detail } =
   where 
     errorMsg t = T.concat $ (t:) $ if T.null d then ["."] else [": ", d]
     d = decodeUtf8 detail
+
+-------------------------------------------------------------------------------
+-- Dispatch
+-------------------------------------------------------------------------------
+
+dispatch :: RouteResult -> RequestInfo -> Dispatch IO RouteResponse
+-- Unauthorized
+dispatch _ (RequestInfo _ Untrusted) = return unauthorized
+-- Bad request
+dispatch _ (RequestInfo (RequestBodyError _ (Position line col)) _) = 
+    return $ errorResponse ErrorBadRequest $ T.concat 
+        [ "Malformed JSON. Parsing failed on line "
+        , tShow line , ", column "
+        , tShow col  , "." ]
+  where
+    tShow = toStrict . toLazyText . decimal 
+-- Empty request body
+dispatch r (RequestInfo EmptyBody i) = runD r i Null BS.empty
+-- Request object interpreted as JSON 
+dispatch r (RequestInfo (JsonBody v bs) i) = runD r i v bs
+
+runD :: RouteResult -> ClientIdentity -> Value -> ByteString -> Dispatch IO RouteResponse
+-- No match: Error 404 
+runD RouteNoResult _ _ _ = return $ errorResponse ErrorNotFound "Resource not found."
+-- Database (SQL) route action
+runD (RouteResult (RouteSql    q) xs) _ obj _ = dispatchDbAction q (params xs) obj
+-- Pipeline
+runD (RouteResult (RoutePipes  p) xs) _ obj _ = do
+    Context{ dispatchMesh = table } <- ask
+    case lookup p table of
+        Nothing -> return $ errorResponse ErrorServerConfiguration
+            $ T.concat ["Missing pipeline: '", p , "'."]
+        Just s -> dispatchPipeline s (params xs) obj
+-- Inline pipeline
+runD (RouteResult (RouteInline p) xs) _ obj _ = dispatchPipeline p (params xs) obj
+-- Node.js script
+runD (RouteResult (RouteNodeJs j) _ ) _ _ raw = dispatchNodeJs j raw
+-- Static response
+runD (RouteResult (RouteStatic r) _ ) _ _ _   = dispatchStatic r
 
