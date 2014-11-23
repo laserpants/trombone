@@ -18,6 +18,7 @@ import Data.Version                                    ( showVersion )
 import Database.Persist.Postgresql                     
 import Database.PostgreSQL.Simple                      ( SqlError(..) )
 import Monitor.Warp 
+import Network.Wai.Middleware.Static
 import Paths_trombone                                  ( version )
 import System.Console.GetOpt
 import System.Environment                              ( getArgs )
@@ -74,10 +75,10 @@ setupAmqp (Config{ .. }, conf@ServerConf{..}) = do
         , serverDtors      = closeConnection conn:serverDtors
         }
 
--- setupStatic :: SetupStep
--- setupStatic (Config{ .. }, conf@ServerConf{..}) = do 
---     let static = staticPolicy (noDots >-> addBase "public")
---     return conf { serverMiddleware = static:serverMiddleware }
+setupStatic :: SetupStep
+setupStatic (Config{ .. }, conf@ServerConf{..}) = do 
+    let static = staticPolicy (noDots >-> addBase "public")
+    return conf { serverMiddleware = static:serverMiddleware }
  
 setupCors :: SetupStep
 setupCors (Config{ .. }, conf@ServerConf{..}) = 
@@ -174,7 +175,7 @@ onStartup c@Config{..} = do
     serverConf <- foldr setup (initConf pool) $ concatMap opts
         [ ( configEnLogging , setupLogger )
         , ( configEnAmqp    , setupAmqp   )
---      , ( True            , setupStatic )
+        , ( True            , setupStatic )
         , ( configEnCors    , setupCors   )
         , ( configEnPipes   , setupPipes  )
         , ( configEnHmac    , setupHmac   )
