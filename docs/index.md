@@ -1,7 +1,4 @@
-Trombone
-========
-
-## Contents
+# Contents
 
 - Introduction
     - Hello, World!
@@ -34,4 +31,3 @@ Trombone
     - Static File Serving
 - Examples
 - About
-
