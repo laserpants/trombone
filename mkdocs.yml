@@ -17,5 +17,5 @@ pages:
 - ['bnf.md',            'Docs', 'BNF Grammar']
 - ['middleware.md',     'Docs', 'Middleware']
 - ['examples.md',       'Docs', 'Examples']
-- ['about.md',          'Docs', 'About']
+- ['about.md',          'About']
 theme: readthedocs

@@ -22,8 +22,9 @@ Documentation
 Contribute
 ----------
 
-- Issue Tracker: github.com/johanneshilden/trombone/issues
-- Source Code: github.com/johanneshilden/trombone
+- Issue Tracker: [github.com/johanneshilden/trombone/issues](github.com/johanneshilden/trombone/issues)
+- Source Code: [github.com/johanneshilden/trombone](github.com/johanneshilden/trombone)
+
 
 License
 -------
