@@ -2,7 +2,6 @@
 module Trombone.Db.Execute 
     ( SqlT
     , runDb
-    , runDb'
     , collection
     , item
     , executeCount
@@ -25,6 +24,7 @@ import Data.Text.Encoding                              ( decodeUtf8 )
 import Database.Persist
 import Database.Persist.Postgresql
 import Database.PostgreSQL.Simple                      ( SqlError(..), ExecStatus(..) )
+import GHC.IO.Exception                             
 
 import qualified Data.Conduit.List                     as CL
 import qualified Data.HashMap.Strict                   as HMS
@@ -39,9 +39,6 @@ type SqlT = SqlPersistT (ResourceT (NoLoggingT IO))
 --     runDb (collection "SELECT * FROM customer") pool >>= print
 runDb :: SqlT a -> ConnectionPool -> IO a
 runDb sql = catchExceptions . runNoLoggingT . runResourceT . runSqlPool sql
- 
-runDb' :: SqlT a -> ConnectionPool -> IO a
-runDb' sql = runNoLoggingT . runResourceT . runSqlPool sql
  
 source :: Text -> Source SqlT [PersistValue]
 {-# INLINE source #-}
@@ -67,12 +64,7 @@ catchExceptions :: IO a -> IO a
 catchExceptions sql = try sql >>= excp
   where 
     excp (Right r) = return r
-    excp (Left  e) = throwM $ fromMaybe fatal $ fromException e 
-
-fatal :: SqlError
-{-# INLINE fatal #-}
-fatal = SqlError "An exception occured during database query." 
-    FatalError "SQL error." "" ""
+    excp (Left (IOError _ _ _ m _ _)) = error $ head $ lines m
 
 -------------------------------------------------------------------------------
 -- Type conversion helper functions

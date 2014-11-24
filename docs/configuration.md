@@ -1,9 +1,11 @@
-<h1>Server Configuration</h1>
+<h1>Basic Configuration</h1>
 
 ## Running
 
 #### Ping
 
-    http://localhost:3010/ping
+```
+curl http://localhost:3010/ping
+```
 
 ## Unix Signal Handlers

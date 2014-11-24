@@ -122,14 +122,13 @@ setupRoutes (Config{ .. }, conf@ServerConf{..}) = do
                    \key character varying(40), \
                    \val text);" []
         >> (rawQuery "SELECT val FROM trombone_config \
-                    \WHERE key = 'routes';" [] 
-                $$ CL.consume)
+                    \WHERE key = 'routes';" [] $$ CL.consume)
     translate :: [PersistValue] -> Text
     translate [PersistText v] = v
     translate _ = ""
   
 runDbQ :: (a -> b) -> SqlT a -> ConnectionPool -> IO b
-runDbQ fn q = liftM fn . runDb' q 
+runDbQ fn q = liftM fn . runDb q 
 
 -- | Look up and insert column names for 'SELECT * FROM' type of queries.
 insertColNames :: ConnectionPool -> Route -> IO Route
@@ -146,8 +145,9 @@ insertColNames _ r = return r
 -- | Find column names for a given table.
 columns :: ConnectionPool -> Text -> IO [Text]
 columns pool table = 
-    liftM (reverse . concatMap txt) $ 
-        runDb (rawQuery (Text.replace "%" table q) [] $$ CL.consume) pool
+    runDbQ (reverse . concatMap txt) 
+        (rawQuery (Text.replace "%" table q) [] $$ CL.consume) 
+        pool
   where 
     q = "SELECT column_name FROM information_schema.columns \
         \WHERE table_name = '%';"

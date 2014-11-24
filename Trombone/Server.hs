@@ -61,15 +61,15 @@ data DbConf = DbConf
 
 -- | Sever startup configuration settings.
 data ServerConf = ServerConf
-    { serverPort       :: Int                -- ^ Server port number
-    , serverSqlPool    :: ConnectionPool     -- ^ Database connection pool
-    , serverMiddleware :: [Middleware]       -- ^ Middleware stack
-    , serverRoutes     :: [Route]            -- ^ Application routes
-    , serverHmacConf   :: Maybe HmacKeyConf  -- ^ HMAC configuration
-    , serverPipelines  :: [(Text, Pipeline)] -- ^ Pipeline map
-    , serverVerbose    :: Bool               -- ^ Log output to stdout
-    , serverLogger     :: LoggerConf         -- ^ FastLogger instance
-    , serverDtors      :: [IO ()]            -- ^ Destructors
+    { serverPort       :: Int                  -- ^ Server port number
+    , serverSqlPool    :: ConnectionPool       -- ^ Database connection pool
+    , serverMiddleware :: [Middleware]         -- ^ Middleware stack
+    , serverRoutes     :: [Route]              -- ^ Application routes
+    , serverHmacConf   :: (Maybe HmacKeyConf)  -- ^ HMAC configuration
+    , serverPipelines  :: [(Text, Pipeline)]   -- ^ Pipeline map
+    , serverVerbose    :: Bool                 -- ^ Log output to stdout
+    , serverLogger     :: LoggerConf           -- ^ FastLogger instance
+    , serverDtors      :: [IO ()]              -- ^ Destructors
     }
 
 initConf :: ConnectionPool -> IO ServerConf

@@ -1,9 +1,9 @@
-site_name: trombone 
+site_name: Trombone 
 pages: 
 - ['index.md',          'Docs', 'Contents']
 - ['introduction.md',   'Docs', 'Introduction']
 - ['install.md',        'Docs', 'Installation']
-- ['configuration.md',  'Docs', 'Server Configuration']
+- ['configuration.md',  'Docs', 'Basic Configuration']
 - ['format.md',         'Docs', 'Route Format']
 - ['dry-block.md',      'Docs', 'DRY-block Notation']
 - ['non-sql.md',        'Docs', 'Non-SQL Routes']

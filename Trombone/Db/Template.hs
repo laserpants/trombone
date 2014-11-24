@@ -22,8 +22,8 @@ data DbResult = NoResult
               -- ^ Same as Item, except with an added 'Ok' status message 
               | Collection [Text]
               -- ^ Return a collection of items
-              | LastInsert  Text    -- ^ Table name
-                            Text    -- ^ Sequence
+              | LastInsert Text    -- ^ Table name
+                           Text    -- ^ Sequence
               -- ^ Return the last inserted id (for INSERT statements)
               | Count
               -- ^ Return a row count result

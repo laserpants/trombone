@@ -1,6 +1,6 @@
 <h1>Middleware</h1>
 
-Middlewares are server components which provide some additional functionality and can be enabled/configured to suit specific needs. With exception of file serving, middlewares are disabled by default. See respective section for details on how configuration works.
+Middlewares are server components which provide some additional functionality and can be enabled at run-time and configured to suit specific needs. With exception of file serving, middlewares are disabled by default. See respective section for details on how configuration works for a specific component.
 
 ### Available components
 
@@ -23,11 +23,11 @@ The following AMQP exchange should be specified when connecting to the service: 
 
 <h4>Flags</h4>
 
-Enable with `--amqp[=USER:PASS]` or `-A` and, optionally, provide a host name using `--amqp-host[=HOST]` (if you leave out this option, `localhost` is assumed). 
+Enable with `--amqp[=USER:PASS]` or `-A` and, optionally, supply a host name using `--amqp-host[=HOST]` (if you leave out this option, `localhost` is assumed). 
 
 ## CORS
 
-The CORS component adds support for cross-domain requests to Trombone. It provides the hand-shaking and response headers expected by client applications, such as modern web browsers, when sending CORS-enabled requests. 
+The CORS component adds the capability to accept cross-domain requests, by implementing the necessary hand-shaking and response headers. These are typically expected by client applications, such as modern web browsers, when sending CORS-enabled requests. 
 
 > *JavaScript and the web programming has grown by leaps and bounds over the years, but the same-origin policy still remains. This prevents JavaScript from making requests across domain boundaries, and has spawned various hacks for making cross-domain requests.*
 
@@ -37,7 +37,7 @@ For more information about cross-origin resource sharing, please see: [http://en
 
 <h4>Flags</h4>
 
-`--cors` or `-C`
+Enable using `--cors` or `-C`.
 
 ## Logging
 
