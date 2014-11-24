@@ -100,7 +100,7 @@ runConf ServerConf{..} = do
         Context{ dispatchVerbose = loud } <- ask
         res <- routeRequest req
         auth <- authRequest req 
-        when loud $ liftIO $ print res
+        printS $ show res
         dispatch res auth
 
 serviceUnavailable :: Response
