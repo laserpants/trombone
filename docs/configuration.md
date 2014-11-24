@@ -5,7 +5,12 @@
 #### Ping
 
 ```
-curl http://localhost:3010/ping
+curl localhost:3010/ping
 ```
 
 ## Unix Signal Handlers
+
+```
+kill -SIGHUP `ps -a | awk '/trombone/ {print $1}'`
+```
+
