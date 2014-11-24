@@ -83,7 +83,12 @@ runConf ServerConf{..} = do
                $ setBeforeMainLoop (putStrLn $ "Service starting. Trombone listening on port " ++ show serverPort ++ ".")
                $ setPort serverPort defaultSettings
 
-    let context = Context serverSqlPool serverRoutes serverHmacConf [] True serverLogger
+    let context = Context serverSqlPool 
+                          serverRoutes 
+                          serverHmacConf 
+                          serverPipelines 
+                          serverVerbose 
+                          serverLogger
 
     return ServerSettings 
         { handler  = foldr ($) (\req resp -> 
@@ -97,7 +102,6 @@ runConf ServerConf{..} = do
   where
     run :: Request -> Dispatch IO RouteResponse
     run req = do
-        Context{ dispatchVerbose = loud } <- ask
         res <- routeRequest req
         auth <- authRequest req 
         printS $ show res
