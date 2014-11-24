@@ -67,7 +67,7 @@ catchExceptions :: IO a -> IO a
 catchExceptions sql = try sql >>= excp
   where 
     excp (Right r) = return r
-    excp (Left  e) = throwM $ fromMaybe fatal (fromException e :: Maybe SqlError)
+    excp (Left  e) = throwM $ fromMaybe fatal $ fromException e 
 
 fatal :: SqlError
 {-# INLINE fatal #-}
