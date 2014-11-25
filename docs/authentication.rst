@@ -23,6 +23,9 @@ Table schema
 .. NOTE::
    This table is automatically created when the server is started with HMAC authentication enabled.
 
+Registering a client application
+********************************
+
 Authentication is enabled by default. A client application that wishes to consume the service must therefore;
 
 1. be present in the ``trombone_keys`` database table with a unique identifier and the secure token; as well as
