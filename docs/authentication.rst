@@ -59,7 +59,7 @@ The key is a random 40-character hexadecimal string.
 Client key administration
 `````````````````````````
 
-A simple bash script, such as the one presented here, can be used to administrate client keys.
+A simple bash script, such as the one presented here (`utils/bash/keyadmin.sh <github.com/johanneshilden/trombone/blob/refactor/utils/bash/keyadmin.sh>`_), can be used to manage client keys.
 
 ::
 
