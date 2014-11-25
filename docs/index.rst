@@ -26,7 +26,7 @@ Contents:
    rest-conventions.rst
    bnf-grammar.rst
    middleware.rst
-   tools-and-utilities-rst
+   tools-and-utilities.rst
    examples.rst
    about.rst
 
