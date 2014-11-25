@@ -9,6 +9,14 @@ To establish the authenticity of a request, the server performs a message integr
 Table schema
 ************
 
+The key is a random 40-character hexadecimal string.
+
+::
+
+    SELECT encode(digest(random()::text, 'sha1'), 'hex');
+
+A ``trombone_keys`` table is used to maintain client-key associations.
+
 ::
 
     CREATE TABLE trombone_keys (
@@ -32,7 +40,7 @@ Registering client applications
 
 In order for a client application to authenticate with the service, it must;
 
-1. be present in the ``trombone_keys`` database table with a unique identifier and secure token; as well as
+1. be present in the ``trombone_keys`` database table with a unique identifier and its secure token; as well as
 2. supply the following HTTP header with each request:
 
 :: 
@@ -49,12 +57,6 @@ SHA1 implementations are widely available for most programming languages. The fo
 JavaScript https://code.google.com/p/crypto-js/ 
 Haskell    http://hackage.haskell.org/package/Crypto/docs/Data-HMAC.html
 ========== ===============================================================       
-
-The key is a random 40-character hexadecimal string.
-
-::
-
-    SELECT encode(digest(random()::text, 'sha1'), 'hex');
 
 Client key administration
 `````````````````````````
