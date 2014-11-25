@@ -40,7 +40,9 @@ The CORS component adds the capability to accept cross-domain requests, by imple
 |
 | *CORS introduces a standard mechanism that can be used by all browsers for implementing cross-domain requests. The spec defines a set of headers that allow the browser and server to communicate about which requests are (and are not) allowed. CORS continues the spirit of the open web by bringing API access to all.*
 
-For more information about cross-origin resource sharing, please see: `enable-cors.org <http://enable-cors.org>`_.
+.. NOTE::
+
+    For more information about cross-origin resource sharing, please see: `enable-cors.org <http://enable-cors.org>`_.
 
 Flags
 `````
