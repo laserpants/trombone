@@ -50,6 +50,12 @@ JavaScript https://code.google.com/p/crypto-js/
 Haskell    http://hackage.haskell.org/package/Crypto/docs/Data-HMAC.html
 ========== ===============================================================       
 
+The key is a random 40-character hexadecimal string.
+
+::
+
+    SELECT encode(digest(random()::text, 'sha1'), 'hex');
+
 Client key administration
 `````````````````````````
 
@@ -110,9 +116,8 @@ After registering an application, it should appear in the client list with its k
 
 ::
 
-    $ ./keyadmin.sh list
+    $ ./keyadmin.sh list | grep my_application
 
-    ...
     my_application       53d5864520d65aa0364a52ddbb116ca78e0df8dc
 
 To remove a client, use:
