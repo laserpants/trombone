@@ -11,6 +11,27 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   introduction.rst
+   installation.rst
+   basic-configuration.rst
+   route-format.rst
+   dry-block-notation.rst
+   non-sql-routes.rst
+   authentication.rst
+   pipelines.rst
+   array-actions.rst
+   wildcard-operators.rst
+   response-codes.rst
+   command-line-flags.rst
+   rest-conventions.rst
+   bnf-grammar.rst
+   middleware.rst
+   tools-and-utilities-rst
+   examples.rst
+   about.rst
+
+
+
 
 
 Indices and tables

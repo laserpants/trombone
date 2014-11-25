@@ -260,7 +260,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'Trombone', u'Trombone Documentation',
-   u'Johannes Hilden', 'Trombone', 'One line description of project.',
+   u'Johannes Hilden', 'Trombone', 'Instant RESTful data access service for your PostgreSQL database.',
    'Miscellaneous'),
 ]
 
