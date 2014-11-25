@@ -1,7 +1,0 @@
-Introduction
-============
-
-Hello, World!
--------------
-
-abc
