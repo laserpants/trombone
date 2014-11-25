@@ -92,12 +92,12 @@ setupHmac (Config{ .. }, conf@ServerConf{..}) = do
     buildHmacConf keys = Just . HmacKeyConf (Map.fromList keys) 
 
 readKeysFromDb :: ConnectionPool -> IO [(ByteString, ByteString)]
-readKeysFromDb pool = runDbQ (translate . concat) q pool 
+readKeysFromDb = runDbQ (translate . concat) q 
   where 
     q :: SqlT [[PersistValue]]
     q = rawExecute "CREATE TABLE IF NOT EXISTS trombone_keys \
                    \(id serial PRIMARY KEY, \
-                   \client character varying(40), \
+                   \client character varying(40) UNIQUE, \
                    \key character varying(40));" [] 
         >> (rawQuery "SELECT client, key FROM trombone_keys;" [] 
                 $$ CL.consume)
