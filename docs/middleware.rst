@@ -6,10 +6,10 @@ Middlewares are server components which provide some additional functionality an
 Available components
 --------------------
 
-* RabbitMQ 
-* CORS (cross-origin resource sharing)
-* Logging
-* Static File Serving
+* `RabbitMQ`_
+* `CORS`_ (cross-origin resource sharing)
+* `Logging`_
+* `Static File Serving`_
 
 RabbitMQ
 ********
