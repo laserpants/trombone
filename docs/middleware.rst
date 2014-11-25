@@ -36,9 +36,9 @@ CORS
 
 The CORS component adds the capability to accept cross-domain requests, by implementing the necessary hand-shaking and response headers. These are typically expected by client applications, such as modern web browsers, when sending CORS-enabled requests. 
 
-| JavaScript and the web programming has grown by leaps and bounds over the years, but the same-origin policy still remains. This prevents JavaScript from making requests across domain boundaries, and has spawned various hacks for making cross-domain requests.
+| *JavaScript and the web programming has grown by leaps and bounds over the years, but the same-origin policy still remains. This prevents JavaScript from making requests across domain boundaries, and has spawned various hacks for making cross-domain requests.*
 |
-| CORS introduces a standard mechanism that can be used by all browsers for implementing cross-domain requests. The spec defines a set of headers that allow the browser and server to communicate about which requests are (and are not) allowed. CORS continues the spirit of the open web by bringing API access to all.
+| *CORS introduces a standard mechanism that can be used by all browsers for implementing cross-domain requests. The spec defines a set of headers that allow the browser and server to communicate about which requests are (and are not) allowed. CORS continues the spirit of the open web by bringing API access to all.*
 
 For more information about cross-origin resource sharing, please see: `enable-cors.org <http://enable-cors.org>`_.
 
@@ -58,5 +58,5 @@ Flags
 Static File Serving
 *******************
 
-Trombone can also act as a simple file server. By convention, files located under the ``public`` directory or any of its subdirectories are HTTP accessible.
+Trombone can also act as a simple file server. By convention, files located under the ``public/`` directory or any of its subdirectories are HTTP accessible.
 
