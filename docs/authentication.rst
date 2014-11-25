@@ -51,16 +51,73 @@ Haskell    http://hackage.haskell.org/package/Crypto/docs/Data-HMAC.html
 Client key administration
 `````````````````````````
 
-The following are some ``psql`` commands that can be used to manage client keys from the CLI.
+A simple bash script, such as the one provided here, can be used to administrate client keys.
 
-==================== ==============================================================================================================================================       
-Task                 Command
--------------------- ----------------------------------------------------------------------------------------------------------------------------------------------       
-List clients         ``$ psql -d <database> -c "SELECT * FROM trombone_keys;"``
-Register a client    ``$ psql -d <database> -c "INSERT INTO trombone_keys (client, key) VALUES ('<application>', encode(digest(random()::text, 'sha1'), 'hex'));"``
-Re-generate password ``$ psql -d <database> -c "UPDATE trombone_keys SET key = encode(digest(random()::text, 'sha1'), 'hex') WHERE client = '<application>';"``
-Remove a client      ``$ psql -d <database> -c "DELETE FROM trombone_keys WHERE client = '<application>';"``
-==================== ==============================================================================================================================================       
+::
+
+    #!/bin/bash
+    
+    # Replace <database> below with name of database
+    db="<database>"  
+    
+    # PostgreSQL user
+    psql_user="postgres"
+    
+    # Modify according to host environment
+    psql_cmd="sudo -u $psql_user psql -d $db -c" 
+    
+    case $1 in
+        list)
+            eval "$psql_cmd \"SELECT client, key FROM trombone_keys;\"" | tail -n+3 | head -n-2 | awk '{printf "%-20s %-40s\n", $1, $3}'
+            ;;
+        register)
+            eval "$psql_cmd \"INSERT INTO trombone_keys (client, key) VALUES ('$2', encode(digest(random()::text, 'sha1'), 'hex'));\""
+            ;;
+        renew)
+            eval "$psql_cmd \"UPDATE trombone_keys SET key = encode(digest(random()::text, 'sha1'), 'hex') WHERE client = '$2';\""
+            ;;
+        revoke)
+            eval "$psql_cmd \"DELETE FROM trombone_keys WHERE client = '$2';\""
+            ;;
+        *)
+            echo "Usage: $0 {list|register|renew|revoke} [client]"
+            exit 1
+    esac
+
+Edit the file as required; save, e.g. as ``keyadmin.sh``; and assign necessary permissions.
+
+::
+
+    chmod +x keyadmin.sh
+
+Then use the command as:
+
+::
+
+    $ ./keyadmin.sh list
+
+    generic              14ad0ef86bf392b38bad6009113c2a5a8a1d993a
+    batman               53d5864520d65aa0364a52ddbb116ca78e0df8dc
+    spock                78a302b6d3e0e37d2e37cf932955781900c46eca
+
+::
+
+    $ ./keyadmin.sh register my_application
+
+After registering an application, it should appear in the client list with its key.
+
+::
+
+    $ ./keyadmin.sh list
+
+    ...
+    my_application       53d5864520d65aa0364a52ddbb116ca78e0df8dc
+
+To remove a client, use:
+
+::
+
+    $ ./keyadmin.sh revoke unwanted_client
 
 JavaScript implementation
 *************************
