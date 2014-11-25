@@ -58,7 +58,7 @@ JavaScript https://code.google.com/p/crypto-js/
 Haskell    http://hackage.haskell.org/package/Crypto/docs/Data-HMAC.html
 ========== ===============================================================       
 
-For reference implementations, see `Demo implementations`_.
+For complete, working examples, see `Reference implementations`_.
 
 Client key administration
 `````````````````````````
@@ -143,8 +143,8 @@ Allowing access from localhost
 
 To circumvent HMAC authentication specifically for requests originating from a local host, instead use the ``-t``, or ``--trust-localhost`` option. 
 
-Demo implementations
---------------------
+Reference implementations
+-------------------------
 
 @todo
 
