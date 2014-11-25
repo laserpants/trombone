@@ -119,7 +119,7 @@ setupRoutes (Config{ .. }, conf@ServerConf{..}) = do
     q :: SqlT [[PersistValue]]
     q = rawExecute "CREATE TABLE IF NOT EXISTS trombone_config \
                    \(id serial PRIMARY KEY, \
-                   \key character varying(40), \
+                   \key character varying(40) UNIQUE, \
                    \val text);" []
         >> (rawQuery "SELECT val FROM trombone_config \
                     \WHERE key = 'routes';" [] $$ CL.consume)
