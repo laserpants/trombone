@@ -9,11 +9,11 @@ To establish the authenticity of a request, the server performs a message integr
 Table schema
 ************
 
-The key is a random 40-character hexadecimal string.
+The key is a random, 40-character long, hexadecimal string.
 
 ::
 
-    SELECT encode(digest(random()::text, 'sha1'), 'hex');
+    53d5864520d65aa0364a52ddbb116ca78e0df8dc
 
 A ``trombone_keys`` table is used to maintain client-key associations.
 
@@ -33,7 +33,7 @@ A ``trombone_keys`` table is used to maintain client-key associations.
 
 
 .. NOTE::
-   This table is automatically created when the server is started with authentication enabled (which it is by default).
+   This table is automatically created when the server is started with authentication enabled (i.e., in default mode).
 
 Registering client applications
 *******************************
@@ -57,6 +57,8 @@ SHA1 implementations are widely available for most programming languages. The fo
 JavaScript https://code.google.com/p/crypto-js/ 
 Haskell    http://hackage.haskell.org/package/Crypto/docs/Data-HMAC.html
 ========== ===============================================================       
+
+For reference implementations, see `Demo implementations`_.
 
 Client key administration
 `````````````````````````
@@ -114,7 +116,7 @@ Then use the command as:
 
     $ ./keyadmin.sh register my_application
 
-After registering an application, it should appear in the client list with its key.
+A token is generated for the new client using ``encode(digest(random()::text, 'sha1'), 'hex')``. After registering an application, it appears in the client list with its new key.
 
 ::
 
@@ -128,11 +130,6 @@ To remove a client, use:
 
     $ ./keyadmin.sh revoke unwanted_client
 
-JavaScript implementation
-*************************
-
-@todo
-
 Disable HMAC authentication
 ***************************
 
@@ -145,4 +142,9 @@ Allowing access from localhost
 ``````````````````````````````
 
 To circumvent HMAC authentication specifically for requests originating from a local host, instead use the ``-t``, or ``--trust-localhost`` option. 
+
+Demo implementations
+--------------------
+
+@todo
 
