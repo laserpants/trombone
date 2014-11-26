@@ -31,7 +31,7 @@ connectAmqp hname vhost user pass = do
     conn <- openConnection hname vhost user pass
     chan <- openChannel conn
     declareExchange chan newExchange { exchangeName = "trombone"
-                                     , exchangeType = "direct" }
+                                     , exchangeType = "fanout" }
     return (conn, chan)
  
 connectAmqp' :: String -> Text -> Text -> IO (Connection, Channel)
