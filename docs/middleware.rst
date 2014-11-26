@@ -63,7 +63,7 @@ Example
 CORS
 ----
 
-The CORS component introduces the capability to accept cross-domain requests, by implementing the necessary hand-shaking and response headers. These are typically expected by client applications, such as modern web browsers, when sending CORS-enabled requests. 
+The CORS component provisions Trombone with the ability to accept cross-domain requests, by implementing the necessary hand-shaking and response headers. These are typically expected by client applications, such as modern web browsers, when sending CORS-enabled requests. 
 
 | *CORS introduces a standard mechanism that can be used by all browsers for implementing cross-domain requests. The spec defines a set of headers that allow the browser and server to communicate about which requests are (and are not) allowed. CORS continues the spirit of the open web by bringing API access to all.*
 
