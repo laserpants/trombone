@@ -3,7 +3,7 @@ Middleware
 
 Middlewares are server components which provide some additional functionality. They can be enabled at run-time and configured to suit specific needs. With exception of file serving, middlewares are disabled by default. See respective section for details on how configuration works for a specific component.
 
-Available components
+Available Components
 --------------------
 
 * `RabbitMQ`_
@@ -12,17 +12,17 @@ Available components
 * `Static File Serving`_
 
 RabbitMQ
-********
+--------
 
 RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol -- an emerging standard for multi-purpose asynchronous message passing. The AMQP middleware integrates Trombone with RabbitMQ and facilitates for consumer applications to receive notifications when server resources are modified.
 
 AMQP Endpoint
-`````````````
+*************
 
 The following AMQP exchange should be specified when connecting to the service: ``/exchange/trombone/api``.
 
 Examples of using AMQP in JavaScript applications
-`````````````````````````````````````````````````
+*************************************************
 
 @todo
 
@@ -32,9 +32,9 @@ Flags
 Enable with ``--amqp[=USER:PASS]`` or ``-A`` and, optionally, supply a host name using ``--amqp-host[=HOST]`` (if you leave out this option, ``localhost`` is assumed). 
 
 CORS
-****
+----
 
-The CORS component adds the capability to accept cross-domain requests, by implementing the necessary hand-shaking and response headers. These are typically expected by client applications, such as modern web browsers, when sending CORS-enabled requests. 
+The CORS component introduces the capability to accept cross-domain requests, by implementing the necessary hand-shaking and response headers. These are typically expected by client applications, such as modern web browsers, when sending CORS-enabled requests. 
 
 | *JavaScript and the web programming has grown by leaps and bounds over the years, but the same-origin policy still remains. This prevents JavaScript from making requests across domain boundaries, and has spawned various hacks for making cross-domain requests.*
 |
@@ -50,7 +50,7 @@ Flags
 Enable using ``--cors`` or ``-C``.
 
 Logging
-*******
+-------
 
 Flags
 `````
@@ -58,7 +58,7 @@ Flags
 ``--access-log[=FILE]`` or ``-l``
 
 Static File Serving
-*******************
+-------------------
 
 Trombone can also act as a simple file server. By convention, files located under the ``public/`` directory or any of its subdirectories are HTTP accessible.
 
