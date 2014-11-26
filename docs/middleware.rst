@@ -22,9 +22,7 @@ AMQP Endpoint
 The following AMQP exchange should be specified when connecting to the service: ``/exchange/trombone/api``.
 
 Flags
-`````
-
-Enable with ``--amqp[=USER:PASS]`` or ``-A`` and, optionally, supply a host name using ``--amqp-host[=HOST]`` (if you leave out this option, ``localhost`` is assumed). 
+    Enable with ``--amqp[=USER:PASS]`` or ``-A`` and, optionally, supply a host name using ``--amqp-host[=HOST]`` (if you leave out this option, ``localhost`` is assumed). 
 
 Examples of using AMQP in JavaScript applications
 *************************************************
@@ -45,20 +43,22 @@ The CORS component introduces the capability to accept cross-domain requests, by
     For more information about cross-origin resource sharing, please see: `enable-cors.org <http://enable-cors.org>`_.
 
 
-Flags
-`````
-
-Enable using ``--cors`` or ``-C``.
+| ============================================================================================================================================================================
+| Flags
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Enable using ``--cors`` or ``-C``.
+| ============================================================================================================================================================================
 
 Logging
 -------
 
 @todo
 
-Flags
-`````
-
-``--access-log[=FILE]`` or ``-l``
+| ============================================================================================================================================================================
+| Flags
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| ``--access-log[=FILE]`` or ``-l``
+| ============================================================================================================================================================================
 
 Static File Serving
 -------------------
