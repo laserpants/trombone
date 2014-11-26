@@ -14,12 +14,7 @@ Available Components
 RabbitMQ
 --------
 
-RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol -- an emerging standard for multi-purpose asynchronous message passing. The AMQP middleware integrates Trombone with RabbitMQ and facilitates for consumer applications to receive notifications when server resources are modified.
-
-AMQP Endpoint
-*************
-
-The following AMQP exchange should be specified when connecting to the service: ``/exchange/trombone/api``.
+RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol -- an emerging standard for multi-purpose, asynchronous message passing. The AMQP middleware integrates Trombone with RabbitMQ and facilitates for consumer applications to receive notifications when server resources are modified.
 
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Flags                                                                                                                                                                       |
@@ -27,23 +22,53 @@ The following AMQP exchange should be specified when connecting to the service: 
 | Enable with ``--amqp[=USER:PASS]`` or ``-A`` and, optionally, supply a host name using ``--amqp-host[=HOST]`` (if you leave out this option, ``localhost`` is assumed).     |
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-Examples of using AMQP in JavaScript applications
-*************************************************
+AMQP Endpoint
+*************
+
+When a request of type ``POST``, ``PUT``, ``DELETE``, or ``PATCH`` is accepted, a message of the format ``<method> <uri>:<response-body>`` is published to an exchange with the following settings:
+
+======== =========================
+Name     ``exchange/trombone/api``
+Type     ``fanout``
+======== =========================
+
+Example:
+
+::
+
+    POST customer/new:{"status":true,"id":49,"message":"Ok."}
+
+
+Using AMQP in JavaScript applications
+*************************************
+
+To configure and run RabbitMQ with STOMP Over WebSocket enabled, follow the instructions to install the `Web-Stomp plugin <http://www.rabbitmq.com/web-stomp.html>`_.
+
+http://jmesnil.net/stomp-websocket/doc/
 
 @todo
+
+Example
+```````
+
+::
+
+    <script type="text/javascript" src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
+    <script type="text/javascript" src="https://raw.githubusercontent.com/jmesnil/stomp-websocket/master/lib/stomp.min.js"></script>
+
+
+
 
 CORS
 ----
 
 The CORS component introduces the capability to accept cross-domain requests, by implementing the necessary hand-shaking and response headers. These are typically expected by client applications, such as modern web browsers, when sending CORS-enabled requests. 
 
-| *JavaScript and the web programming has grown by leaps and bounds over the years, but the same-origin policy still remains. This prevents JavaScript from making requests across domain boundaries, and has spawned various hacks for making cross-domain requests.*
-|
 | *CORS introduces a standard mechanism that can be used by all browsers for implementing cross-domain requests. The spec defines a set of headers that allow the browser and server to communicate about which requests are (and are not) allowed. CORS continues the spirit of the open web by bringing API access to all.*
 
 .. NOTE::
 
-    For more information about cross-origin resource sharing, please see: `enable-cors.org <http://enable-cors.org>`_.
+    CORS involves coordination between both server and client. For more information regarding client requirements, and cross-origin resource sharing in general, please see: `enable-cors.org <http://enable-cors.org>`_.
 
 
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
