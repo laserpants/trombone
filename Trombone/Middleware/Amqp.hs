@@ -7,22 +7,23 @@ module Trombone.Middleware.Amqp
     , amqp 
     ) where
 
+import Blaze.ByteString.Builder
 import Control.Monad                          ( when )
 import Data.ByteString.Char8                  ( split, filter )
-import Data.ByteString.Lazy                   ( fromStrict )
+import Data.ByteString.Lazy                   ( ByteString, fromStrict, concat )
 import Data.List                              ( intersperse )
 import Data.Text                              ( Text )
 import Data.Text.Encoding
 import Network.AMQP
 import Network.HTTP.Types.Status
 import Network.Wai
-import Network.Wai.Internal                   ( Request(..) )
+import Network.Wai.Internal                   ( Request(..), Response(..) )
 
 import qualified Data.ByteString              as B
 import qualified Data.ByteString.Char8        as C8
 import qualified Data.Text                    as Text
 
-import Prelude                                hiding ( filter )
+import Prelude                                hiding ( filter, concat )
 
 -- | Connect to the AMQP service. Called prior to starting the server in order
 -- to acquire the connection-channel pair.
@@ -44,7 +45,8 @@ amqp :: Channel -> Middleware
 amqp chan app req@Request{..} cback = app req $ \resp -> do
     when (effectful && status resp == 200) $
         publishMsg chan "trombone" "api" 
-            newMsg { msgBody         = fromStrict $ encodeUtf8 body
+            newMsg { msgBody         = concat [ fromStrict $ encodeUtf8 body
+                                              , ":", rawBody resp ]
                    , msgDeliveryMode = Just Persistent }
     cback resp
   where 
@@ -52,4 +54,8 @@ amqp chan app req@Request{..} cback = app req $ \resp -> do
     body = Text.concat $ [decodeUtf8 requestMethod, " "] 
          ++ intersperse "/" pathInfo 
     status = statusCode . responseStatus 
+
+rawBody :: Response -> ByteString
+rawBody (ResponseBuilder _ _ b) = toLazyByteString b
+rawBody _ = ""
 
