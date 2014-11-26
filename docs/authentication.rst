@@ -136,7 +136,7 @@ Disable HMAC authentication
 Message authentication can be disabled with the ``-x`` command line switch. Doing so in a production environment is not recommended, since it renders the system vulnerable to unauthorized access.
 
 .. WARNING::
-   Deactivating message authentication gives everyone full access to your API. The ``-x`` flag should be used for test and development purposes only. 
+   Deactivating message authentication gives everyone full access to your API. Only use the ``-x`` flag in a safe environment. 
 
 
 Allowing access from localhost
