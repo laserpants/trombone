@@ -40,7 +40,7 @@ Registering client applications
 
 In order for a client application to authenticate with the service, it must;
 
-1. be present in the ``trombone_keys`` database table with a unique identifier and its secure token; as well as
+1. be present in the ``trombone_keys`` table with a unique identifier and its secure token; as well as
 2. supply the following HTTP header with each request:
 
 :: 
@@ -136,7 +136,8 @@ Disable HMAC authentication
 Message authentication can be disabled with the ``-x`` command line switch. Doing so in a production environment is not recommended, since it renders the system vulnerable to unauthorized access.
 
 .. WARNING::
-   Disabling authentication gives everyone access to your API.
+   Deactivating message authentication gives everyone full access to your API. The ``-x`` flag should be used for test and development purposes only. 
+
 
 Allowing access from localhost
 ``````````````````````````````
