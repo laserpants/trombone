@@ -17,6 +17,8 @@ import Control.Monad.Logger                            ( NoLoggingT, runNoLoggin
 import Control.Monad.Trans.Resource                   
 import Data.Aeson
 import Data.Conduit
+import Data.List
+import Data.List.Utils                                 ( split )
 import Data.Maybe                                      ( fromMaybe, listToMaybe )
 import Data.Scientific                                 ( fromFloatDigits )
 import Data.Text                                       ( Text, pack )
@@ -25,9 +27,12 @@ import Database.Persist
 import Database.Persist.Postgresql
 import Database.PostgreSQL.Simple                      ( SqlError(..), ExecStatus(..) )
 import GHC.IO.Exception                             
+import Text.ParserCombinators.ReadP
+import Text.Read.Lex                            hiding ( String )
 
 import qualified Data.Conduit.List                     as CL
 import qualified Data.HashMap.Strict                   as HMS
+import qualified Data.List.Utils                       as U
 import qualified Data.Vector                           as Vect
 
 -- | Database monad transformer stack.
@@ -64,7 +69,17 @@ catchExceptions :: IO a -> IO a
 catchExceptions sql = try sql >>= excp
   where 
     excp (Right r) = return r
-    excp (Left (IOError _ _ _ m _ _)) = error $ head $ lines m
+    excp (Left (IOError _ _ _ m _ _)) 
+        | "PGRES_FATAL_ERROR" `isInfixOf` m = 
+            let s = U.replace "\"))" "" $ unescape $ U.split "ERROR:" m !! 1
+            in error ("PGRES_FATAL_ERROR: " ++ s)
+        | otherwise = error $ head $ lines m
+
+unescape :: String -> String
+unescape xs | []      <- r = []
+            | [(a,_)] <- r = a
+  where
+    r = readP_to_S (manyTill lexChar eof) xs 
 
 -------------------------------------------------------------------------------
 -- Type conversion helper functions

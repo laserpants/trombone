@@ -35,6 +35,7 @@ import Trombone.Dispatch.NodeJs
 import Trombone.Dispatch.Pipeline
 import Trombone.Dispatch.Static
 import Trombone.Hmac
+import Trombone.Middleware.Logger
 import Trombone.Pipeline
 import Trombone.RequestJson
 import Trombone.Response
@@ -80,6 +81,7 @@ runConf :: ServerConf -> IO (ServerSettings (IO ()))
 runConf ServerConf{..} = do
 
     let config = setOnExceptionResponse catchException -- $ setServerName (snd versionH) -- Since 3.0.2
+               $ setOnException (logException serverLogger)
                $ setBeforeMainLoop (putStrLn $ "Service starting. Trombone listening on port " ++ show serverPort ++ ".")
                $ setPort serverPort defaultSettings
 
@@ -114,6 +116,10 @@ serviceUnavailable = sendJsonResponse $
 -------------------------------------------------------------------------------
 -- Exception handling
 -------------------------------------------------------------------------------
+
+logException :: LoggerConf -> Maybe Request -> SomeException -> IO ()
+logException (LoggerConf ls _) _ e = pushLogStr ls $ toLogStr $ show e
+logException _ _ _ = return ()
 
 catchException :: SomeException -> Response
 catchException e = 
