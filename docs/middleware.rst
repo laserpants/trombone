@@ -1,7 +1,7 @@
 Middleware
 ==========
 
-Middlewares are server components which provide some additional functionality. They can be enabled at run-time and configured to suit specific needs. With exception of file serving, middlewares are disabled by default. See respective section for details on how configuration works for a specific component.
+Middlewares are built-in software components which provide some auxiliary functionality and may be configured to suit specific needs. With the exception of file serving, middlewares are disabled by default and must be enabled at run-time. See respective section for details on how configuration works for a specific component.
 
 Available Components
 --------------------
