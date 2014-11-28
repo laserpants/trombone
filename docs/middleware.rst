@@ -1,7 +1,7 @@
 Middleware
 ==========
 
-Middlewares are built-in software components which provide some auxiliary functionality and may be configured to suit specific needs. With the exception of file serving, middlewares are disabled by default and must be enabled at run-time. See respective section for details on how configuration works for a specific component.
+Middlewares are built-in software components which provide some auxiliary functionality and may be configured to suit specific needs. With the exception of file serving, middlewares are disabled by default. See respective section for details on how to activate and configure a specific component.
 
 Available Components
 --------------------
@@ -26,12 +26,14 @@ RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol 
 AMQP Endpoint
 *************
 
-When a request of type ``POST``, ``PUT``, ``DELETE``, or ``PATCH`` is accepted, a message of the format ``<method> <uri>:<response-body>`` is published to an exchange with the following settings:
+When a request of type ``POST``, ``PUT``, ``DELETE``, or ``PATCH`` is accepted and results in a ``200 OK`` response, a message is published to an exchange with the following characteristics:
 
 ======== =========================
 Name     ``exchange/trombone/api``
 Type     ``fanout``
 ======== =========================
+
+Messages follow the format ``<method> <uri>:<response-body>``.
 
 Example:
 
@@ -63,7 +65,7 @@ Example
 CORS
 ----
 
-The CORS component provisions Trombone with the ability to accept cross-domain requests, by implementing the necessary hand-shaking and response headers. These are typically expected by client applications, such as modern web browsers, when sending CORS-enabled requests. 
+The CORS component provisions Trombone with the ability to accept cross-domain requests. It implements the mandatory hand-shaking and response headers expected by CORS-compliant client applications, such as modern web browsers. 
 
 | *CORS introduces a standard mechanism that can be used by all browsers for implementing cross-domain requests. The spec defines a set of headers that allow the browser and server to communicate about which requests are (and are not) allowed. CORS continues the spirit of the open web by bringing API access to all.*
 

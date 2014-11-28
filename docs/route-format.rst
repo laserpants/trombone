@@ -32,9 +32,9 @@ A simple configuration file is given below.
             , {{industry}} )
 
 
-The server scans the list of routes during dispatch, looking for a match based on the uri components and HTTP method used in the request.
+The server scans the list of routes during dispatch, looking for one that matches the uri components and HTTP method used in the request.
 
-The arrow symbol specifies the type of route and the response object's expected format. See `below <#types-of-routes>`_ for explanations of these symbols. The particular arrow used here; ``->``, denotes an SQL query with a singleton result.
+The arrow symbol specifies the type of route and the response object's expected format. See `below <#types-of-routes>`_ for explanations of these symbols. E.g., the particular arrow used here; ``->``, denotes an SQL query with a singleton result.
 
 Placeholders
 ------------
