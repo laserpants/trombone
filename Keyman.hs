@@ -43,7 +43,7 @@ listKeys conn = do
     f n (k, v) = putStrLn $ k ++ ": " ++ v 
 
 isHex :: ByteString -> Bool
-isHex = C8.all (flip elem "0123456789abcdefABCDEF") 
+isHex = C8.all (`elem` "0123456789abcdefABCDEF") 
 
 isValid :: ByteString -> Either String ByteString
 isValid key | BS.length key /= 40 = Left "Invalid key length: Please specify a 40-character hexadecimal string."
@@ -98,7 +98,9 @@ runQ q = try q >>= \r ->
                     \mode) to set up tables. Alternatively, confirm that \
                     \your configuration file contains the correct database \
                     \name (dbname)."
-                _ -> error $ C8.unpack m
+                "23505" -> error
+                    "A client is already registered with the specified name." 
+                _ -> error $ C8.unpack m ++ " (" ++ C8.unpack s ++ ")"
         Right r -> return r
 
 runWithArgs :: [String] -> Connection -> IO ()
@@ -121,7 +123,7 @@ runWithArgs args conn = do
 main :: IO ()
 main = do
     args <- getArgs
-    ( BS.readFile "keyman.conf" 
-         >>= connectPostgreSQL 
-         >>= runWithArgs args ) 
+    BS.readFile "keyman.conf" 
+        >>= connectPostgreSQL 
+        >>= runWithArgs args 
 

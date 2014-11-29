@@ -9,7 +9,7 @@ A Trombone configuration file consists of a collection of route patterns. The fo
 
 For a more thorough description of this syntax, please see `BNF grammar <bnf-grammar.html>`_.
 
-A simple configuration file is given below.
+What follows is an example of a simple configuration file.
 
 ::
 

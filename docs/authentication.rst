@@ -63,72 +63,125 @@ For complete, working examples, see `Reference Implementations`_.
 Client key administration
 `````````````````````````
 
-A simple bash script, such as the one presented here (`utils/bash/keyadmin.sh <github.com/johanneshilden/trombone/blob/refactor/utils/bash/keyadmin.sh>`_), can be used to manage client keys.
+To manage client keys, the ``keyman`` command line tool can be used. It requires a configuration file with db configuration settings to be present.
+
+Sample ``keyman.conf`` file:
 
 ::
 
-    #!/bin/bash
+    host     = 'localhost' 
+    port     =  5432 
+    dbname   = 'trombone' 
+    user     = 'postgres' 
+    password = 'postgres'
+
+
+E.g., to list existing client keys:
+
+:: 
+
+        $ keyman list
+
+        generic            : 14ad0ef86bf392b38bad6009113c2a5a8a1d993a
+        batman             : 53d5864520d65aa0364a52ddbb116ca78e0df8dc
+        spock              : 78a302b6d3e0e37d2e37cf932955781900c46eca
+ 
+        
+Register a new client:
+
+::
+
+        $ keyman register my_application
+
+        Client registered:
+        my_application: 53d5864520d65aa0364a52ddbb116ca78e0df8dc
     
-    # Replace <database> below with name of database
-    db="<database>"  
+
+A token is automatically generated for the new client. Alternatively, an existing key (a 40 character long hexadecimal string) can be specified as a trailing argument: ``keyman register my_application 53d5864520d65aa0364a52ddbb116ca78e0df8dc``. After registering an application, we can confirm that it shows up in the client list with its new key.
     
-    # PostgreSQL user
-    psql_user="postgres"
+
+::
+
+    $ keyman list | grep my_application
+
+    my_application      : 53d5864520d65aa0364a52ddbb116ca78e0df8dc
+ 
+
+To remove a client use:
     
-    # Modify according to host environment
-    psql_cmd="sudo -u $psql_user psql -d $db -c" 
+
+::
+
+    $ keyman revoke unwanted_client
+
+
+.. comments
+    A simple bash script, such as the one presented here (`utils/bash/keyadmin.sh <github.com/johanneshilden/trombone/blob/refactor/utils/bash/keyadmin.sh>`_), can be used to manage client keys.
     
-    case $1 in
-        list)
-            eval "$psql_cmd \"SELECT client, key FROM trombone_keys;\"" | tail -n+3 | head -n-2 | awk '{printf "%-20s %-40s\n", $1, $3}'
-            ;;
-        register)
-            eval "$psql_cmd \"INSERT INTO trombone_keys (client, key) VALUES ('$2', encode(digest(random()::text, 'sha1'), 'hex'));\""
-            ;;
-        renew)
-            eval "$psql_cmd \"UPDATE trombone_keys SET key = encode(digest(random()::text, 'sha1'), 'hex') WHERE client = '$2';\""
-            ;;
-        revoke)
-            eval "$psql_cmd \"DELETE FROM trombone_keys WHERE client = '$2';\""
-            ;;
-        *)
-            echo "Usage: $0 {list|register|renew|revoke} [client]"
-            exit 1
-    esac
-
-Edit the file as required; save, e.g. as ``keyadmin.sh``; and assign necessary permissions.
-
-::
-
-    chmod +x keyadmin.sh
-
-Then use the command as:
-
-::
-
-    $ ./keyadmin.sh list
-
-    generic              14ad0ef86bf392b38bad6009113c2a5a8a1d993a
-    batman               53d5864520d65aa0364a52ddbb116ca78e0df8dc
-    spock                78a302b6d3e0e37d2e37cf932955781900c46eca
-
-::
-
-    $ ./keyadmin.sh register my_application
-
-A token is generated for the new client using ``encode(digest(random()::text, 'sha1'), 'hex')``. After registering an application, it appears in the client list with its new key.
-
-::
-
-    $ ./keyadmin.sh list | grep my_application
-
-    my_application       53d5864520d65aa0364a52ddbb116ca78e0df8dc
-
-Similarly, to remove a client use:
-
-::
-
-    $ ./keyadmin.sh revoke unwanted_client
+    ::
+    
+        #!/bin/bash
+        
+        # Replace <database> below with name of database
+        db="<database>"  
+        
+        # PostgreSQL user
+        psql_user="postgres"
+        
+        # Modify according to host environment
+        psql_cmd="sudo -u $psql_user psql -d $db -c" 
+        
+        case $1 in
+            list)
+                eval "$psql_cmd \"SELECT client, key FROM trombone_keys;\"" | tail -n+3 | head -n-2 | awk '{printf "%-20s %-40s\n", $1, $3}'
+                ;;
+            register)
+                eval "$psql_cmd \"INSERT INTO trombone_keys (client, key) VALUES ('$2', encode(digest(random()::text, 'sha1'), 'hex'));\""
+                ;;
+            renew)
+                eval "$psql_cmd \"UPDATE trombone_keys SET key = encode(digest(random()::text, 'sha1'), 'hex') WHERE client = '$2';\""
+                ;;
+            revoke)
+                eval "$psql_cmd \"DELETE FROM trombone_keys WHERE client = '$2';\""
+                ;;
+            *)
+                echo "Usage: $0 {list|register|renew|revoke} [client]"
+                exit 1
+        esac
+    
+    Edit the file as required; save, e.g. as ``keyadmin.sh``; and assign necessary permissions.
+    
+    ::
+    
+        chmod +x keyadmin.sh
+    
+    Then use the command as:
+    
+    ::
+    
+        $ ./keyadmin.sh list
+    
+        generic              14ad0ef86bf392b38bad6009113c2a5a8a1d993a
+        batman               53d5864520d65aa0364a52ddbb116ca78e0df8dc
+        spock                78a302b6d3e0e37d2e37cf932955781900c46eca
+    
+    ::
+    
+        $ ./keyadmin.sh register my_application
+    
+    A token is generated for the new client using ``encode(digest(random()::text, 'sha1'), 'hex')``. After registering an application, it appears in the client list with its new key.
+    
+    ::
+    
+        $ ./keyadmin.sh list | grep my_application
+    
+        my_application       53d5864520d65aa0364a52ddbb116ca78e0df8dc
+    
+    Similarly, to remove a client use:
+    
+    ::
+    
+        $ ./keyadmin.sh revoke unwanted_client
 
 Disable HMAC authentication
 ***************************
@@ -136,7 +189,7 @@ Disable HMAC authentication
 Message authentication can be disabled with the ``-x`` command line switch. Doing so in a production environment is not recommended, since it renders the system vulnerable to unauthorized access.
 
 .. WARNING::
-   Deactivating message authentication gives everyone access to your server API. Therefore, only use the ``-x`` flag in a safe environment. 
+   Deactivating message authentication gives everyone access to your server interface. Only use the ``-x`` flag in a safe environment to avoid the risk of unauthorized access to production data.
 
 
 Allowing access from localhost
