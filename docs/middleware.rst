@@ -16,12 +16,15 @@ RabbitMQ
 
 RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol -- an emerging standard for multi-purpose, asynchronous message passing. The AMQP middleware integrates Trombone with RabbitMQ and facilitates for consumer applications to receive notifications when server resources are modified.
 
-+-------------------------------------------------------------------------------------------+
-| Flags                                                                                     |
-+===========================================================================================+
-| | Enable with ``--amqp[=USER:PASS]`` or ``-A`` and, optionally, supply a host name using  |
-| | ``--amqp-host[=HOST]`` (if you leave out this option, ``localhost`` is assumed).        |
-+-------------------------------------------------------------------------------------------+
+.. role:: raw-html(raw)
+   :format: html
+
++-----------------------------------------------------------------------------------------------------------+
+| Flags                                                                                                     |
++===========================================================================================================+
+| Enable with ``--amqp[=USER:PASS]`` or ``-A`` and, optionally, supply a host name using :raw-html:`<br />` |
+| ``--amqp-host[=HOST]`` (if you leave out this option, ``localhost`` is assumed).                          |
++-----------------------------------------------------------------------------------------------------------+
 
 AMQP Endpoint
 *************
