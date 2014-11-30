@@ -97,7 +97,7 @@ Register a new client:
         my_application: 53d5864520d65aa0364a52ddbb116ca78e0df8dc
     
 
-A token is automatically generated for the new client. Alternatively, an existing key (a 40 character long hexadecimal string) can be specified as a trailing argument: ``keyman register my_application 53d5864520d65aa0364a52ddbb116ca78e0df8dc``. After registering an application, we can confirm that it shows up in the client list with its new key.
+A token is automatically generated for the new client. Alternatively, an existing key (a 40 character long hexadecimal string) can be specified as a trailing argument: ``keyman register my_application 53d5864520d65aa0364a52ddbb116ca78e0df8dc``. After registering an application, we can confirm that it appears in the client list with its new key.
     
 
 ::
@@ -189,13 +189,13 @@ Disable HMAC authentication
 Message authentication can be disabled with the ``-x`` command line switch. Doing so in a production environment is not recommended, since it renders the system vulnerable to unauthorized access.
 
 .. WARNING::
-   Deactivating message authentication gives everyone access to your server interface. Only use the ``-x`` flag in a safe environment to avoid the risk of unauthorized access to production data.
+   Deactivating message authentication gives everyone access to your server interface. To mitigate the risk of unauthorized access to production data, only use the ``-x`` flag in a safe environment.
 
 
 Allowing access from localhost
 ``````````````````````````````
 
-To circumvent HMAC authentication specifically for requests originating from a local host, instead use the ``-t``, or ``--trust-localhost`` option. 
+To bypass HMAC authentication specifically for requests originating from a local host, instead use the ``-t``, or ``--trust-localhost`` option. 
 
 Reference Implementations
 -------------------------
