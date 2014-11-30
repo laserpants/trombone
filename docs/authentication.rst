@@ -4,7 +4,7 @@ Authentication
 Security model
 --------------
 
-To establish the authenticity of a request, the server must perform a message integrity check operating on a cryptographic primitive known as a HMAC (hash-based message authentication code). A MAC is attached to each request, in the form of an ``API-Access`` header. During dispatch, a subsequent code is computed from the request object using a token (secure key) associated with the client application. The result of this operation is compared with the original MAC attached to the request, in order to verify its authenticity.
+To establish the authenticity of a request, the server must perform a message integrity check which operates on a cryptographic primitive known as a HMAC (hash-based message authentication code). A MAC is attached to each request, in the form of an ``API-Access`` header. During dispatch, a subsequent code is computed from the request object using a token (secure key) associated with the client application. The result of this operation is compared with the original MAC attached to the request, in order to verify its authenticity.
 
 The key is a random, 40-character long, hexadecimal string.
 
@@ -65,6 +65,19 @@ Client key administration
 
 The ``keyman`` utility implements a simple CRUD interface, suitable for command line administration of client keys. 
 
+:: 
+
+    Usage:
+      keyman list [--config=<file>]
+      keyman (register|renew) <client> [<key>] [--config=<file>]
+      keyman revoke <client> [--config=<file>]
+      keyman --help
+    
+    Options:
+      -c --config=<file>  Path to database connection file.
+      -? --help           Display this help.
+
+
 Sample ``keyman.conf`` file:
 
 ::
@@ -107,7 +120,7 @@ A token is automatically generated for the new client. Alternatively, an existin
     my_application      : 53d5864520d65aa0364a52ddbb116ca78e0df8dc
  
 
-To remove a client use:
+To remove a client, use:
     
 
 ::
