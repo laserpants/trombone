@@ -49,7 +49,7 @@ authenticate :: Request         -- ^ Request object
 
 authenticate req body hmacEnabled trustLocal allowPing keys =
     fromMaybe Untrusted $ msum 
-        [ authHmac req body keys
+        [ authHmac'
         -- ^ Validate the request's API-Access header, if one is present
         , authLocal 
         -- ^ Authenticate requests from applications running on the same server
@@ -59,7 +59,9 @@ authenticate req body hmacEnabled trustLocal allowPing keys =
         -- ^ Finally, if HMAC is disabled, all requests are honored
         ]
   where 
-    authLocal, authPing, authAnon :: Maybe ClientIdentity
+    authHmac', authLocal, authPing, authAnon :: Maybe ClientIdentity
+    authHmac' | not hmacEnabled            = Nothing
+              | otherwise                = authHmac req body keys
     authLocal | isLocal && trustLocal     = Just Local
               | otherwise                = Nothing
     authPing  | isPing req && allowPing   = Just Anonymous

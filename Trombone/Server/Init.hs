@@ -13,7 +13,7 @@ import Data.Conduit
 import Data.HashMap                                    ( Map )
 import Data.Pool                                       ( destroyAllResources )
 import Data.Text                                       ( Text )
-import Data.Text.Encoding                              ( encodeUtf8 )
+import Data.Text.Encoding                              ( decodeUtf8, encodeUtf8 )
 import Data.Version                                    ( showVersion )
 import Database.Persist.Postgresql                     
 import Database.PostgreSQL.Simple                      ( SqlError(..) )
@@ -92,7 +92,7 @@ setupHmac (Config{ .. }, conf@ServerConf{..}) = do
     buildHmacConf keys = Just . HmacKeyConf (Map.fromList keys) 
 
 readKeysFromDb :: ConnectionPool -> IO [(ByteString, ByteString)]
-readKeysFromDb = runDbQ (translate . concat) q 
+readKeysFromDb = runDbQ (concatMap translate) q 
   where 
     q :: SqlT [[PersistValue]]
     q = rawExecute "CREATE TABLE IF NOT EXISTS trombone_keys \
@@ -102,6 +102,7 @@ readKeysFromDb = runDbQ (translate . concat) q
         >> (rawQuery "SELECT client, key FROM trombone_keys;" [] 
                 $$ CL.consume)
     translate [PersistText c, PersistText k] = [(encodeUtf8 c, encodeUtf8 k)]
+    translate [PersistByteString c, PersistByteString k] = [(c, k)]
     translate _ = []
 
 setupRoutes :: SetupStep
@@ -124,8 +125,9 @@ setupRoutes (Config{ .. }, conf@ServerConf{..}) = do
         >> (rawQuery "SELECT val FROM trombone_config \
                     \WHERE key = 'routes';" [] $$ CL.consume)
     translate :: [PersistValue] -> Text
-    translate [PersistText v] = v
-    translate _ = ""
+    translate [PersistText v]       = v
+    translate [PersistByteString b] = decodeUtf8 b
+    translate _                     = ""
   
 runDbQ :: (a -> b) -> SqlT a -> ConnectionPool -> IO b
 runDbQ fn q = liftM fn . runDb q 

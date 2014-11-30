@@ -87,10 +87,12 @@ auth req Context{..} =
                                (maybe True allowLocal dispatchKeys) 
                                True (keys dispatchKeys)
 
+keys :: Maybe HmacKeyConf -> Map.Map ByteString ByteString
 keys (Just (HmacKeyConf m _)) = m
 keys _                        = Map.empty
 
 takeBody :: RequestJson -> ByteString
+{-# INLINE takeBody #-}
 takeBody (JsonBody _ raw)     = raw
 takeBody _                    = BS.empty
 
