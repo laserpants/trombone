@@ -49,7 +49,7 @@ In order for a client application to be granted access to the service, it must;
 
 
     
-where ``<client>`` is replaced with a unique name identifying the application, and ``<hash>`` with the MAC code obtained by hashing the request body using the `HMAC-SHA1 <http://en.wikipedia.org/wiki/SHA-1>`_ algorithm and aforementioned key .
+where ``<client>`` is replaced with the name of the application, and ``<hash>`` with the MAC code obtained by hashing the request body using the `HMAC-SHA1 <http://en.wikipedia.org/wiki/SHA-1>`_ algorithm and aforementioned key .
 
 SHA1 implementations are available for most programming languages. The following have been tested with Trombone:
 
@@ -90,6 +90,9 @@ Sample ``keyman.conf`` file:
     user     = 'postgres' 
     password = 'postgres'
 
+
+Keyman usage
+************
 
 To list existing client keys:
 
