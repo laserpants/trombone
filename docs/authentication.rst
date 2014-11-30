@@ -92,7 +92,7 @@ Sample ``keyman.conf`` file:
 
 
 Keyman usage
-************
+````````````
 
 To list existing client keys:
 
