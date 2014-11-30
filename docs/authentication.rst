@@ -63,7 +63,7 @@ For complete, working examples, see `Reference Implementations`_.
 Client key administration
 `````````````````````````
 
-To manage client keys, the ``keyman`` command line tool can be used. It requires a configuration file with db configuration settings to be present.
+The ``keyman`` utility implements a simple CRUD interface, suitable for command line administration of client keys. 
 
 Sample ``keyman.conf`` file:
 
@@ -76,11 +76,11 @@ Sample ``keyman.conf`` file:
     password = 'postgres'
 
 
-E.g., to list existing client keys:
+To list existing client keys:
 
 :: 
 
-        $ keyman list
+        $ ./keyman list
 
         generic            : 14ad0ef86bf392b38bad6009113c2a5a8a1d993a
         batman             : 53d5864520d65aa0364a52ddbb116ca78e0df8dc
@@ -91,18 +91,18 @@ Register a new client:
 
 ::
 
-        $ keyman register my_application
+        $ ./keyman register my_application
 
         Client registered:
         my_application: 53d5864520d65aa0364a52ddbb116ca78e0df8dc
     
 
-A token is automatically generated for the new client. Alternatively, an existing key (a 40 character long hexadecimal string) can be specified as a trailing argument: ``keyman register my_application 53d5864520d65aa0364a52ddbb116ca78e0df8dc``. After registering an application, we can confirm that it appears in the client list with its new key.
+A token is automatically generated for the new client. Alternatively, an existing key (a 40 character long hexadecimal string) may be specified as a trailing argument: ``keyman register my_application 53d5864520d65aa0364a52ddbb116ca78e0df8dc``. After registering an application, we can confirm that it appears in the client list with its new key.
     
 
 ::
 
-    $ keyman list | grep my_application
+    $ ./keyman list | grep my_application
 
     my_application      : 53d5864520d65aa0364a52ddbb116ca78e0df8dc
  
@@ -112,7 +112,7 @@ To remove a client use:
 
 ::
 
-    $ keyman revoke unwanted_client
+    $ ./keyman revoke unwanted_client
 
 
 .. comments
