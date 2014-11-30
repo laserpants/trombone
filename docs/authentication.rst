@@ -4,7 +4,7 @@ Authentication
 Security model
 --------------
 
-To establish the authenticity of a request, the server performs a message integrity check, operating on a cryptographic primitive known as a HMAC (hash-based message authentication code). A MAC is attached to each request, in the form of an ``API-Access`` header. During dispatch, a subsequent code is computed from the request object using a token (secure key) associated with the client application. The result of this operation is compared with the original MAC attached to the request, in order to verify its authenticity.
+To establish the authenticity of a request, the server must perform a message integrity check operating on a cryptographic primitive known as a HMAC (hash-based message authentication code). A MAC is attached to each request, in the form of an ``API-Access`` header. During dispatch, a subsequent code is computed from the request object using a token (secure key) associated with the client application. The result of this operation is compared with the original MAC attached to the request, in order to verify its authenticity.
 
 The key is a random, 40-character long, hexadecimal string.
 
