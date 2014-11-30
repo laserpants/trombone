@@ -19,8 +19,8 @@ RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol 
 +-------------------------------------------------------------------------------------------+
 | Flags                                                                                     |
 +===========================================================================================+
-| Enable with ``--amqp[=USER:PASS]`` or ``-A`` and, optionally, supply a host name using    |
-| ``--amqp-host[=HOST]`` (if you leave out this option, ``localhost`` is assumed).          |
+| | Enable with ``--amqp[=USER:PASS]`` or ``-A`` and, optionally, supply a host name using  |
+| | ``--amqp-host[=HOST]`` (if you leave out this option, ``localhost`` is assumed).        |
 +-------------------------------------------------------------------------------------------+
 
 AMQP Endpoint
@@ -65,7 +65,7 @@ Example
 CORS
 ----
 
-The CORS component provisions Trombone with the ability to accept cross-domain requests. It implements the mandatory hand-shaking and response headers expected by CORS-compliant client applications, such as modern web browsers. 
+The CORS component provisions Trombone with the ability to accept cross-domain requests. It implements the handshake and response headers mandated by CORS-compliant client applications, such as modern web browsers. 
 
 | *CORS introduces a standard mechanism that can be used by all browsers for implementing cross-domain requests. The spec defines a set of headers that allow the browser and server to communicate about which requests are (and are not) allowed. CORS continues the spirit of the open web by bringing API access to all.*
 
