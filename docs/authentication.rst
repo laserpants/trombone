@@ -78,6 +78,8 @@ The ``keyman`` utility implements a simple CRUD interface, suitable for command 
       -? --help           Display this help.
 
 
+Default location for the configuration file is ``~/.config/trombone/keyman.conf``. This file contains a list of parameters (identical to those `described here <http://www.postgresql.org/docs/9.1/static/libpq-connect.html>`_.) used to connect to the database.
+
 Sample ``keyman.conf`` file:
 
 ::
