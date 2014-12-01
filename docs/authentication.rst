@@ -210,7 +210,11 @@ Start the server
 JavaScript
 **********
 
-::
+Insert the generated ``demo`` key on line 28.
+
+.. code-block:: js
+    :linenos:
+    :emphasize-lines: 28
 
     <!DOCTYPE html>
     <html lang="en">
@@ -256,6 +260,16 @@ JavaScript
 
 Haskell
 *******
+
+@todo
+
+Java
+****
+
+@todo
+
+Purescript
+**********
 
 @todo
 
