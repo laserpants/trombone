@@ -145,7 +145,7 @@ Message authentication can be disabled with the ``-x`` command line switch. Doin
 Allowing access from localhost
 ``````````````````````````````
 
-To bypass HMAC authentication specifically for requests originating from a local host, instead use the ``-t``, or ``--trust-localhost`` option. 
+To bypass HMAC authentication specifically for requests originating from the local host, instead use the ``-t``, or ``--trust-localhost`` option. 
 
 Reference Implementations
 -------------------------
@@ -190,7 +190,7 @@ Create a file ``basic-keyman.conf``:
     password = 'postgres'
 
 
-(Modify the ``user`` and ``password`` field as required.)
+(Modify the file as required.)
 
 ::
 
@@ -210,21 +210,22 @@ Start the server
 JavaScript
 **********
 
+::
+
     <!DOCTYPE html>
     <html lang="en">
         <head>
             <meta charset="utf-8">
-            <title>Trombone data access service example: Request authentication</title>
+            <title>Trombone example: Request authentication</title>
         </head>
         <body>
-            <a id="request-action" href="javascript:">Request some data</a>
-            <div id="response"></div>
+            <a id="request-action" href="javascript:">Request some data</a><div id="response"></div>
+
             <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
             <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
             <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
-            <script src="js/trombone.request.min.js"></script>
+            <script src="https://raw.githubusercontent.com/johanneshilden/trombone/master/utils/js/trombone.request.min.js"></script>
             <script>
-    
                 $(document).ready(function() {
                     $('#request-action').click(function() {
     
@@ -238,7 +239,7 @@ JavaScript
     
                         Trombone.request({
                             host     : 'http://localhost:3010',
-                            key      : 'fc1f5dc11def6a11e2626af3035902b47cfd626e',
+                            key      : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
                             client   : 'demo',
                             type     : 'GET',
                             resource : 'utils',
@@ -248,10 +249,10 @@ JavaScript
     
                     });
                 });
-    
             </script>
         </body>
     </html>
+
 
 Haskell
 *******
