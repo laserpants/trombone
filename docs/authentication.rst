@@ -212,9 +212,7 @@ JavaScript
 
 Insert the generated ``demo`` key on line 28.
 
-.. code-block:: js
-    :linenos:
-    :emphasize-lines: 28
+.. sourcecode:: js
 
     <!DOCTYPE html>
     <html lang="en">
