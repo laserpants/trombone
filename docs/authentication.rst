@@ -33,7 +33,7 @@ The ``trombone_keys`` table maintains client-key associations.
 
 
 .. NOTE::
-   This table is automatically created when the server is started with authentication enabled (i.e., in default mode), unless it already exists.
+   This table is automatically created when the server starts with authentication enabled (i.e., in default mode), unless it already exists.
 
 Registering client applications
 *******************************
@@ -78,7 +78,7 @@ The ``keyman`` utility implements a simple CRUD interface, suitable for command 
       -? --help           Display this help.
 
 
-The configuration file contains a list of parameters (identical to those `described here <http://www.postgresql.org/docs/9.1/static/libpq-connect.html>`_.) used to establish a database connection. Note that default location for this file is ``~/.config/trombone/keyman.conf``.
+The configuration file contains a list of parameters (identical to those `described here <http://www.postgresql.org/docs/9.1/static/libpq-connect.html>`_.) used to establish a database connection. Note that the default location for this file is ``~/.config/trombone/keyman.conf``.
 
 Sample ``keyman.conf`` file:
 
@@ -149,6 +149,112 @@ To bypass HMAC authentication specifically for requests originating from a local
 
 Reference Implementations
 -------------------------
+
+::
+
+    CREATE DATABASE basic_auth_demo;
+    
+    \c basic_auth_demo
+    
+    CREATE TABLE IF NOT EXISTS utilities (
+        id        serial PRIMARY KEY,
+        name      character varying(255)       NOT NULL,
+        summary   character varying(255)       NOT NULL
+    );
+    
+    INSERT INTO utilities (name, summary) VALUES 
+        ('ls',   'list directory contents'),
+        ('htop', 'interactive process viewer'),
+        ('df',   'report file system disk usage'),
+        ('pwd',  'print name of current/working directory'),
+        ('awk',  'pattern scanning and text processing language');
+    
+    CREATE TABLE IF NOT EXISTS trombone_config (
+        id        serial PRIMARY KEY, 
+        key       character varying(40) UNIQUE NOT NULL, 
+        val       text                         NOT NULL
+    ); 
+     
+    INSERT INTO trombone_config (key, val) VALUES 
+        ('routes', 'GET /utils >> SELECT * FROM utilities');
+
+
+Create a file ``basic-keyman.conf``:
+
+::
+
+    host     = 'localhost' 
+    port     =  5432 
+    dbname   = 'basic_auth_demo' 
+    user     = 'postgres' 
+    password = 'postgres'
+
+
+(Modify the ``user`` and ``password`` field as required.)
+
+::
+
+    $ ./keyman register demo -c basic-keyman.conf
+
+    Client registered:
+    demo: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+Start the server
+
+::
+
+    trombone -d basic_auth_demo -C
+
+
+JavaScript
+**********
+
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <title>Trombone data access service example: Request authentication</title>
+        </head>
+        <body>
+            <a id="request-action" href="javascript:">Request some data</a>
+            <div id="response"></div>
+            <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+            <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
+            <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
+            <script src="js/trombone.request.min.js"></script>
+            <script>
+    
+                $(document).ready(function() {
+                    $('#request-action').click(function() {
+    
+                        var render = function(obj) {
+                            $('#response').html('<pre>' + JSON.stringify(obj, null, 4) + '</pre>');
+                        };
+    
+                        var onError = function(e) {
+                            render(JSON.parse(e.responseText));
+                        };
+    
+                        Trombone.request({
+                            host     : 'http://localhost:3010',
+                            key      : 'fc1f5dc11def6a11e2626af3035902b47cfd626e',
+                            client   : 'demo',
+                            type     : 'GET',
+                            resource : 'utils',
+                            success  : render,
+                            error    : onError
+                        });
+    
+                    });
+                });
+    
+            </script>
+        </body>
+    </html>
+
+Haskell
+*******
 
 @todo
 

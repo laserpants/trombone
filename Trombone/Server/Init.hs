@@ -97,8 +97,8 @@ readKeysFromDb = runDbQ (concatMap translate) q
     q :: SqlT [[PersistValue]]
     q = rawExecute "CREATE TABLE IF NOT EXISTS trombone_keys \
                    \(id serial PRIMARY KEY, \
-                   \client character varying(40) UNIQUE, \
-                   \key character varying(40));" [] 
+                   \client character varying(40) UNIQUE NOT NULL, \
+                   \key character varying(40) NOT NULL);" [] 
         >> (rawQuery "SELECT client, key FROM trombone_keys;" [] 
                 $$ CL.consume)
     translate [PersistText c, PersistText k] = [(encodeUtf8 c, encodeUtf8 k)]
@@ -120,8 +120,8 @@ setupRoutes (Config{ .. }, conf@ServerConf{..}) = do
     q :: SqlT [[PersistValue]]
     q = rawExecute "CREATE TABLE IF NOT EXISTS trombone_config \
                    \(id serial PRIMARY KEY, \
-                   \key character varying(40) UNIQUE, \
-                   \val text);" []
+                   \key character varying(40) UNIQUE NOT NULL, \
+                   \val text NOT NULL);" []
         >> (rawQuery "SELECT val FROM trombone_config \
                     \WHERE key = 'routes';" [] $$ CL.consume)
     translate :: [PersistValue] -> Text
