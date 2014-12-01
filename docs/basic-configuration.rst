@@ -14,7 +14,7 @@ Ping
 Unix signal handlers
 --------------------
 
-::
+.. sourcecode:: bash
 
     kill -SIGHUP `ps -a | awk '/trombone/ {print $1}'`
 

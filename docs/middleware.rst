@@ -55,7 +55,7 @@ http://jmesnil.net/stomp-websocket/doc/
 Example
 ```````
 
-::
+.. sourcecode:: html
 
     <script type="text/javascript" src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
     <script type="text/javascript" src="https://raw.githubusercontent.com/jmesnil/stomp-websocket/master/lib/stomp.min.js"></script>

@@ -17,7 +17,7 @@ Table schema
 
 The ``trombone_keys`` table maintains client-key associations.
 
-::
+.. sourcecode:: postgres
 
     CREATE TABLE trombone_keys (
         id serial,
@@ -96,7 +96,7 @@ Keyman usage
 
 To list existing client keys:
 
-:: 
+.. sourcecode:: bash
 
         $ ./keyman list
 
@@ -107,7 +107,7 @@ To list existing client keys:
         
 Register a new client:
 
-::
+.. sourcecode:: bash
 
         $ ./keyman register my_application
 
@@ -118,7 +118,7 @@ Register a new client:
 A token is automatically generated for the new client. Alternatively, an existing key (a 40 character long hexadecimal string) may be specified as a trailing argument: ``keyman register my_application 53d5864520d65aa0364a52ddbb116ca78e0df8dc``. After registering an application, we can confirm that it appears in the client list with its new key.
     
 
-::
+.. sourcecode:: bash
 
     $ ./keyman list | grep my_application
 
@@ -128,7 +128,7 @@ A token is automatically generated for the new client. Alternatively, an existin
 To remove a client, use:
     
 
-::
+.. sourcecode:: bash
 
     $ ./keyman revoke unwanted_client
 
@@ -150,12 +150,15 @@ To bypass HMAC authentication specifically for requests originating from the loc
 Reference Implementations
 -------------------------
 
-::
+.. sourcecode:: psql
 
     CREATE DATABASE basic_auth_demo;
     
     \c basic_auth_demo
     
+
+.. sourcecode:: postgres
+
     CREATE TABLE IF NOT EXISTS utilities (
         id        serial PRIMARY KEY,
         name      character varying(255)       NOT NULL,
@@ -192,7 +195,7 @@ Create a file ``basic-keyman.conf``:
 
 (Modify the file as required.)
 
-::
+.. sourcecode:: bash
 
     $ ./keyman register demo -c basic-keyman.conf
 
@@ -202,17 +205,48 @@ Create a file ``basic-keyman.conf``:
 
 Start the server
 
-::
+.. sourcecode:: bash
 
-    trombone -d basic_auth_demo -C
+    $ trombone -d basic_auth_demo -C
 
 
 JavaScript
 **********
 
-Insert the generated ``demo`` key on line 28.
+Insert the generated ``demo`` key on line 16.
 
-.. sourcecode:: js
+.. sourcecode:: javascript
+    :linenos:
+    :emphasize-lines: 16
+
+    // auth-example.js
+
+    $(document).ready(function() {
+        $('#request-action').click(function() {
+
+            var render = function(obj) {
+                $('#response').html('<pre>' + JSON.stringify(obj, null, 4) + '</pre>');
+            };
+
+            var onError = function(e) {
+                render(JSON.parse(e.responseText));
+            };
+
+            Trombone.request({
+                host     : 'http://localhost:3010',
+                key      : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                client   : 'demo',
+                type     : 'GET',
+                resource : 'utils',
+                success  : render,
+                error    : onError
+            });
+
+        });
+    });
+
+
+.. sourcecode:: html
 
     <!DOCTYPE html>
     <html lang="en">
@@ -221,37 +255,14 @@ Insert the generated ``demo`` key on line 28.
             <title>Trombone example: Request authentication</title>
         </head>
         <body>
-            <a id="request-action" href="javascript:">Request some data</a><div id="response"></div>
+            <a id="request-action" href="javascript:">Request some data</a>
+            <div id="response"></div>
 
             <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
             <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
             <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
             <script src="https://raw.githubusercontent.com/johanneshilden/trombone/master/utils/js/trombone.request.min.js"></script>
-            <script>
-                $(document).ready(function() {
-                    $('#request-action').click(function() {
-    
-                        var render = function(obj) {
-                            $('#response').html('<pre>' + JSON.stringify(obj, null, 4) + '</pre>');
-                        };
-    
-                        var onError = function(e) {
-                            render(JSON.parse(e.responseText));
-                        };
-    
-                        Trombone.request({
-                            host     : 'http://localhost:3010',
-                            key      : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                            client   : 'demo',
-                            type     : 'GET',
-                            resource : 'utils',
-                            success  : render,
-                            error    : onError
-                        });
-    
-                    });
-                });
-            </script>
+            <script src="auth-example.js"></script>
         </body>
     </html>
 
