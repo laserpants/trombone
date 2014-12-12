@@ -7,7 +7,7 @@ A Trombone configuration file consists of a collection of route patterns. The fo
 
     <route> ::= <method> <uri> <symbol> <action>
 
-For a more thorough description of the arrangement of these syntactic rules, please see `BNF grammar <bnf-grammar.html>`_.
+For a more thorough description of these syntactic rules, please see `BNF grammar <bnf-grammar.html>`_.
 
 What follows is an example of a simple configuration file.
 
@@ -50,10 +50,11 @@ Request body JSON values
 
 When a JSON-formatted request body is present, the server will first try to parse the JSON object and substitute any placeholders in the template with corresponding values whose keys match the names of the variables in question. 
 
-::
+=======================  ==========================
+Route configuration:     ``POST /customer  <>  INSERT INTO customer (name, address, phone) VALUES ( {{name}}, {{address}}, {{phone}} )``              
+=======================  ==========================
 
-    POST /customer  <>  INSERT INTO customer (name, address, phone) VALUES ( {{name}}, {{address}}, {{phone}} )
-
+Request object:
 
 ::
 
@@ -64,9 +65,37 @@ When a JSON-formatted request body is present, the server will first try to pars
     }
 
 
-::
+=======================  ==========================
+Actual SQL query:        ``INSERT INTO customer (name, address, phone) VALUES ('OCP', 'Delta City', '555-MEGACORP')``
+=======================  ==========================
 
-    INSERT INTO customer (name, address, phone) VALUES ('OCP', 'Delta City', '555-MEGACORP')
+
+.. Route configuration:
+    ````````````````````
+    
+    ::
+    
+        POST /customer  <>  INSERT INTO customer (name, address, phone) VALUES ( {{name}}, {{address}}, {{phone}} )
+    
+    
+    Request object:
+    ```````````````
+    
+    ::
+    
+        {
+            "name": "OCP",
+            "address": "Delta City",
+            "phone": "555-MEGACORP"
+        }
+    
+    
+    Actual SQL query:
+    `````````````````
+    
+    ::
+    
+        INSERT INTO customer (name, address, phone) VALUES ('OCP', 'Delta City', '555-MEGACORP')
 
 
 .. NOTE::
