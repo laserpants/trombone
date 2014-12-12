@@ -1,7 +1,7 @@
 Introduction
 ============
 
-Trombone facilitates effortless adaptation of conventional RDBMS schemas to data exchange based on JSON and the RESTful web service paradigm. It uses PostgreSQL as underlying RDBMS. 
+Trombone facilitates effortless adaptation of conventional RDBMS schemas to mobile-friendly data exchange based on JSON and the RESTful web service paradigm. It uses PostgreSQL as underlying RDBMS. 
 
 ::
 

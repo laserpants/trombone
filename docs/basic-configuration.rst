@@ -26,7 +26,7 @@ To send a ping request to the server, we may use a command line tool like ``curl
 
 ::
 
-    curl localhost:3010/ping
+    $ curl localhost:3010/ping
 
 
 A typical response, if the service is running:
@@ -56,7 +56,7 @@ Configuration data storage
 
 .. In cloud-based architectures, file system storage is typically short lived (ephemeral) and resources assigned to an application are reclaimed by the platform when the service is stopped or restarted. 
 
-If you prefer to store configuration data in the database, the server will look for a database table called ``trombone_config`` as a fallback, when a configuration file is not specified (i.e., the ``-r`` flag is omitted).
+The server will look for a database table called ``trombone_config`` as a fallback, when a configuration file is not specified (i.e., the ``-r`` flag is omitted). This is useful if you prefer to store configuration data in the database. 
 
 ::
 

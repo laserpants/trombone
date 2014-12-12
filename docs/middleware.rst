@@ -1,7 +1,9 @@
 Middleware
 ==========
 
-Middlewares are built-in software components which provide some auxiliary functionality and may be configured to suit specific needs. With the exception of file serving, middlewares are disabled by default. See respective section for details on how to activate and configure a specific component.
+.. Middlewares are built-in software components which provide some auxiliary functionality and may be configured to suit specific needs. With the exception of file serving, middlewares are disabled by default. See respective section for details on how to activate and configure a specific component.
+
+Middlewares are built-in software components providing some auxiliary functionality, which is normally disabled (with the exception of file serving). These components may be enabled at run-time and configured to suit specific needs. See respective section for details on how to activate and configure a specific component.
 
 Available Components
 --------------------
@@ -14,7 +16,7 @@ Available Components
 RabbitMQ
 --------
 
-RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol -- an emerging standard for multi-purpose, asynchronous message passing. The AMQP middleware integrates Trombone with RabbitMQ and facilitates for consumer applications to receive notifications when server resources are modified.
+RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol -- an emerging standard for multi-purpose, asynchronous message passing. The AMQP middleware integrates Trombone with RabbitMQ and makes it possible for participating applications to receive notifications when server resources are modified.
 
 .. role:: raw-html(raw)
    :format: html

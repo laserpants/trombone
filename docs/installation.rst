@@ -4,16 +4,17 @@ Installation
 Build Prerequisites
 -------------------
 
-To build Trombone you need the `Cabal tool <https://www.haskell.org/cabal/>`_  -- a build system for Haskell programs, and a recent version of GHC (`The Glasgow Haskell Compiler <https://www.haskell.org/ghc/>`_).
+To build Trombone you need 
+
+* the `Cabal tool <https://www.haskell.org/cabal/>`_  -- a build system for Haskell programs, and 
+* a recent version of GHC (`The Glasgow Haskell Compiler <https://www.haskell.org/ghc/>`_).
 
 Both of these come bundled with the Haskell Platform, which is available for all major operating systems. This is also the recommended method of installation, unless you have more specific requirements.
 
 Getting the Haskell Platform
 ****************************
 
-Consult the search tool provided by your distribution's package manager to locate a suitable candidate, or follow the instructions on the official web page for instructions relating to your system:
-
-https://www.haskell.org/platform/
+Consult the search utility provided by your distribution's package manager to locate a suitable candidate, or follow the instructions on https://www.haskell.org/platform/, relevant to your operating system.
 
 Building
 ********

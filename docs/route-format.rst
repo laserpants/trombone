@@ -7,9 +7,7 @@ A Trombone configuration file consists of a collection of route patterns. The fo
 
     <route> ::= <method> <uri> <symbol> <action>
 
-For a more thorough description of these syntactic rules, please see `BNF grammar <bnf-grammar.html>`_.
-
-What follows is an example of a simple configuration file.
+For a more thorough description of these syntactic rules, please see `BNF grammar <bnf-grammar.html>`_. What follows is an example of a simple configuration file.
 
 ::
 
@@ -214,7 +212,7 @@ These are `explained here <non-sql-routes.html>`_.
 Parameter hints
 ---------------
 
-With joins, and more complex queries, the server can occasionally have difficulty figuring out the attribute names to return, by looking at the template alone. In such cases, and in situations where more control is needed, it is therefore possible (and necessary) to specify the list of property names. This list should appear immediately before the query template, enclosed in parentheses. 
+With joins, and more complex queries, the server can occasionally have difficulty figuring out the attribute names to return, from looking at the template alone. In such cases, and in situations where more control is needed, it is therefore possible (and necessary) to specify the list of property names. This list should appear immediately before the query template, enclosed in parentheses. 
 
 ::
 
@@ -247,7 +245,7 @@ SELECT * FROM
 Wildcard operators
 ******************
 
-Since string values are automatically wrapped in single quoute marks before inserted into a template, the following will not work as intended,
+Since string values are automatically wrapped in single quoutes before they are inserted into a template, the following will not work as expected,
 
 ::
 
@@ -256,7 +254,7 @@ Since string values are automatically wrapped in single quoute marks before inse
 
 E.g., ``{"q": "ACME"}`` would translate to ``customer.name LIKE '%'ACME'%'``.
 
-This is clearly not what we want. Instead, define your template as
+This is clearly not what we intended. Instead, define your template as
 
 ::
 
@@ -289,7 +287,7 @@ A common pattern is to have multiple database queries that are similar in one wa
        select id, name, phone, address from customer where area_id = {{:id}} order by id
 
 
-To avoid repetition, an alternative `DRY <http://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ notation can be employed cases such as this. The following is an equivalent route definition, insted using a, so called, DRY-block construction.
+To avoid repetition, an alternative `DRY <http://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ notation can be employed in cases such as this. The following is an equivalent route definition, insted using a, so called, DRY-block construction.
 
 ::
 
