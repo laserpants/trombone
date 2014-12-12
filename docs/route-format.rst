@@ -103,7 +103,7 @@ When a JSON-formatted request body is present, the dispatch handler will first t
 Uri variables
 *************
 
-Uri variables are simple placeholders that may conceal text or integer values.
+Uri variables are simple placeholders that may conceal text or integer values, supplied as part of the request uri.
 
 ::
 
