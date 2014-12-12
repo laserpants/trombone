@@ -48,7 +48,7 @@ Placeholders are denoted by a double pair of surrounding curly-braces (akin to H
 Request body JSON values
 ************************
 
-When a JSON-formatted request body is present, the server will first try to parse the JSON object and substitute any placeholders in the template with corresponding values whose keys match the names of the variables in question. 
+When a JSON-formatted request body is present, the dispatch handler will first try to parse the object and substitute any placeholders in the template with corresponding values whose keys match the names of the variables in question. 
 
 ..  =======================  ==========================
     Route configuration:     ``POST /customer  <>  INSERT INTO customer (name, address, phone) VALUES ( {{name}}, {{address}}, {{phone}} )``              
