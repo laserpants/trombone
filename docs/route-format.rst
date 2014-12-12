@@ -153,7 +153,7 @@ SQL routes are allowed to span across multiple lines, as long as each subsequent
           order by id
 
 
-This is not valid:
+This, however, is not valid:
 
 ::
 
@@ -167,7 +167,7 @@ This is not valid:
     order by id
 
 
-Except from this "single-space" requirement, indentation does not matter. Hence, the following is also valid.
+Except from this "single-space" requirement, indentation does not matter. Hence, the following is a valid route description.
 
 ::
 

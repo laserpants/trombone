@@ -1,6 +1,16 @@
 Non-SQL Routes
 ==============
 
+============ =================================================================================
+Symbol       Explanation
+------------ ---------------------------------------------------------------------------------
+``||``       A request pipeline. (Followed by a pipeline identifier.)
+``|>``       An inline request pipeline. (Followed by a pipeline definition.)
+``<js>``     A node.js route. (Followed by a file path to the script.)
+``{..}``     A static route. (Followed by a JSON object.)
+============ =================================================================================
+
+
 Pipelines
 ---------
 
