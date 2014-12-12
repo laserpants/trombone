@@ -22,7 +22,7 @@ For a complete list of flags and switches, see `Command Line Flags <command-line
 Ping
 ****
 
-To send a ping request to the server, we may use a command line tool like ``curl``:
+To send a ping request to the server, we may then use a command line tool like ``curl``:
 
 ::
 
