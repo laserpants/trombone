@@ -70,16 +70,14 @@ When a JSON-formatted request body is present, the server will first try to pars
     =======================  ==========================
 
 
-Route configuration:
-````````````````````
+**Route configuration:**
 
 ::
 
     POST /customer  <>  INSERT INTO customer (name, address, phone) VALUES ( {{name}}, {{address}}, {{phone}} )
 
 
-Request object:
-```````````````
+**Request object:**
 
 ::
 
@@ -90,8 +88,7 @@ Request object:
     }
 
 
-Actual SQL query:
-`````````````````
+**Actual SQL query:**
 
 ::
 
@@ -106,7 +103,7 @@ Actual SQL query:
 Uri variables
 *************
 
-Uri variables are simple placeholders that may indicate text or integer values.
+Uri variables are simple placeholders that may conceal text or integer values.
 
 ::
 
