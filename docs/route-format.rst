@@ -1,7 +1,7 @@
 Route Format
 ============
 
-A Trombone configuration file consists of a collection of route patterns. The format of a single route instance is described by the following (high-level) grammar.
+A Trombone configuration file consists of a collection of route patterns. The format of a single route instance is controlled by the following (high-level) grammar.
 
 ::
 
@@ -30,7 +30,7 @@ For a more thorough description of the syntactic rules involved in this formatio
             , {{industry}} )
 
 
-The server scans the list of routes during dispatch, looking for a pattern that matches the uri components and HTTP method used in the request.
+The server scans the list of routes during dispatch, carefully looking for a pattern that matches the uri components and HTTP method used in the request.
 
 The arrow symbol specifies the type of route and the response object's expected format. See `below <#types-of-routes>`_ for explanations of these symbols. E.g., the particular arrow used here; ``->``, denotes an SQL query with a singleton result.
 
@@ -226,7 +226,7 @@ With joins, and more complex queries, the server can occasionally have difficult
         JOIN something 
           AS b...
 
-A similar syntax is available for ``INSERT`` statements. This can be used if the server is unable to infer the table name and sequence necessary to obtain the last inserted id.
+A similar syntax is available for ``INSERT`` statements, which can be used if the server is unable to infer the table name and sequence necessary to obtain the last inserted id.
 
 ::
 
