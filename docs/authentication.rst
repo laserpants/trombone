@@ -136,7 +136,7 @@ To remove a client, use:
 Disable HMAC authentication
 ***************************
 
-Message authentication can be disabled with the ``-x`` command line switch. Doing so in a production environment is not recommended, since it renders the system vulnerable to unauthorized access.
+Message authentication can be disabled with the ``-x`` command line switch. Doing so in a production setting is not recommended.
 
 .. WARNING::
    Deactivating message authentication gives everyone access to your server interface. To mitigate the risk of unauthorized access to production data, only use the ``-x`` flag in a safe environment.
@@ -269,11 +269,6 @@ Insert the generated ``demo`` key on line 16.
 
 Haskell
 *******
-
-@todo
-
-Java
-****
 
 @todo
 

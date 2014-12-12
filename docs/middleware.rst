@@ -84,16 +84,23 @@ The CORS component provisions Trombone with the ability to accept cross-domain r
 Logging
 -------
 
-@todo
-
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Flags                                                                                                                                                                       |
 +=============================================================================================================================================================================+
-| ``--access-log[=FILE]`` or ``-l``                                                                                                                                           |
+| Enable using ``--access-log[=FILE]`` or ``-l``, and specify ``--colors`` to enable colors in the log file.                                                                  |
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+Typical log output
+******************
+
+@todo
 
 Static File Serving
 -------------------
 
-Trombone can also act as a simple file server. By convention, files located under the ``public/`` directory or any of its subdirectories are HTTP accessible.
+Trombone can also act as a simple file server. Files located under the ``public/`` directory or any of its subdirectories are HTTP accessible. E.g.,
+
+::
+
+    public/image.png   <~>   http://localhost:3010/image.png
 

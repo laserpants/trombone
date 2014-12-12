@@ -15,18 +15,13 @@ Contents:
    installation.rst
    basic-configuration.rst
    route-format.rst
-   dry-block-notation.rst
    non-sql-routes.rst
+   usage-patterns-and-conventions.rst
    authentication.rst
-   pipelines.rst
-   array-actions.rst
-   wildcard-operators.rst
-   response-codes.rst
    command-line-flags.rst
-   rest-conventions.rst
-   bnf-grammar.rst
    middleware.rst
    tools-and-utilities.rst
+   bnf-grammar.rst
    examples.rst
    about.rst
 
