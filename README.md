@@ -6,7 +6,7 @@ Trombone is a data access server for PostgreSQL. Its chief purpose is to transla
 You may find this software useful if;
 
 1. your application relies on relational SQL schemas; and
-2. you need to expose JSON data via a RESTful web service.
+2. you need to expose JSON data via a RESTful web service interface.
 
 #### In a nutshell
 
