@@ -33,21 +33,21 @@ The ``{..}`` syntax enables for static JSON response objects to be embedded dire
 
 A possible use-case for this is to deliver machine readable documentation as part of the service (self-describing APIs), where clients automatically can determine their abilities against a communication endpoint using the ``OPTIONS`` HTTP method. See, e.g., http://zacstewart.com/2012/04/14/http-options-method.html for a discussion of this approach.
 
-    | At the very least, services should be responding with a 200 and the Allow header. That's just correct web server behavior. But there's really no excuse for JSON APIs not to be returning a documentation object. 
+    | *At the very least, services should be responding with a 200 and the Allow header. That's just correct web server behavior. But there's really no excuse for JSON APIs not to be returning a documentation object.*
     
 ::
 
     OPTIONS /photo  {..}  {"GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
 
 
-The rationale behind the ``OPTIONS`` method is clarified in `RFC 2616, Section 9.2 <http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html>`_.
+The rationale behind the ``OPTIONS`` method is outlined in `RFC 2616, Section 9.2 <http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html>`_.
 
-    | The OPTIONS method represents a request for information about the communication options available on the request/response chain identified by the Request-URI. This method allows the client to determine the options and/or requirements associated with a resource, or the capabilities of a server, without implying a resource action or initiating a resource retrieval. 
+    | *The OPTIONS method represents a request for information about the communication options available on the request/response chain identified by the Request-URI. This method allows the client to determine the options and/or requirements associated with a resource, or the capabilities of a server, without implying a resource action or initiating a resource retrieval.*
 
 Special <Allow> keyword
 ***********************
 
-Static JSON response routes support a special <Allow> keyword, the primary intent of which is to support the interaction pattern described above: 
+Static JSON response routes support a special ``<Allow>`` keyword, the primary intent of which is to support the interaction pattern described above. 
 
 ::
 

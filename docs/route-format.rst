@@ -1,13 +1,15 @@
 Route Format
 ============
 
-A Trombone configuration file consists of a collection of route patterns. The format of a single route instance is controlled by the following (high-level) grammar.
+A Trombone configuration file consists of a collection of route patterns. The format of a single route instance is given by the following (high-level) grammar.
 
 ::
 
     <route> ::= <method> <uri> <symbol> <action>
 
-For a more thorough description of the syntactic rules involved in this formation, please see `BNF grammar <bnf-grammar.html>`_. What follows is an example of a simple configuration file.
+For a more detailed description of the syntactic rules involved in this schema, please see `BNF grammar <bnf-grammar.html>`_. What we consider here is a more general overview. 
+
+As an example of a simple configuration file:
 
 ::
 
@@ -32,7 +34,7 @@ For a more thorough description of the syntactic rules involved in this formatio
 
 The server scans the list of routes during dispatch, carefully looking for a pattern that matches the uri components and HTTP method used in the request.
 
-The arrow symbol specifies the type of route and the response object's expected format. See `below <#types-of-routes>`_ for explanations of these symbols. E.g., the particular arrow used here; ``->``, denotes an SQL query with a singleton result.
+The arrow symbol specifies the type of route and the response object's expected format. See `below <#types-of-routes>`_ for explanations of these symbols. E.g., the particular arrow used here (``->``) denotes an SQL query with a singleton result.
 
 Placeholders
 ------------
@@ -151,7 +153,7 @@ SQL routes are allowed to span across multiple lines, as long as each subsequent
           order by id
 
 
-This, however, is not valid:
+This, however, is *not* valid:
 
 ::
 
@@ -197,6 +199,8 @@ Symbol       Explanation
 Other routes
 ************
 
+The following, additional route formats all share the common trait that they do not interact directly with the database.
+
 ============ =================================================================================
 Symbol       Explanation
 ------------ ---------------------------------------------------------------------------------
@@ -212,7 +216,7 @@ These are `explained here <non-sql-routes.html>`_.
 Parameter hints
 ---------------
 
-With joins, and more complex queries, the server can occasionally have difficulty figuring out the attribute names to return, from looking at the template alone. In such cases, and in situations where more control is needed, it is therefore possible (and necessary) to specify the list of property names. This list should appear immediately before the query template, enclosed in parentheses. 
+With joins, and more complex queries, the server can occasionally have a difficult time figuring out the attribute names to return, from looking at the template alone. In such cases, and in situations where more control is needed, it is therefore possible (and necessary) to specify the list of property names. This list should appear immediately before the query template, enclosed in parentheses. 
 
 ::
 
@@ -239,7 +243,7 @@ Special Considerations
 SELECT * FROM
 *************
 
-``SELECT * FROM``-type of queries are accepted as a convenient shorthand. The server will attempt to expand the column names during preprocessing of the configuration file. However, this is not guaranteed to work and in some cases you have to explicitly write out the column names, e.g., ``SELECT id, name, favorite_cheese FROM...``.
+``SELECT * FROM``-type of queries are accepted as a convenient shorthand. The server will attempt to expand the column names during preprocessing of the configuration file. However, this is not guaranteed to work and in some cases you will have to explicitly write out the column names, e.g., ``SELECT id, name, favorite_cheese FROM...``.
 
 
 Wildcard operators
@@ -287,7 +291,7 @@ A common pattern is to have multiple database queries that are similar in one wa
        select id, name, phone, address from customer where area_id = {{:id}} order by id
 
 
-To avoid repetition, an alternative `DRY <http://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ notation can be employed in cases such as this. The following is an equivalent route definition, insted using a, so called, DRY-block construction.
+To avoid repetition, an alternative `DRY <http://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ notation can be employed in cases such as this. The following is an equivalent route definition, insted using a DRY-block.
 
 ::
 
@@ -300,7 +304,7 @@ To avoid repetition, an alternative `DRY <http://en.wikipedia.org/wiki/Don%27t_r
     }
 
 
-A DRY-block consists of a *base template* and a number of *stubs*, each with the segment of the statement unique to that particular route.
+A DRY-block consists of a *base template* and a number of *stubs*, each with the segment of the statement unique to its corresponding route.
 
 ::
 

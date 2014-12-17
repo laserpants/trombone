@@ -31,7 +31,10 @@ RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol 
 AMQP Endpoint
 *************
 
-When a request of type ``POST``, ``PUT``, ``DELETE``, or ``PATCH`` is accepted and produces an ordinary ``200 OK`` response, a message is published to an exchange with the following attributes:
+When a request of type ``POST``, ``PUT``, ``DELETE``, or ``PATCH`` is accepted and yields a regular ``200 OK`` response, a subsequent message is published to an exchange managed by the server.
+
+Trombone AMQP Exchange
+``````````````````````
 
 ======== =========================
 Name     ``exchange/trombone/api``
