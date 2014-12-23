@@ -14,7 +14,7 @@ Both of these come bundled with `the Haskell Platform <https://www.haskell.org/p
 Getting the Haskell Platform
 ****************************
 
-Consult the search utility provided by your distribution's package manager to locate a suitable candidate, or follow the instructions on https://www.haskell.org/platform/, relevant to your operating system.
+Consult the search utility provided by your distribution's package manager to locate a suitable candidate, or follow the instructions on https://www.haskell.org/platform/ relevant to your operating system.
 
 Building
 ********
@@ -53,5 +53,5 @@ and run the below sequence of commands. (The use of a sandbox here is optional, 
 Troubleshooting
 ---------------
 
-It happens that builds fail,
+Report bugs and other issues to `github.com/johanneshilden/trombone/issues <http://github.com/johanneshilden/trombone/issues>`_.
 

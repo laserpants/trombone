@@ -29,7 +29,7 @@ To send a ping request to the server, we may then use a command line tool like `
     $ curl localhost:3010/ping
 
 
-A typical response, if the service is running:
+A typical response (if the service is running):
 
 ::
 
