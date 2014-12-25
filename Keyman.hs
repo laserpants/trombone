@@ -62,9 +62,9 @@ insertKey conn client key = f >>= \r ->
   where f = case isValid key of
               (Left  e) -> error e
               (Right k) -> runQ $ execute_ conn $ Query $ BS.concat
-                  [ "INSERT INTO trombone_keys (client, key) VALUES ('"
+                  [ "INSERT INTO trombone_keys (client, key, nonce) VALUES ('"
                   , client , "', '"
-                  , k      , "');" ]
+                  , k      , "', 0);" ]
 
 renewKey :: Connection -> ByteString -> ByteString -> IO ()
 renewKey conn client key = f >>= \r ->
@@ -76,7 +76,7 @@ renewKey conn client key = f >>= \r ->
   where f = case isValid key of
               (Left  e) -> error e
               (Right k) -> runQ $ execute_ conn $ Query $ BS.concat
-                  [ "UPDATE trombone_keys SET key = '"
+                  [ "UPDATE trombone_keys SET nonce = 0, key = '"
                   , k      , "' WHERE client = '"
                   , client , "';" ]
 

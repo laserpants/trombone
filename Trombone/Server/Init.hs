@@ -98,7 +98,8 @@ readKeysFromDb = runDbQ (concatMap translate) q
     q = rawExecute "CREATE TABLE IF NOT EXISTS trombone_keys \
                    \(id serial PRIMARY KEY, \
                    \client character varying(40) UNIQUE NOT NULL, \
-                   \key character varying(40) NOT NULL);" [] 
+                   \key character varying(40) NOT NULL, \
+                   \nonce bigint NOT NULL);" [] 
         >> (rawQuery "SELECT client, key FROM trombone_keys;" [] 
                 $$ CL.consume)
     translate [PersistText c, PersistText k] = [(encodeUtf8 c, encodeUtf8 k)]
