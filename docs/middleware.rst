@@ -1,9 +1,9 @@
 Middleware
 ==========
 
-.. Middlewares are built-in software components which provide some auxiliary functionality and may be configured to suit specific needs. With the exception of file serving, middlewares are disabled by default. See respective section for details on how to activate and configure a specific component.
+.. 
 
-Middlewares are built-in software components, providing some auxiliary functionality which is normally disabled (with the exception of file serving). These components may be enabled at run-time and configured to suit specific needs. See respective section for details on how to activate and configure a specific component.
+Middlewares are built-in, auxiliary software components providing some functionality which is normally disabled (with the exception of file serving). These components may be enabled at run-time and configured to suit specific needs. See respective section for details on how to activate and configure a specific component.
 
 Available Components
 --------------------
@@ -31,7 +31,7 @@ RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol 
 AMQP Endpoint
 *************
 
-When a request of type ``POST``, ``PUT``, ``DELETE``, or ``PATCH`` is accepted and yields a regular ``200 OK`` response, a subsequent message is published to an exchange managed by the server.
+When a request of type ``POST``, ``PUT``, ``DELETE``, or ``PATCH`` is accepted and produces a regular ``200 OK`` response, a subsequent message is published to an exchange managed by the server.
 
 Trombone AMQP Exchange
 ``````````````````````
@@ -51,21 +51,61 @@ Messages follow the format ``<method> <uri>:<response-body>``; e.g.,
 Using AMQP in JavaScript applications
 *************************************
 
-To configure and run RabbitMQ with STOMP Over WebSocket enabled, follow the instructions to install the `Web-Stomp plugin <http://www.rabbitmq.com/web-stomp.html>`_.
+To configure and run RabbitMQ with STOMP Over WebSocket enabled, follow `these instructions <http://www.rabbitmq.com/web-stomp.html>`_ to install the Web-Stomp plugin.
 
-http://jmesnil.net/stomp-websocket/doc/
+| *STOMP is a simple text-orientated messaging protocol. It defines an interoperable wire format so that any of the available STOMP clients can communicate with any STOMP message broker to provide easy and widespread messaging interoperability among languages and platforms.*
 
-@todo
+For more information on STOMP Over WebSocket, see http://jmesnil.net/stomp-websocket/doc/.
 
-Example
-```````
+JavaScript Example
+``````````````````
+
+For this example, you need stomp.js, and sock.js.
+
+* http://jmesnil.net/stomp-websocket/doc/#download
+* http://cdn.sockjs.org/sockjs-0.3.min.js
+
 
 .. sourcecode:: html
 
-    <script type="text/javascript" src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
-    <script type="text/javascript" src="https://raw.githubusercontent.com/jmesnil/stomp-websocket/master/lib/stomp.min.js"></script>
-
-
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <title>Trombone/RabbitMQ over STOMP</title>
+        </head>
+        <body>
+    
+            <div id="notification"></div>
+    
+            <script type="text/javascript" src="js/sockjs.min.js"></script>
+            <script type="text/javascript" src="js/stomp.min.js"></script>
+            <script type="text/javascript">
+    
+                // See: http://www.rabbitmq.com/web-stomp.html
+                var ws = new SockJS('http://127.0.0.1:55674/stomp'),
+                    client = Stomp.over(ws);
+    
+                // Heartbeats won't work with SockJS.
+                client.heartbeat.outgoing = 0;
+                client.heartbeat.incoming = 0;
+    
+                var onConnect = function() {
+                    client.subscribe('/exchange/trombone/api', function(msg) {
+                        var div = document.getElementById('notification');
+                        div.innerHTML += msg.body + '<br>';
+                    });
+                };
+    
+                var onError = function() {
+                    console.log('Error connecting to RabbitMQ server.');
+                };
+    
+                client.connect('guest', 'guest', onConnect, onError, '/');
+    
+            </script>
+        </body>
+    </html>
 
 
 CORS
@@ -77,7 +117,7 @@ The CORS component provisions Trombone with the ability to accept cross-domain r
 
 .. NOTE::
 
-    CORS involves coordination between both server and client. For more information regarding client requirements, and cross-origin resource sharing in general, please see: `enable-cors.org <http://enable-cors.org>`_.
+    CORS involves coordination between both server and client. For more information regarding client requirements, as well as cross-origin resource sharing in general, please see: `enable-cors.org <http://enable-cors.org>`_.
 
 
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -89,14 +129,16 @@ The CORS component provisions Trombone with the ability to accept cross-domain r
 Logging
 -------
 
+The logging format is similar to Apache's log file output. 
+
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Flags                                                                                                                                                                       |
 +=============================================================================================================================================================================+
 | Enable using ``--access-log[=FILE]`` or ``-l``, and specify ``--colors`` to enable colors in the log file.                                                                  |
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-Typical log output
-******************
+Typical output
+**************
 
 @todo
 

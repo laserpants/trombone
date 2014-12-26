@@ -48,7 +48,7 @@ Placeholders are denoted by a double pair of surrounding curly-braces (akin to H
 Request body JSON values
 ************************
 
-When a JSON-formatted request body is present, the dispatch handler will first try to parse the object and substitute any placeholders in the template with corresponding values whose keys match the names of the variables in question. 
+When a JSON-formatted request body is present, the dispatch handler will first try to parse the object and substitute placeholders in the template with values whose keys corresponding to the names of the variables being considered. 
 
 ..  =======================  ==========================
     Route configuration:     ``POST /customer  <>  INSERT INTO customer (name, address, phone) VALUES ( {{name}}, {{address}}, {{phone}} )``              
@@ -216,7 +216,7 @@ These are `explained here <non-sql-routes.html>`_.
 Parameter hints
 ---------------
 
-With joins, and more complex queries, the server can occasionally have a difficult time figuring out the attribute names to return, from looking at the template alone. In such cases, and in situations where more control is needed, it is therefore possible (and necessary) to specify the list of property names. This list should appear immediately before the query template, enclosed in parentheses. 
+With joins, and more complex queries, the server can have a difficult time figuring out the attribute names to return, from looking at the template alone. In such cases, and in situations where more control is needed, it is therefore possible (and necessary) to specify the list of property names. This list should appear immediately before the query template, enclosed in parentheses. 
 
 ::
 

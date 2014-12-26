@@ -4,13 +4,20 @@ Authentication
 Security model
 --------------
 
-To establish the authenticity of a request, the server must perform a message integrity check, operating on a cryptographic primitive known as a HMAC (hash-based message authentication code). A MAC is attached to each request, in the form of an ``API-Access`` header. During dispatch, a subsequent code is computed from the request object using a token (secure key) associated with the client application. The result of this operation is compared with the original MAC attached to the request, in order to verify its authenticity.
+To establish the authenticity of a request, the server must perform a message integrity check, operating on a cryptographic primitive known as a HMAC (hash-based message authentication code). A MAC is attached to each request, in the form of an ``API-Access`` header. During dispatch, a subsequent code is computed from the request object using 
+
+- a token (secure key) associated with the client application, 
+- an incremental nonce (see below), and 
+- the request method together with the path info. 
+  
+The result of this operation is compared with the original MAC attached to the request, in order to verify its authenticity.
 
 The key is a random, 40-character long, hexadecimal string.
 
 ::
 
     53d5864520d65aa0364a52ddbb116ca78e0df8dc
+
 
 Table schema
 ************
@@ -21,8 +28,9 @@ The ``trombone_keys`` table maintains client-key associations.
 
     CREATE TABLE trombone_keys (
         id serial,
-        client character varying(40),
-        key character varying(40)
+        client character varying(40) NOT NULL,
+        key character varying(40) NOT NULL,
+        nonce bigint NOT NULL
     );
 
     ALTER TABLE ONLY trombone_keys
@@ -35,8 +43,8 @@ The ``trombone_keys`` table maintains client-key associations.
 .. NOTE::
    This table is automatically created when the server starts with authentication enabled (i.e., in default mode), unless it already exists.
 
-Registering client applications
-*******************************
+Authenticating client applications
+**********************************
 
 In order for a client application to be granted access to the service, it must;
 
@@ -45,11 +53,23 @@ In order for a client application to be granted access to the service, it must;
 
 :: 
 
-    API-Access: <client>:<hash>
+    API-Access: <client_id>:<nonce>:<hash>
 
 
     
-where ``<client>`` is replaced with the name of the application, and ``<hash>`` with the MAC code obtained by hashing the request body using the `HMAC-SHA1 <http://en.wikipedia.org/wiki/SHA-1>`_ algorithm and aforementioned key .
+where ``<client_id>`` is replaced with the name of the application (as it appears in the ``trombone_keys`` table), and ``<hash>`` with the MAC code obtained by hashing a concatenated string -- the constituents of which are given below, using the `HMAC-SHA1 <http://en.wikipedia.org/wiki/SHA-1>`_ algorithm and aforementioned key.
+
+The ``<nonce>`` is an integer value which is used to prevent an adversary from reusing a hash in a, so called, `replay attack <http://en.wikipedia.org/wiki/Replay_attack>`_. The client implementation must therefore ensure that the nonce is strictly increasing for each request. This can be achieved using a timestamp, such as the one used in the reference implementation.   
+
+Hash string format
+``````````````````
+
+The format of the string given as input to the hashing algorithm must be as follows:
+
+::
+
+    <client_id>:<method>:<uri>:<nonce>:<json_body>
+
 
 SHA1 implementations are available for most programming languages. The following have been tested with Trombone:
 
@@ -115,7 +135,7 @@ Register a new client:
         my_application: 53d5864520d65aa0364a52ddbb116ca78e0df8dc
     
 
-A token is automatically generated for the new client. Alternatively, an existing key (a 40 character long hexadecimal string) may be specified as a trailing argument: ``keyman register my_application 53d5864520d65aa0364a52ddbb116ca78e0df8dc``. After registering an application, we can confirm that it appears in the client list with its new key.
+A token is automatically generated for the new client. Alternatively, an existing key (a 40 character long hexadecimal string) may be specified as an extra, trailing argument: ``keyman register my_application 53d5864520d65aa0364a52ddbb116ca78e0df8dc``. Subsequent to registering the application, we can confirm that it appears in the client list with its new key.
     
 
 .. sourcecode:: bash
@@ -179,7 +199,7 @@ Reference Implementations
     ); 
      
     INSERT INTO trombone_config (key, val) VALUES 
-        ('routes', 'GET /utils >> SELECT * FROM utilities');
+        ('routes', E'GET /utils >> SELECT * FROM utilities\nPOST /util <> INSERT INTO utilities (name, summary) VALUES ({{name}}, {{summary}})');
 
 
 Create a file ``basic-keyman.conf``:
@@ -213,34 +233,66 @@ Start the server
 JavaScript
 **********
 
-Insert the generated ``demo`` key on line 16.
+Insert the generated ``demo`` key on line 15.
 
 .. sourcecode:: javascript
     :linenos:
-    :emphasize-lines: 16
+    :emphasize-lines: 15
 
     // auth-example.js
 
     $(document).ready(function() {
+
+        var render = function(obj) {
+            $('#response').html('<pre>' + JSON.stringify(obj, null, 4) + '</pre>');
+        };
+
+        var onError = function(e) {
+            render(JSON.parse(e.responseText));
+        };
+
+        var defaults = {
+            host     : 'http://localhost:3010',
+            key      : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            client   : 'demo',
+            type     : 'GET',
+            error    : onError
+        };
+
+        $('#insert-action').click(function() {
+
+            var name    = $('#insert-title').val(),
+                summary = $('#insert-description').val();
+
+            if (!summary || !name) {
+                $('#response').html('Please fill out both fields.');
+                return;
+            }
+
+            var obj = {
+                summary : summary,
+                name    : name
+            };
+
+            Trombone.request($.extend({}, defaults, {
+                data     : obj,
+                nonce    : Date.now()/10 | 0,
+                type     : 'POST',
+                resource : 'util',
+                success  : function() { 
+                    $('#response').html('Ok.'); 
+                }
+            }));
+
+        });
+
         $('#request-action').click(function() {
 
-            var render = function(obj) {
-                $('#response').html('<pre>' + JSON.stringify(obj, null, 4) + '</pre>');
-            };
-
-            var onError = function(e) {
-                render(JSON.parse(e.responseText));
-            };
-
-            Trombone.request({
-                host     : 'http://localhost:3010',
-                key      : 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                client   : 'demo',
-                type     : 'GET',
+            Trombone.request($.extend({}, defaults, {
+                nonce    : Date.now()/10 | 0,
                 resource : 'utils',
-                success  : render,
-                error    : onError
-            });
+                success  : render
+            }));
 
         });
     });
@@ -252,10 +304,18 @@ Insert the generated ``demo`` key on line 16.
     <html lang="en">
         <head>
             <meta charset="utf-8">
-            <title>Trombone example: Request authentication</title>
+            <title>Trombone data access service example: Request authentication</title>
         </head>
         <body>
-            <a id="request-action" href="javascript:">Request some data</a>
+    
+            <div>
+                <a id="request-action" href="javascript:">Request some data</a>
+            </div>
+            <div>
+                <div><input id="insert-title" type="text"></div>
+                <div><textarea id="insert-description"></textarea></div>
+                <div><a id="insert-action" href="javascript:">Insert some data</a></div>
+            </div>
             <div id="response"></div>
 
             <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -274,6 +334,11 @@ Haskell
 
 Purescript
 **********
+
+@todo
+
+C++/Qt
+******
 
 @todo
 

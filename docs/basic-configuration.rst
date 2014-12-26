@@ -17,7 +17,22 @@ run the following command:
     ./trombone -d my_database -r my.conf
 
 
-For a complete list of flags and switches, see `Command Line Flags <command-line-flags.html>`_. 
+Some commonly used flags are:
+
+============= ===================================================
+``-C``        enable CORS support
+``-r FILE``   specify a (route) configuration file 
+``--verbose`` verbose output
+``-x``        disable HMAC authentication (for dev. environments)
+``-t``        bypass authentication for localhost
+============= ===================================================
+
+For a complete list of flags and switches, see `Command Line Flags <command-line-flags.html>`_, or give the command 
+
+::
+
+    $ trombone --help
+
 
 Ping
 ****
@@ -47,6 +62,11 @@ A typical response (if the service is running):
 Unix signal handlers
 --------------------
 
+Trombone responds to ``SIGHUP`` by reloading all configuration data and restarting the service, and to ``SIGTERM`` by shutting down the server after completion of all pending requests.
+
+Example
+*******
+
 .. sourcecode:: bash
 
     kill -SIGHUP `ps -a | awk '/trombone/ {print $1}'`
@@ -54,9 +74,9 @@ Unix signal handlers
 Configuration data storage
 --------------------------
 
-.. In cloud-based architectures, file system storage is typically short lived (ephemeral) and resources assigned to an application are reclaimed by the platform when the service is stopped or restarted. 
+..  
 
-The server will look for a database table called ``trombone_config`` as a fallback, when a configuration file is not specified (i.e., the ``-r`` flag is omitted). This is useful if you prefer to store configuration data in the database. 
+As a fallback, the server will look for a database table called ``trombone_config`` when a configuration file is not specified (i.e., the ``-r`` flag is omitted). This comes in handy if you cannot rely on persistent disk storage (e.g. on ephemeral file systems), or simply prefer to keep configuration data in the database. 
 
 ::
 

@@ -1,6 +1,8 @@
 Non-SQL Routes
 ==============
 
+This is an overview of the various route types that do not interact directly with the database.
+
 ============ =================================================================================
 Symbol       Explanation
 ------------ ---------------------------------------------------------------------------------
@@ -40,7 +42,7 @@ A possible use-case for this is to deliver machine readable documentation as par
     OPTIONS /photo  {..}  {"GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
 
 
-The rationale behind the ``OPTIONS`` method is outlined in `RFC 2616, Section 9.2 <http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html>`_.
+The rationale for the ``OPTIONS`` method is outlined in `RFC 2616, Section 9.2 <http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html>`_.
 
     | *The OPTIONS method represents a request for information about the communication options available on the request/response chain identified by the Request-URI. This method allows the client to determine the options and/or requirements associated with a resource, or the capabilities of a server, without implying a resource action or initiating a resource retrieval.*
 
