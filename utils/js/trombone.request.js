@@ -10,10 +10,18 @@ Trombone.request = (function($){
 
         var source = conf.resource.replace(/^\/|\/$/g, ''),
             host = conf.host.replace(/\/$/, ''),
-            data = conf.data ? serial(conf.data) : '',
-            hash = CryptoJS.HmacSHA1(data, conf.key),
-            onComplete = conf.complete,
             client = conf.client || 'generic';
+
+        var data = conf.data ? serial(conf.data) : '';
+
+        var pieces = client 
+             + ':' + (conf.type || 'GET')
+             + ':' + '/' + source
+             + ':' + conf.nonce
+             + ':' + data;
+
+        var hash = CryptoJS.HmacSHA1(pieces, conf.key),
+            onComplete = conf.complete;
 
         delete(conf.data);
         delete(conf.complete);
@@ -34,7 +42,7 @@ Trombone.request = (function($){
             headers: {
                 "Accept"       : "application/json; charset=utf-8",
                 "Content-Type" : "application/json; charset=utf-8",
-                "API-Access"   : client + ':' + hash.toString()
+                "API-Access"   : client + ':' + conf.nonce + ':' + hash.toString()
              }
         }, conf));
 
@@ -45,4 +53,3 @@ Trombone.request = (function($){
     return request;
 
 }(jQuery));
-

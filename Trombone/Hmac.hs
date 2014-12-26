@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 module Trombone.Hmac 
     ( Keys
     , ClientIdentity(..)
@@ -16,9 +17,12 @@ import Data.Text                                       ( Text )
 import Data.Text.Encoding                              ( decodeUtf8 )
 import Network.Socket
 import Network.Wai
+import Network.Wai.Internal                            ( Request(..) )
 
 import qualified Data.ByteString.Char8                 as C8
+import qualified Data.ByteString.Lazy.Char8            as L8
 import qualified Data.HashMap                          as Map
+import qualified Text.Show.ByteString                  as Show
 
 -- | Compute a MAC using the SHA1 cryptographic algorithm.
 generateHmac :: ByteString -> ByteString -> ByteString
@@ -29,11 +33,11 @@ generateHmac key = digestToHexByteString . hmacGetDigest . sha1Hmac key
  
 -- | User agent identity.
 data ClientIdentity = 
-    Anonymous    -- ^ Unknown user agent
-  | Local        -- ^ Application running on the local server
-  | Client Text  -- ^ Authenticated and trusted user agent
-  | Untrusted    -- ^ A request which is invalid, fraudulent, or originates 
-                 --   from an untrusted source
+    Anonymous            -- ^ Unknown user agent
+  | Local                -- ^ Application running on the local server
+  | Client Text Integer  -- ^ Authenticated and trusted user agent
+  | Untrusted            -- ^ A request which is invalid, fraudulent, or 
+                         --   originates from an untrusted source
     deriving (Show)
 
 type Keys = Map ByteString ByteString
@@ -75,20 +79,42 @@ authenticate req body hmacEnabled trustLocal allowPing keys =
 -- using a stored key associated with the client application from which the 
 -- request claims to originate. The result is then compared to the code found in
 -- the header field in order to establish the authenticity of the request.
+--
+-- Request format: 
+--     client_id:nonce:hash
+--
+-- Hash constituents: 
+--     client_id:method:uri:nonce:json_body
+--
 authHmac :: Request -> ByteString -> Keys -> Maybe ClientIdentity
-authHmac req body keys = macCheck <$> lookup "API-Access" (requestHeaders req)
+authHmac req@Request{..} body keys = macCheck <$> lookup "API-Access" requestHeaders
   where 
     macCheck :: ByteString -> ClientIdentity
-    macCheck h = maybe Untrusted Client $ do
-        (client, code) <- extractClientInfo h
-        key <- Map.lookup client keys
-        guard (generateHmac key body == code) >> Just (decodeUtf8 client)
+    macCheck = maybe Untrusted (uncurry Client) . key 
 
-extractClientInfo :: ByteString -> Maybe (ByteString, ByteString)
+    key :: ByteString -> Maybe (Text, Integer)
+    key h = do
+        (client, nonce, code) <- extractClientInfo h
+        key <- Map.lookup client keys
+        guard (generateHmac key (payload client nonce) == code)
+        Just (decodeUtf8 client, nonce)
+
+    payload :: ByteString -> Integer -> ByteString
+    payload client nonce = C8.concat 
+        [ client                        , ":"
+        , requestMethod                 , ":"
+        , rawPathInfo                   , ":"
+        , L8.toStrict $ Show.show nonce , ":"
+        , body ]
+
+extractClientInfo :: ByteString -> Maybe (ByteString, Integer, ByteString)
 extractClientInfo = ext . C8.split ':' 
   where
-    ext [client, code] = Just (client, code)
-    ext _              = Nothing
+    ext [client, n, code] = 
+        case reads $ C8.unpack n of
+          [(nonce, _)] -> Just (client, nonce, code)
+          _            -> Nothing
+    ext _ = Nothing
 
 isPing :: Request -> Bool
 {-# INLINE isPing #-}

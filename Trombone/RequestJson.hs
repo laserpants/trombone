@@ -20,8 +20,10 @@ import Data.Conduit
 import Data.Conduit.Attoparsec                         ( Position, sinkParser, errorMessage, errorPosition )
 import Data.Conduit.Internal                           ( zipSinks )
 import Data.Maybe                                      ( isJust )
+import Database.Persist.Postgresql
 import Network.Wai
 import Network.Wai.Conduit                             ( sourceRequestBody )
+import Trombone.Db.Execute
 import Trombone.Dispatch.Core
 import Trombone.Hmac
 import Trombone.Route
@@ -77,15 +79,35 @@ authRequest :: Request -> Dispatch IO RequestInfo
 authRequest req = ask >>= liftIO . auth req
 
 auth :: Request -> Context -> IO RequestInfo
-auth req Context{..} = 
-    liftM (flip RequestInfo <$> authId . takeBody 
-                            <*> id) (requestJson req)
+auth req Context{..} = do
+    requestJson req >>= \json -> 
+        authId dispatchPool (takeBody json) 
+            >>= return . RequestInfo json 
   where
-    authId :: ByteString -> ClientIdentity
-    authId body = authenticate req body 
-                               (isJust dispatchKeys)
-                               (maybe True allowLocal dispatchKeys) 
-                               True (keys dispatchKeys)
+    authId :: ConnectionPool -> ByteString -> IO ClientIdentity
+    authId pool body = do
+        let cid = authenticate req body 
+                     (isJust dispatchKeys)
+                     (maybe True allowLocal dispatchKeys) 
+                     True (keys dispatchKeys)
+        case cid of
+          Client client nonce -> do
+            -- Ascertain that the nonce is incremental, and update the
+            -- client with the new nonce value.
+                res <- runDb (rawExecuteCount "UPDATE trombone_keys \
+                                             \SET nonce = ? \
+                                             \WHERE client = ?\
+                                             \  AND nonce < ?;"
+                    [ persistNonce nonce 
+                    , PersistText client
+                    , persistNonce nonce ]) pool
+                return $ case res of
+                           0 -> Untrusted
+                           _ -> cid
+          _ -> return cid
+
+    persistNonce :: Integer -> PersistValue
+    persistNonce = PersistInt64 . fromIntegral 
 
 keys :: Maybe HmacKeyConf -> Map.Map ByteString ByteString
 keys (Just (HmacKeyConf m _)) = m
