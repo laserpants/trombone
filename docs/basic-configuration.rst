@@ -76,7 +76,7 @@ Configuration data storage
 
 ..  
 
-As a fallback, the server will look for a database table called ``trombone_config`` when a configuration file is not specified (i.e., the ``-r`` flag is omitted). This comes in handy if you cannot rely on persistent disk storage (e.g. on ephemeral file systems), or simply prefer to keep configuration data in the database. 
+As a fallback, the server will look for a database table called ``trombone_config`` in the event that a configuration file is not specified (i.e., the ``-r`` flag is omitted). This comes in handy if you cannot rely on persistent disk storage (e.g. on ephemeral file systems), or simply prefer to keep configuration data in the database. 
 
 ::
 
