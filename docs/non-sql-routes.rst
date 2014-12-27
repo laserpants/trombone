@@ -190,7 +190,7 @@ Example 2.
 ::
 
     $ curl http://localhost:3010/oracle -d '{"string": "The answer is %1."}'
-    $ The answer is 42.
+    The answer is 42.
 
 
 Static Objects

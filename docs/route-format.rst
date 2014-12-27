@@ -1,7 +1,7 @@
 Route Format
 ============
 
-A Trombone configuration file consists of a collection of route patterns. The format of a single route instance is given by the following (high-level) grammar.
+A Trombone configuration file consists of a collection of route patterns. The format of a single route item is given by the following (high-level) grammar.
 
 ::
 
@@ -187,13 +187,17 @@ Types of Routes
 Database routes
 ***************
 
+.. role:: raw-html(raw)
+   :format: html
+
 ============ =====================================================================================
 Symbol       Explanation
 ------------ -------------------------------------------------------------------------------------
 ``--``       An SQL statement that does not return any result. 
 ``>>``       A query of a type that returns a collection.
 ``~>``       A query that returns a single item.
-``->``       Identical to ``~>`` except that an 'Ok' status message is added to the JSON response.
+``->``       Identical to ``~>`` except that an 'Ok' status message is added to the :raw-html:`<br />` 
+             JSON response.
 ``<>``       An ``INSERT`` statement that should return a 'last insert id'.
 ``><``       A statement that returns a row count result (e.g. ``UPDATE``).
 ============ =====================================================================================
