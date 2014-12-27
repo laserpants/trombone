@@ -59,6 +59,12 @@ A typical response (if the service is running):
 
 
 
+Console app
+***********
+
+.. image:: console.png 
+
+
 Unix signal handlers
 --------------------
 
