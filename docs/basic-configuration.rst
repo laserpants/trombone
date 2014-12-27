@@ -27,7 +27,7 @@ Some commonly used flags are:
 ``-t``        bypass authentication for localhost
 ============= ===================================================
 
-For a complete list of flags and switches, see `Command Line Flags <command-line-flags.html>`_, or give the command 
+For a complete list of flags and switches, see `Command Line Flags <command-line-flags.html>`_, or give the following command.
 
 ::
 
@@ -72,6 +72,8 @@ Trombone responds to ``SIGHUP`` by reloading all configuration data and restarti
 
 Example
 *******
+
+To send a ``SIGHUP``:
 
 .. sourcecode:: bash
 

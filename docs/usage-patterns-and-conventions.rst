@@ -56,48 +56,56 @@ Array Actions
 Response Codes
 --------------
 
-+-----------+------------------------------+
-| Code      | Explanation                  |
-+===========+==============================+
-| 200       | Ok                           |
-+-----------+------------------------------+
-| A normal response.                       |
-+-----------+------------------------------+
-| 202       | Accepted                     |
-+-----------+------------------------------+
-|                                          |
-+-----------+------------------------------+
-| 400       | Bad Request                  |
-+-----------+------------------------------+
-| The request contains malformed JSON      |
-| or is otherwise invalid.                 |
-+-----------+------------------------------+
-| 401       | Unauthorized                 |
-+-----------+------------------------------+
-| HMAC authentication failed.              |
-+-----------+------------------------------+
-| 404       | Not Found                    |
-+-----------+------------------------------+
-| - No route matches the request.          |
-| - The selected record does not exist     |
-|   for the route. E.g., a                 |
-|   ``SELECT * FROM tbl WHERE id = {{id}}``|
-|   query returns an empty result.         |
-+-----------+------------------------------+
-| 409       | Conflict                     |
-+-----------+------------------------------+
-|                                          |
-+-----------+------------------------------+
-| 500       | Internal Server Error        |
-+-----------+------------------------------+
-|                                          |
-+-----------+------------------------------+
-| 503       | Service Unavailable          |
-+-----------+------------------------------+
-| The server is shutting down or           |
-| restarting.                              |
-+-----------+------------------------------+
++-----------+--------------------------------+
+| Code      | Explanation                    |
++===========+================================+
+| **200**   | Ok                             |
++-----------+--------------------------------+
+| A normal response.                         |
++-----------+--------------------------------+
+| **202**   | Accepted                       |
++-----------+--------------------------------+
+| This response type indicates that the      |
+| result is a collection (array). That is,   |
+| each individual response item must be      |
+| considered separately and no claim is made |
+| as to the state of success w.r.t. these.   |
+| See `Array Actions <Array Actions_>`_.     |
++-----------+--------------------------------+
+| **400**   | Bad Request                    |
++-----------+--------------------------------+
+| The request contains malformed JSON        |
+| or is otherwise invalid.                   |
++-----------+--------------------------------+
+| **401**   | Unauthorized                   |
++-----------+--------------------------------+
+| HMAC authentication failed.                |
++-----------+--------------------------------+
+| **404**   | Not Found                      |
++-----------+--------------------------------+
+| | - No route matches the request.          |
+| | - The record does not exist              |
+| |   for the route. E.g., a                 |
+| |   ``SELECT * FROM tbl WHERE id = {{id}}``|
+| |   query returns an empty result.         |
++-----------+--------------------------------+
+| **500**   | Internal Server Error          |
++-----------+--------------------------------+
+| An error occured during processing of the  |
+| request. Refer to the attached             |
+| `error code <Error Codes_>`_ for details.  |
++-----------+--------------------------------+
+| **503**   | Service Unavailable            |
++-----------+--------------------------------+
+| The server is shutting down or             |
+| restarting.                                |
++-----------+--------------------------------+
 
+.. | **409**   | Conflict                       |
+   +-----------+--------------------------------+
+   |                                            |
+
+.. _error-codes: 
 
 Error Codes
 -----------
@@ -113,7 +121,7 @@ Error Codes
 
 
 ========================================== ==================
-Code                                       Explanation
+Code                                       Comment
 ========================================== ==================
 ``BAD_REQUEST``
 ``NOT_FOUND``
@@ -128,8 +136,8 @@ Code                                       Explanation
 ========================================== ==================
 
 
-HTTP Methods
-------------
+Notes about HTTP Methods
+------------------------
 
 @todo
 

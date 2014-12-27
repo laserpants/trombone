@@ -16,12 +16,181 @@ Symbol       Explanation
 Pipelines
 ---------
 
+| *The pipeline syntax is a simple, declarative technique for composition of routes using JavaScript objects (JSON).*
+
+Pipelines can be declared in two different ways; either in a separate file or as inline definitions.
+
+Pipeline configuration file
+***************************
+
+Inline pipeline syntax
+**********************
+
+
+Basic Format
+************
+
+Structure of a pipeline
+```````````````````````
+
+::
+
+    GET  /my-pipeline  |>
+
+    {
+        "processors": [
+        ],
+        "connections": [
+        ]
+    }
+
+Processors
+``````````
+
+@todo
+
+Connections
+```````````
+
+@todo
+
+Filters
+*******
+
+@todo
+
+Equal-to
+````````
+
+@todo
+
+Not-equal-to
+````````````
+
+@todo
+
+Greater-than
+````````````
+
+@todo
+
+Greater-than-or-equal
+`````````````````````
+
+@todo
+
+Less-than
+`````````
+
+@todo
+
+Less-than-or-equal
+``````````````````
+
+@todo
+
+Transformers
+************
+
+@todo
+
+Exclude
+```````
+
+@todo
+
+Include
+```````
+
+@todo
+
+Bind
+````
+
+@todo
+
+Rename
+``````
+
+@todo
+
+Copy
+````
+
+@todo
+
+Aggregate
+`````````
+
 @todo
 
 node.js
 -------
 
-@todo
+http://nodejs.org/
+
+Example 1.
+**********
+
+::
+
+    GET /stuff  <js>  node/demo.js
+
+
+::
+
+    var response = {
+        statusCode : 200,
+        body       : 'Just saying "hello".' 
+    };
+    
+    console.log(JSON.stringify(response));
+ 
+
+Example 2.
+**********
+
+
+::
+
+    POST /oracle <js>  node/demo.js
+
+
+::
+
+    // node/demo.js
+
+    var fs = require('fs');
+    
+    function parseStdin() {
+        var data = fs.readFileSync('/dev/stdin').toString();
+        if (data) {
+            return JSON.parse(data);
+        } else {
+            return null;
+        }
+    };
+    
+    // Parse request object 
+    var obj = parseStdin();
+    
+    // Do some heavy computation
+    obj.string = obj.string.replace(/\%1/, '42');
+    
+    // Send response
+    var response = {
+        statusCode : 200,
+        body       : obj
+    };
+    
+    console.log(JSON.stringify(response));
+
+
+::
+
+    $ curl http://localhost:3010/oracle -d '{"string": "The answer is %1."}'
+    $ The answer is 42.
+
 
 Static Objects
 --------------
