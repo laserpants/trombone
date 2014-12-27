@@ -56,7 +56,77 @@ Array Actions
 Response Codes
 --------------
 
-@todo
++-----------+------------------------------+
+| Code      | Explanation                  |
++===========+==============================+
+| 200       | Ok                           |
++-----------+------------------------------+
+| A normal response.                       |
++-----------+------------------------------+
+| 202       | Accepted                     |
++-----------+------------------------------+
+|                                          |
++-----------+------------------------------+
+| 400       | Bad Request                  |
++-----------+------------------------------+
+| The request contains malformed JSON      |
+| or is otherwise invalid.                 |
++-----------+------------------------------+
+| 401       | Unauthorized                 |
++-----------+------------------------------+
+| HMAC authentication failed.              |
++-----------+------------------------------+
+| 404       | Not Found                    |
++-----------+------------------------------+
+| - No route matches the request.          |
+| - The selected record does not exist     |
+|   for the route. E.g., a                 |
+|   ``SELECT * FROM tbl WHERE id = {{id}}``|
+|   query returns an empty result.         |
++-----------+------------------------------+
+| 409       | Conflict                     |
++-----------+------------------------------+
+|                                          |
++-----------+------------------------------+
+| 500       | Internal Server Error        |
++-----------+------------------------------+
+|                                          |
++-----------+------------------------------+
+| 503       | Service Unavailable          |
++-----------+------------------------------+
+| The server is shutting down or           |
+| restarting.                              |
++-----------+------------------------------+
+
+
+Error Codes
+-----------
+
+::
+
+    {
+        "status"       : false,
+        "error"        : "NOT_FOUND",
+        "responseCode" : 404,
+        "message"      : "Resource not found."
+    }
+
+
+========================================== ==================
+Code                                       Explanation
+========================================== ==================
+``BAD_REQUEST``
+``NOT_FOUND``
+``UNAUTHORIZED``
+``CONFLICT``
+``SQL_FOREIGN_KEY_CONSTRAINT_VIOLATION``
+``SQL_UNIQUE_CONSTRAINT_VIOLATION``
+``SQL_ERROR``
+``SERVER_CONFIGURATION_ERROR``
+``SERVICE_UNAVAILABLE``
+``INTERNAL_SERVER_ERROR``
+========================================== ==================
+
 
 HTTP Methods
 ------------
@@ -66,22 +136,14 @@ HTTP Methods
 GET
 ***
 
-@todo
-
 POST
 ****
-
-@todo
 
 PUT
 ***
 
-@todo
-
 DELETE
 ******
-
-@todo
 
 Idempotency in a nutshell
 `````````````````````````
@@ -89,10 +151,8 @@ Idempotency in a nutshell
 OPTIONS
 *******
 
-@todo
 
 PATCH
 *****
 
-@todo
 

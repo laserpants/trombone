@@ -39,7 +39,7 @@ The arrow symbol specifies the type of route and the response object's expected 
 Placeholders
 ------------
 
-Placeholders are denoted by a double pair of surrounding curly-braces (akin to Handlebars.js). Trombone templates acknowledge three types of placeholder variables:
+Placeholders are denoted by a double pair of surrounding curly-braces (akin to e.g., Handlebars.js). Trombone templates acknowledge three types of placeholder variables:
 
 * JSON value ``{{placeholders}}``; 
 * Uri segment ``{{:variables}}``; and
@@ -48,7 +48,7 @@ Placeholders are denoted by a double pair of surrounding curly-braces (akin to H
 Request body JSON values
 ************************
 
-When a JSON-formatted request body is present, the dispatch handler will first try to parse the object and substitute placeholders in the template with values whose keys corresponding to the names of the variables being considered. 
+When a JSON-formatted request body is present, the dispatch handler will first try to parse the object and substitute placeholders in the template with values whose keys corresponding to the names of the concerned variables. 
 
 ..  =======================  ==========================
     Route configuration:     ``POST /customer  <>  INSERT INTO customer (name, address, phone) VALUES ( {{name}}, {{address}}, {{phone}} )``              
@@ -243,7 +243,7 @@ Special Considerations
 SELECT * FROM
 *************
 
-``SELECT * FROM``-type of queries are accepted as a convenient shorthand. The server will attempt to expand the column names during preprocessing of the configuration file. However, this is not guaranteed to work and in some cases you will have to explicitly write out the column names, e.g., ``SELECT id, name, favorite_cheese FROM...``.
+``SELECT * FROM``-type of queries are accepted as a convenient shorthand. The server will attempt to expand the column names during preprocessing of the configuration file. However, this is not guaranteed to work. In some cases you will have to explicitly write out the column names, e.g., ``SELECT id, name, favorite_cheese FROM...``.
 
 
 Wildcard operators
@@ -291,7 +291,7 @@ A common pattern is to have multiple database queries that are similar in one wa
        select id, name, phone, address from customer where area_id = {{:id}} order by id
 
 
-To avoid repetition, an alternative `DRY <http://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ notation can be employed in cases such as this. The following is an equivalent route definition, insted using a DRY-block.
+To avoid repetition, an alternative `DRY <http://en.wikipedia.org/wiki/Don%27t_repeat_yourself>`_ notation can be employed in cases such as this. The following is an equivalent route definition using a DRY-block.
 
 ::
 

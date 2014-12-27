@@ -4,7 +4,7 @@ Tools & Utilities
 Console
 -------
 
-@todo
+.. image:: console.png 
 
 Keyman
 ------

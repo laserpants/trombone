@@ -9,29 +9,29 @@ Command Line Flags
 +-------------------+-------------------------+---------------------------------------------+
 | Flag              | Long option             | Description                                 |
 +===================+=========================+=============================================+
-| ``-V``            | ``--version``           | display version number and exit             |
+| ``-V``            | ``--version``           | Display version number and exit             |
 +-------------------+-------------------------+---------------------------------------------+
-| ``-?``            | ``--help``              | display this help and exit                  |
+| ``-?``            | ``--help``              | Display this help and exit                  |
 +-------------------+-------------------------+---------------------------------------------+
-| ``-x``            | ``--disable-hmac``      | | disable message integrity authentication  |
+| ``-x``            | ``--disable-hmac``      | | Disable message integrity authentication  |
 |                   |                         | | (HMAC)                                    |
 +-------------------+-------------------------+---------------------------------------------+
-| ``-C``            | ``--cors``              | | enable support for cross-origin resource  |
+| ``-C``            | ``--cors``              | | Enable support for cross-origin resource  |
 |                   |                         | | sharing                                   |
 +-------------------+-------------------------+---------------------------------------------+
-| ``-A[USER:PASS]`` | ``--amqp[=USER:PASS]``  | | enable RabbitMQ messaging middleware      |
+| ``-A[USER:PASS]`` | ``--amqp[=USER:PASS]``  | | Enable RabbitMQ messaging middleware      |
 |                   |                         | | [username:password]                       |
 +-------------------+-------------------------+---------------------------------------------+
 | ..                | ``--amqp-host=HOST``    | RabbitMQ host [host]                        |          
 +-------------------+-------------------------+---------------------------------------------+
-| ``-i[FILE]``      | ``--pipelines[=FILE]``  | | read request pipelines from external      |
+| ``-i[FILE]``      | ``--pipelines[=FILE]``  | | Read request pipelines from external      |
 |                   |                         | | file [config. file]                       |                
 +-------------------+-------------------------+---------------------------------------------+
 | ``-s PORT``       | ``--port=PORT``         | server port                                 | 
 +-------------------+-------------------------+---------------------------------------------+
-| ``-l[FILE]``      | ``--access-log[=FILE]`` | enable logging to file [log file]           |   
+| ``-l[FILE]``      | ``--access-log[=FILE]`` | Enable logging to file [log file]           |   
 +-------------------+-------------------------+---------------------------------------------+
-| ..                | ``--colors``            | use colors in log output                    |    
+| ..                | ``--colors``            | Use colors in log output                    |    
 +-------------------+-------------------------+---------------------------------------------+
 | ..                | ``--size=SIZE``         | log file size                               |
 +-------------------+-------------------------+---------------------------------------------+
@@ -47,13 +47,13 @@ Command Line Flags
 +-------------------+-------------------------+---------------------------------------------+
 | ``-r FILE``       | ``--routes-file=FILE``  | route pattern configuration file            |
 +-------------------+-------------------------+---------------------------------------------+
-| ``-t``            | ``--trust-localhost``   | | bypass HMAC authentication for            |
+| ``-t``            | ``--trust-localhost``   | | Bypass HMAC authentication for            |
 |                   |                         | | requests from localhost                   |
 +-------------------+-------------------------+---------------------------------------------+
-| ..                | ``--pool-size=SIZE``    | | number of connections to keep in          |
+| ..                | ``--pool-size=SIZE``    | | Number of connections to keep in          |
 |                   |                         | | PostgreSQL connection pool                |
 +-------------------+-------------------------+---------------------------------------------+
-| ..                | ``--verbose``           | print various debug information to stdout   |
+| ..                | ``--verbose``           | Print various debug information to stdout   |
 +-------------------+-------------------------+---------------------------------------------+
 
 
