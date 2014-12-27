@@ -21,21 +21,21 @@ Building
 
 Once you have GHC and Cabal installed, run the command 
 
-::
+.. sourcecode:: bash
 
     $ cabal update
 
 
 to download the most recent list of packages. Next, clone the repository,
 
-::
+.. sourcecode:: bash
 
     $ git clone https://github.com/johanneshilden/trombone.git
 
 
 and run the below sequence of commands. (The use of a sandbox here is optional, but recommended to avoid dependency problems.)
 
-::
+.. sourcecode:: bash
 
     $ cd trombone
     $ cabal sandbox init
