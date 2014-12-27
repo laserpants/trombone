@@ -56,6 +56,11 @@ Array Actions
 Response Codes
 --------------
 
+.. raw:: html
+
+    <style> .wy-table-responsive { overflow: visible; } </style>
+
+
 +-----------+--------------------------------+
 | Code      | Explanation                    |
 +===========+================================+
@@ -83,11 +88,11 @@ Response Codes
 +-----------+--------------------------------+
 | **404**   | Not Found                      |
 +-----------+--------------------------------+
-| | - No route matches the request.          |
-| | - The record does not exist              |
-| |   for the route. E.g., a                 |
-| |   ``SELECT * FROM tbl WHERE id = {{id}}``|
-| |   query returns an empty result.         |
+| - No route matches the request.            |
+| - The record does not exist                |
+|   for the route. E.g., a                   |
+|   ``SELECT * FROM tbl WHERE id = {{id}}``  |
+|   query returns an empty result.           |
 +-----------+--------------------------------+
 | **500**   | Internal Server Error          |
 +-----------+--------------------------------+

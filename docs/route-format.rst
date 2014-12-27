@@ -93,7 +93,8 @@ When a JSON-formatted request body is present, the dispatch handler will first t
 
 ::
 
-    INSERT INTO customer (name, address, phone) VALUES ('OCP', 'Delta City', '555-MEGACORP')
+    INSERT INTO customer (name, address, phone) 
+    VALUES ('OCP', 'Delta City', '555-MEGACORP')
 
 
 .. NOTE::
