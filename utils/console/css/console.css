@@ -25,10 +25,14 @@ body {
     margin-bottom: 0.5em;
 }
 
-.nav-text-input {
+#console-host, #console-client {
     max-width:140px;
 }
 
-.nav-text-last {
+#console-key {
     min-width:300px;
+}
+
+.container-inner {
+    max-width: 730px;
 }
