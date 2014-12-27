@@ -3,7 +3,8 @@ Command Line Flags
 
 .. raw:: html
 
-    <style> td .line-block { margin: 0; } </style>
+    <style> td .line-block { margin: 0 !important; } </style>
+
 
 +-------------------+-------------------------+---------------------------------------------+
 | Flag              | Long option             | Description                                 |
@@ -46,8 +47,8 @@ Command Line Flags
 +-------------------+-------------------------+---------------------------------------------+
 | ``-r FILE``       | ``--routes-file=FILE``  | route pattern configuration file            |
 +-------------------+-------------------------+---------------------------------------------+
-| ``-t``            | ``--trust-localhost``   | | bypass HMAC authentication for requests   |
-|                   |                         | | from localhost                            |
+| ``-t``            | ``--trust-localhost``   | | bypass HMAC authentication for            |
+|                   |                         | | requests from localhost                   |
 +-------------------+-------------------------+---------------------------------------------+
 | ..                | ``--pool-size=SIZE``    | | number of connections to keep in          |
 |                   |                         | | PostgreSQL connection pool                |
