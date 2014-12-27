@@ -1,0 +1,34 @@
+body {
+    margin-top: 80px;
+}
+
+#console-payload {
+    font-family: monospace;
+    font-size: .9em;
+}
+
+#console-out {
+    overflow: auto;
+    font-size: .85em;
+}
+
+#console-action-btn {
+    min-width: 80px;
+}
+
+#console-wrapper, #console-btn-wrapper {
+    display: none;
+}
+
+.panel-footer .form-group {
+    text-align: right; 
+    margin-bottom: 0.5em;
+}
+
+.nav-text-input {
+    max-width:140px;
+}
+
+.nav-text-last {
+    min-width:300px;
+}
