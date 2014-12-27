@@ -79,11 +79,11 @@ Response Codes
 | **401**   | Unauthorized                    | HMAC authentication failed.                 |
 +-----------+---------------------------------+---------------------------------------------+
 | **404**   | Not Found                       | | No route matches the request.             | 
-|           |                                 +---------------------------------------------+
+|           |                                 |                                             |
 |           |                                 | | The record does not exist                 |
 |           |                                 | | for the route. For instance, a            |
 |           |                                 | | ``SELECT * FROM tbl WHERE id = {{id}}``   |
-|           |                                 | | query returns an empty result.            |
+|           |                                 | | query returning an empty result.          |
 +-----------+---------------------------------+---------------------------------------------+
 | **500**   | Internal Server Error           | | An error occured during processing of the |
 |           |                                 | | request. Refer to the attached            |
