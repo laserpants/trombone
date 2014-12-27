@@ -1,2 +1,0 @@
-DRY-block Notation
-==================

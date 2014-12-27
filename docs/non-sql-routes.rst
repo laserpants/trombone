@@ -209,7 +209,8 @@ A possible use-case for this is to deliver machine readable documentation as par
     
 ::
 
-    OPTIONS /photo  {..}  {"GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
+    OPTIONS /photo  {..}  {"GET":{"description":"Retreive a list of all photos."},
+                           "POST":{"description":"Create a new photo."}}
 
 
 The rationale for the ``OPTIONS`` method is outlined in `RFC 2616, Section 9.2 <http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html>`_.
@@ -223,7 +224,9 @@ Static JSON response routes support a special ``<Allow>`` keyword, the primary i
 
 ::
 
-    OPTIONS /photo  {..}  {"<Allow>":"GET,POST,OPTIONS","GET":{"description":"Retreive a list of all photos."},"POST":{"description":"Create a new photo."}}
+    OPTIONS /photo  {..}  {"<Allow>":"GET,POST,OPTIONS",
+                "GET":{"description":"Retreive a list of all photos."},
+                "POST":{"description":"Create a new photo."}}
 
 
 A typical response would then be:
@@ -233,5 +236,6 @@ A typical response would then be:
     < HTTP/1.1 200
     < Allow: 'GET,POST,OPTIONS'
     < Content-Type: application/json; charset=utf-8
-    {"GET":{"description":"Retreive a list of all customers."},"POST":{"description":"Create a new customer."}}
+    {"GET":{"description":"Retreive a list of all customers."},
+     "POST":{"description":"Create a new customer."}}
 
