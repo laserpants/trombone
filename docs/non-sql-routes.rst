@@ -136,7 +136,7 @@ Example 1.
     GET /stuff  <js>  node/demo1.js
 
 
-::
+.. sourcecode:: javascript
 
     // node/demo1.js
 
@@ -157,7 +157,7 @@ Example 2.
     POST /oracle <js>  node/demo2.js
 
 
-::
+.. sourcecode:: javascript
 
     // node/demo2.js
 
