@@ -209,7 +209,7 @@ The following, additional route formats all share the common trait that they do 
 
 ============ =================================================================================
 Symbol       Explanation
------------- ---------------------------------------------------------------------------------
+============ =================================================================================
 ``||``       A request pipeline. (Followed by a pipeline identifier.)
 ``|>``       An inline request pipeline. (Followed by a pipeline definition.)
 ``<js>``     A node.js route. (Followed by a file path to the script.)
