@@ -1,4 +1,5 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 module Trombone.Pipeline.Json where
 
 import Control.Applicative

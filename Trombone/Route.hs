@@ -1,11 +1,13 @@
 module Trombone.Route 
     ( RouteAction(..)
+    , RouteResult(..)
     , Route(..)
     ) where
 
 import Data.Text                                       ( Text )
 import Network.HTTP.Types.Method                       ( Method )
-import Trombone.Db.Template                            ( DbQuery )
+import Network.Wai.Internal                            ( Request(..) )
+import Trombone.Db.Template
 import Trombone.Pipeline
 import Trombone.Response
 import Trombone.RoutePattern
@@ -23,3 +25,9 @@ data RouteAction = RouteSql    DbQuery
 data Route = Route Method RoutePattern RouteAction
     deriving (Show)
  
+-- | The result of matching a request against a list of routes. A RouteAction
+-- value which denotes the action, and a list of key-value pairs with the uri 
+-- parameter names and extracted values.
+data RouteResult = RouteNoResult | RouteResult RouteAction [(Text, Text)]
+    deriving (Show)
+

@@ -1,27 +1,39 @@
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
-module Trombone.Router where
+{-# LANGUAGE RecordWildCards #-}
+module Trombone.Router 
+    ( routeRequest
+    ) where
 
+import Control.Monad                                   ( when )
+import Control.Monad.IO.Class                          ( liftIO ) 
+import Control.Monad.Trans.Reader
 import Data.Text                                       ( Text )
-import Network.HTTP.Types                              ( Method )
-import Trombone.Dispatch
+import Network.HTTP.Types.Method                       ( Method )
+import Network.Wai
+import Network.Wai.Internal                            ( Request(..) )
 import Trombone.Dispatch.Core
+import Trombone.Route
 import Trombone.RoutePattern
 
 import qualified Data.Text                             as Text
 
-runRoutes :: Dispatch (Maybe RouteResponse)
-runRoutes = do
-    Context pool Request{..} routes _ _ loud _ <- ask
-    when loud $ liftIO $ putStrLn $ show requestMethod ++ " " ++ show pathInfo 
-    run loud routes requestMethod $ filterNot Text.null pathInfo
-  where run v [] _ _ = do
-            when v $ liftIO $ print "(no match)"
-            return Nothing -- List exhausted
-        run v (Route method pattern action:rs) mtd info 
-                -- First check if the request methods match 
-                | mtd /= method = run v rs mtd info
-                | otherwise =
-            case match pattern info of
-                Params ps -> liftM Just (dispatch action $ params ps)
-                _         -> run v rs mtd info
- 
+-- | Compare the incoming request against a list of routes for a possible match
+-- and return the result.
+routeRequest :: Request -> Dispatch IO RouteResult
+routeRequest Request{..} = do
+    Context pool routes _ _ loud _ <- ask
+    printS $ show requestMethod ++ " " ++ show pathInfo 
+    run requestMethod (filterNot Text.null pathInfo) routes 
+  where
+    run :: Method -> [Text] -> [Route] -> Dispatch IO RouteResult
+    -- List exhausted
+    run _ _ [] = do
+        printS "(no match)"
+        return RouteNoResult
+    run mtd info (Route method pat action : rs)
+        -- First check if the request methods match 
+        | mtd /= method = run mtd info rs
+        | otherwise = 
+            case match pat info of
+                Params ps -> return $ RouteResult action ps
+                _ -> run mtd info rs
+

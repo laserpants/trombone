@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Trombone Console</title>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/console.css" rel="stylesheet">
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+                <a class="navbar-brand" href="#">Trombone console</a>
+                <form class="navbar-form navbar-right" role="search">
+                    <div class="form-group input-btn input-group-sm">
+                        <input type="text" class="form-control" id="console-host" placeholder="localhost:3010">
+                        <input type="text" class="form-control" id="console-client" placeholder="client">
+                        <input type="text" class="form-control" id="console-key" placeholder="Authentication token">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="container">
+            <div class="container container-inner">
+                <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-btn">
+                                        <button id="console-action-btn" type="button" class="btn btn-default" data-toggle="dropdown"><span id="console-action">GET</span></button>
+                                        <ul class="dropdown-menu method-selector" role="menu">
+                                            <li><a href="#">GET</a></li>
+                                            <li><a href="#">POST</a></li>
+                                            <li><a href="#">PUT</a></li>
+                                            <li><a href="#">DELETE</a></li>
+                                            <li><a href="#">PATCH</a></li>
+                                            <li><a href="#">OPTIONS</a></li>
+                                        </ul>
+                                    </div>
+                                    <span class="input-group-addon" id="sizing-addon1">/</span>
+                                    <input id="console-resource" class="form-control" type="text" placeholder="Please specify a resource identifier">
+                                    <div class="input-group-btn">
+                                        <button id="console-send" type="button" class="btn btn-primary"><span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;Send</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div id="console-wrapper" class="form-group">
+                                    <textarea class="form-control" rows="12" id="console-payload"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="form-group">
+                                <span id="console-btn-wrapper">
+                                    <button id="console-json-validate" type="button" class="btn btn-default btn-sm">Validate JSON</button>
+                                    <button id="console-buffer-reset" type="button" class="btn btn-default btn-sm">Clear JSON</button>
+                                </span>
+                                <button id="console-ping" type="button" class="btn btn-default btn-sm">Ping!</button>
+                                <button id="console-output-clear" type="button" class="btn btn-default btn-sm">Clear output</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="console-out"></div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+        <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
+        <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
+        <script src="js/trombone.request.min.js"></script>
+        <script src="js/json2tbl.min.js"></script>
+        <script src="js/console.js"></script>
+
+    </body>
+</html>

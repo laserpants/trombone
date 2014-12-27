@@ -14,24 +14,24 @@ import Data.Text                                       ( Text, append, pack )
 
 import qualified Data.Text                             as Text
 
--- | The type of result produced by an SQL statement.
+-- | A result produced by an SQL statement.
 data DbResult = NoResult 
               | Item       [Text]
               -- ^ Return a single item, or a 404 error message
               | ItemOk     [Text]
-              -- ^ Same as Item, except with added 'Ok' status message 
+              -- ^ Same as Item, except with an added 'Ok' status message 
               | Collection [Text]
               -- ^ Return a collection of items
-              | LastInsert  Text    -- ^ Table name
-                            Text    -- ^ Sequence
+              | LastInsert Text    -- ^ Table name
+                           Text    -- ^ Sequence
               -- ^ Return the last inserted id (for INSERT statements)
               | Count
               -- ^ Return a row count result
     deriving (Show)
 
--- | A part of a query template.
+-- | A query template segment.
 data DbSqlSegment 
-    = DbSqlStatic    Text -- ^ A normal text segment 
+    = DbSqlStatic    Text -- ^ A normal text value
     | DbSqlUriParam  Text -- ^ A uri variable placeholder, e.g., "id"
     | DbSqlJsonValue Text -- ^ A parameterized JSON value 
     deriving (Show)

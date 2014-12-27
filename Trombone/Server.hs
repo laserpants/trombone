@@ -1,49 +1,55 @@
-{-# LANGUAGE RecordWildCards, OverloadedStrings, PackageImports #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 module Trombone.Server 
     ( DbConf(..)
     , ServerConf(..)
-    , buildConnectionString
-    , nullConf
-    , runWithArgs
-    , runWithConf
+    , runConf
+    , initConf
     ) where
 
-import "mtl" Control.Monad.State
-
-import Control.Exception.Lifted                        ( SomeException, try, fromException )
-import Control.Monad
+import Control.Exception.Lifted                        
+import Control.Monad                                   ( when )
+import Control.Monad.IO.Class                          ( liftIO ) 
+import Control.Monad.Trans.Reader
 import Data.ByteString                                 ( ByteString )
-import Data.Conduit
-import Data.Text                                       ( Text, replace )
-import Data.Text.Encoding                              ( encodeUtf8 )
+import Data.Conduit.Attoparsec                         
+import Data.HashMap                                    ( Map )
+import Data.Text                                       ( Text )
+import Data.Text.Encoding
+import Data.Text.Lazy                                  ( toStrict )
+import Data.Text.Lazy.Builder
+import Data.Text.Lazy.Builder.Int
+import Data.Text.Lazy.Builder.RealFloat
 import Data.Version                                    ( showVersion )
-import Database.Persist.Postgresql                     ( ConnectionString, PersistValue(..), rawExecute, rawQuery, withPostgresqlConn, withPostgresqlPool )
-import Database.PostgreSQL.Simple                      ( SqlError(..) )
+import Database.Persist.Postgresql
+import Database.PostgreSQL.Simple                    
+import Monitor.Warp
 import Network.Wai                                     ( Middleware, Response, responseLBS )
-import Network.Wai.Handler.Warp                        ( run )
-import Network.Wai.Middleware.Static
-import Paths_trombone                                  ( version )
-import System.Console.GetOpt
+import Network.Wai.Handler.Warp                        
+import Network.Wai.Internal                            ( Request(..) )
 import System.Environment                              ( getArgs )
-import Trombone.Db.Execute
-import Trombone.Db.Reflection                          ( uscToCamel )
+import Trombone.Db.Template
 import Trombone.Dispatch.Core
-import Trombone.Middleware.Amqp
-import Trombone.Middleware.Cors
+import Trombone.Dispatch.Db
+import Trombone.Dispatch.NodeJs
+import Trombone.Dispatch.Pipeline
+import Trombone.Dispatch.Static
+import Trombone.Hmac
 import Trombone.Middleware.Logger
-import Trombone.Parse
 import Trombone.Pipeline
-import Trombone.Pipeline.Json
+import Trombone.RequestJson
+import Trombone.Response
 import Trombone.Route
-import Trombone.RoutePattern
 import Trombone.Router
 import Trombone.Server.Config
 
 import qualified Data.ByteString                       as BS
-import qualified Data.ByteString.Char8                 as C8
-import qualified Data.ByteString.Lazy.Char8            as L8
-import qualified Data.Conduit.List                     as CL
-import qualified Text.Show.ByteString                  as Show
+import qualified Data.HashMap                          as Map
+import qualified Data.Text                             as T
+
+lookupKey :: ByteString -> HmacKeyConf -> Maybe ByteString
+{-# INLINE lookupKey #-}
+lookupKey key (HmacKeyConf hm _) = Map.lookup key hm
 
 -- | Database connection settings.
 data DbConf = DbConf 
@@ -56,173 +62,125 @@ data DbConf = DbConf
 
 -- | Sever startup configuration settings.
 data ServerConf = ServerConf
-    { serverPoolSize   :: Int                -- ^ Connection pool size
-    , serverPort       :: Int                -- ^ Server port number
-    , serverDbConf     :: DbConf             -- ^ Database connection settings
-    , serverMiddleware :: [Middleware]       -- ^ Middleware stack
-    , serverRoutes     :: [Route]            -- ^ Application routes
-    , serverHmacConf   :: Maybe HmacKeyConf  -- ^ HMAC configuration
-    , serverPipelines  :: [(Text, Pipeline)] -- ^ Pipeline map
-    , serverVerbose    :: Bool               -- ^ Log output to stdout
-    , serverLogger     :: Maybe LoggerSet    -- ^ FastLogger instance
+    { serverPort       :: Int                  -- ^ Server port number
+    , serverSqlPool    :: ConnectionPool       -- ^ Database connection pool
+    , serverMiddleware :: [Middleware]         -- ^ Middleware stack
+    , serverRoutes     :: [Route]              -- ^ Application routes
+    , serverHmacConf   :: (Maybe HmacKeyConf)  -- ^ HMAC configuration
+    , serverPipelines  :: [(Text, Pipeline)]   -- ^ Pipeline map
+    , serverVerbose    :: Bool                 -- ^ Log output to stdout
+    , serverLogger     :: LoggerConf           -- ^ FastLogger instance
+    , serverDtors      :: [IO ()]              -- ^ Destructors
     }
 
-nullConf :: ServerConf
-{-# INLINE nullConf #-}
-nullConf = ServerConf 0 0 (DbConf "" 0 "" "" "") [] [] Nothing [] False Nothing
+initConf :: ConnectionPool -> IO ServerConf
+{-# INLINE initConf #-}
+initConf p = return $ ServerConf 0 p [] [] Nothing [] False NoLogger []
 
-buildConnectionString :: DbConf -> ConnectionString
-buildConnectionString DbConf{..} =
-    BS.concat [ "host="     ,                         dbHost , " "
-              , "port="     , L8.toStrict $ Show.show dbPort , " "
-              , "user="     ,                         dbUser , " "
-              , "password=" ,                         dbPass , " "
-              , "dbname="   ,                         dbName ]
+runConf :: ServerConf -> IO (ServerSettings (IO ()))
+runConf ServerConf{..} = do
 
--- | Run the server with configuration as indicated by command line arguments.
-runWithArgs :: IO ()
-runWithArgs = do
-    args <- getArgs
-    translOpts args >>= \(args, _) -> run args
-  where run :: Config -> IO ()
-        run Config{ configShowVer  = True } = 
-            putStrLn $ "Trombone server version " ++ showVersion version 
-        run Config{ configShowHelp = True } = 
-            putStrLn $ usageInfo "Usage: trombone [OPTION...]" options
-        run cfg = do
-            (_,(_,c)) <- flip runStateT (cfg, nullConf) $ do
-                setupLogger
-                setupAmqp
-                setupStatic
-                setupCors
-                setupPipes
-                setupDbConf
-                setupHmac
-                setupRoutes 
-            runWithConf $ c { serverPoolSize = configPoolSize   cfg
-                            , serverPort     = configServerPort cfg 
-                            , serverVerbose  = configVerbose    cfg }
+    let config = setOnExceptionResponse catchException -- $ setServerName (snd versionH) -- Since 3.0.2
+               $ setOnException (logException serverLogger)
+               $ setBeforeMainLoop (putStrLn $ "Service starting. Trombone listening on port " ++ show serverPort ++ ".")
+               $ setPort serverPort defaultSettings
 
--- | Run the server with provided configuration.
-runWithConf :: ServerConf -> IO ()
-runWithConf ServerConf
-    { serverPoolSize   = pconns
-    , serverPort       = port
-    , serverDbConf     = dbconf
-    , serverMiddleware = midware
-    , serverRoutes     = routes
-    , serverHmacConf   = hconf
-    , serverPipelines  = pipes 
-    , serverVerbose    = loud
-    , serverLogger     = logger
-    } = 
-    withPostgresqlPool (buildConnectionString dbconf) pconns $ \pool -> do
-        putStrLn $ "Trombone listening on port " ++ show port ++ "."
-        run port $ foldr ($) `flip` midware $ \request app -> do
-            let context = Context pool request routes hconf pipes loud logger
-            flip runReaderT context $ runRoutes 
-                >>= lift . app . sendJsonResponse . responseOr404 
+    let context = Context serverSqlPool 
+                          serverRoutes 
+                          serverHmacConf 
+                          serverPipelines 
+                          serverVerbose 
+                          serverLogger
 
-type ServerState = StateT (Config, ServerConf) IO 
+    return ServerSettings 
+        { handler  = foldr ($) (\req resp -> 
+            runReaderT (run req) context 
+                >>= resp . sendJsonResponse) serverMiddleware
+        , config   = config
+        , response = serviceUnavailable
+        , options  = sequence_ serverDtors
+        }
 
-setupLogger :: ServerState ()
-setupLogger = do
-    (c@Config{..}, setup@ServerConf{ serverMiddleware = mw }) <- get
-    when configEnLogging $ do
-        (logger, m) <- lift $ buildLogger configLogBufSize configLogFile
-        put (c, setup{ serverMiddleware = m:mw 
-                     , serverLogger     = Just logger })
+  where
+    run :: Request -> Dispatch IO RouteResponse
+    run req = do
+        res <- routeRequest req
+        auth <- authRequest req 
+        printS $ show res
+        dispatch res auth
 
-setupAmqp :: ServerState ()
-setupAmqp = do
-    (c@Config{..}, setup@ServerConf{ serverMiddleware = mw }) <- get
-    when configEnAmqp $ do
-        (_, channel) <- lift $ connectAmqp configAmqpUser configAmqpPass
-        put (c, setup{ serverMiddleware = amqp channel:mw })
+serviceUnavailable :: Response
+serviceUnavailable = sendJsonResponse $ 
+    errorResponse ErrorServiceUnavailable "Server shutting down."
 
-setupStatic :: ServerState ()
-setupStatic = do
-    let static = staticPolicy (noDots >-> addBase "public")
-    modify $ \(c@Config{..}, setup@ServerConf{ serverMiddleware = mw }) -> 
-        (c, setup{ serverMiddleware = static:mw })
+-------------------------------------------------------------------------------
+-- Exception handling
+-------------------------------------------------------------------------------
 
-setupCors :: ServerState ()
-setupCors = do
-    (c@Config{..}, setup@ServerConf{ serverMiddleware = mw }) <- get
-    when configEnCors $ put (c, setup{ serverMiddleware = cors:mw })
+logException :: LoggerConf -> Maybe Request -> SomeException -> IO ()
+logException (LoggerConf ls _) _ e = pushLogStr ls $ toLogStr $ show e
+logException _ _ _ = return ()
 
-setupPipes :: ServerState ()
-setupPipes = do
-    (c@Config{..}, setup) <- get
-    when configEnPipes $ do
-        pipes <- lift $ parsePipesFromFile configPipesFile
-        put (c, setup{ serverPipelines = pipes })
-
-setupDbConf :: ServerState ()
-setupDbConf = modify $ \(c@Config{..}, setup) -> 
-    let dbconf = DbConf { dbHost = configDbHost
-                        , dbPort = configDbPort
-                        , dbUser = configDbUser
-                        , dbPass = configDbPass
-                        , dbName = configDbName } 
-    in (c, setup{ serverDbConf = dbconf })
-
-setupHmac :: ServerState ()
-setupHmac = do
-    (c@Config{..}, setup@ServerConf{..}) <- get
-    when configEnHmac $ do
-        hc <- readKeysFromDb
-        put (c, setup{ serverHmacConf = buildHmacConf hc configTrustLocal })
-
-readKeysFromDb :: ServerState [(ByteString, ByteString)]
-readKeysFromDb = liftM (concatMap f) (runStatement q)
-  where q = rawExecute "CREATE TABLE IF NOT EXISTS trombone_keys \
-                       \(id serial PRIMARY KEY, \
-                       \client character varying(40), \
-                       \key character varying(40));" []
-            >> rawQuery "SELECT client, key FROM \
-                       \trombone_keys;" [] $$ CL.consume
-        f [PersistText c, PersistText k] = [(encodeUtf8 c, encodeUtf8 k)]
-        f _ = []
-
--- | Run a database statement in the ServerState monad and return its result.
-runStatement :: Sql a -> ServerState a
-runStatement sql = do
-    (_, ServerConf{..}) <- get
-    let conn = buildConnectionString serverDbConf
-    res <- try $ lift $ withPostgresqlConn conn $ runDbConn sql
-    case res of
-      Left  e -> error $ "SQL error. " ++ C8.unpack (sqlErrorMsg e)
-      Right r -> return r
-
-setupRoutes :: ServerState ()
-setupRoutes = do
-    (c@Config{..}, setup) <- get
-    routes <- lift $ parseRoutesFromFile configRoutesFile
-    -- Add a simple /ping response route
-    let pong = RouteStatic $ okResponse [("message", "Pong!")]
-        ping = Route "GET" (decompose "ping") pong
-    rs <- mapM insertColNames routes
-    put (c, setup{ serverRoutes = ping:rs })
-
--- Look up and insert column names for 'SELECT * FROM' type of queries.
-insertColNames:: Route -> ServerState Route
-insertColNames (Route m p (RouteSql (DbQuery q t))) = do
-    r <- f q
-    return $ Route m p (RouteSql (DbQuery r t))
-  where f :: DbResult -> ServerState DbResult
-        f (Item       ["*", tbl]) = fmap Item       $ columns tbl
-        f (ItemOk     ["*", tbl]) = fmap ItemOk     $ columns tbl
-        f (Collection ["*", tbl]) = fmap Collection $ columns tbl
-        f x                       = return x 
-insertColNames r = return r
-
--- | Find column names for a given table.
-columns :: Text -> ServerState [Text]
-columns table = liftM (reverse . concatMap txt) $ do
-    runStatement $ rawQuery (replace "%" table q) [] $$ CL.consume
-  where q = "SELECT column_name FROM information_schema.columns \
-            \WHERE table_name = '%';"
-        txt [PersistText n] = [uscToCamel n]
-        txt _               = []
+catchException :: SomeException -> Response
+catchException e = 
+    sendJsonResponse $
+    case fromException e of
+      Just e' -> catchSqlErrors e'
+      Nothing -> errorResponse ErrorServerGeneric "Internal server error."
  
+catchSqlErrors :: SqlError -> RouteResponse
+catchSqlErrors SqlError{ sqlState = sqls, sqlErrorDetail = detail } = 
+    case sqls of
+      "23503" -> errorResponse ErrorSqlKeyConstraintViolation 
+                    $ errorMsg "Foreign key constraint violation"
+      "23505" -> errorResponse ErrorSqlUniqueViolation
+                    $ errorMsg "Unique constraint violation"
+      "42P01" -> errorResponse ErrorSqlGeneric
+                    $ errorMsg "Undefined table"
+      -- @todo: Add more error codes here!
+      _       -> errorResponse ErrorSqlGeneric  
+                    $ errorMsg $ T.concat 
+                        ["SQL error ", T.pack $ show sqls]
+  where 
+    errorMsg t = T.concat $ (t:) $ if T.null d then ["."] else [": ", d]
+    d = decodeUtf8 detail
+
+-------------------------------------------------------------------------------
+-- Dispatch
+-------------------------------------------------------------------------------
+
+dispatch :: RouteResult -> RequestInfo -> Dispatch IO RouteResponse
+-- Unauthorized
+dispatch _ (RequestInfo _ Untrusted) = return unauthorized
+-- Bad request
+dispatch _ (RequestInfo (RequestBodyError _ (Position line col)) _) = 
+    return $ errorResponse ErrorBadRequest $ T.concat 
+        [ "Malformed JSON. Parsing failed on line "
+        , tShow line , ", column "
+        , tShow col  , "." ]
+  where
+    tShow = toStrict . toLazyText . decimal 
+-- Empty request body
+dispatch r (RequestInfo EmptyBody i) = runD r i Null BS.empty
+-- Request object interpreted as JSON 
+dispatch r (RequestInfo (JsonBody v bs) i) = runD r i v bs
+
+runD :: RouteResult -> ClientIdentity -> Value -> ByteString -> Dispatch IO RouteResponse
+-- No match: Error 404 
+runD RouteNoResult _ _ _ = return $ errorResponse ErrorNotFound "Resource not found."
+-- Database (SQL) route action
+runD (RouteResult (RouteSql    q) xs) _ obj _ = dispatchDbAction q (params xs) obj
+-- Pipeline
+runD (RouteResult (RoutePipes  p) xs) _ obj _ = do
+    Context{ dispatchMesh = table } <- ask
+    case lookup p table of
+        Nothing -> return $ errorResponse ErrorServerConfiguration
+            $ T.concat ["Missing pipeline: '", p , "'."]
+        Just s -> dispatchPipeline s (params xs) obj
+-- Inline pipeline
+runD (RouteResult (RouteInline p) xs) _ obj _ = dispatchPipeline p (params xs) obj
+-- Node.js script
+runD (RouteResult (RouteNodeJs j) _ ) _ _ raw = dispatchNodeJs j raw
+-- Static response
+runD (RouteResult (RouteStatic r) _ ) _ _ _   = dispatchStatic r
+

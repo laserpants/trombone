@@ -1,7 +1,6 @@
 module Main where
 
-import Trombone.Server
+import Trombone.Server.Init
 
 main :: IO ()
-main = runWithArgs
-
+main = runServer

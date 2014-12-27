@@ -8,15 +8,12 @@ import Data.List.Utils
 import Database.Persist.Types
 import Network.HTTP.Types.Header             ( HeaderName )
 import Network.HTTP.Types.Status
-import Network.Wai                           ( Application
-                                             , Middleware
-                                             , Request
-                                             , Response
-                                             , requestHeaders
-                                             , requestMethod
-                                             , responseLBS )
+import Network.Wai                           
 import Network.Wai.Internal
 
+-- | The CORS middleware component provides support for accepting cross-domain 
+-- requests. For more information about cross-origin resource sharing, see: 
+-- http://enable-cors.org.
 cors :: Middleware
 cors app req cback = do
      let head = requestHeaders req
@@ -30,17 +27,18 @@ cors app req cback = do
                 cback $ case lookup "Origin" (requestHeaders req) of
                           Nothing  -> resp
                           Just org -> addHeader org resp
-  where responseHeaders origin headers = 
-            let h = case (origin, headers) of
-                        (Just origin', Just headers') -> 
-                            [ ("Access-Control-Allow-Origin",  origin')
-                            , ("Access-Control-Allow-Headers", headers') ]
-                        _ -> []
-                allowed = "POST, GET, PUT, PATCH, DELETE, OPTIONS"
-            in [ ("Access-Control-Allow-Methods", allowed)
-               , ("Access-Control-Max-Age",       "1728000")
-               , ("Content-Type",                 "text/plain") 
-               ] ++ h
+  where 
+    responseHeaders origin headers = 
+        let h = case (origin, headers) of
+                    (Just origin', Just headers') -> 
+                        [ ("Access-Control-Allow-Origin",  origin')
+                        , ("Access-Control-Allow-Headers", headers') ]
+                    _ -> []
+            allowed = "POST, GET, PUT, PATCH, DELETE, OPTIONS"
+        in [ ("Access-Control-Allow-Methods", allowed)
+           , ("Access-Control-Max-Age",       "1728000")
+           , ("Content-Type",                 "text/plain") 
+           ] ++ h
 
 addHeader :: ByteString -> Response -> Response
 addHeader org (ResponseFile    s headers fp m) = 

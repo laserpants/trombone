@@ -46,13 +46,14 @@ decorate (StringLit t) = Text.concat [ colorCode Vivid White  , " '"
 
 tokens :: [SqlString] -> [Label]
 tokens = concatMap f 
-  where f :: SqlString -> [Label]
-        f (StringItem t) = [StringLit t]
-        f (SqlItem    t) = map label $ concatMap Text.words 
-                                     $ concatMap (bup ';') 
-                                     $ bup ',' t
-        bup :: Char -> Text -> [Text]
-        bup c = filter (/= "") . intersperse (pack [c]) . Text.split (== c) 
+  where 
+    f :: SqlString -> [Label]
+    f (StringItem t) = [StringLit t]
+    f (SqlItem    t) = map label $ concatMap Text.words 
+                                 $ concatMap (bup ';') 
+                                 $ bup ',' t
+    bup :: Char -> Text -> [Text]
+    bup c = filter (/= "") . intersperse (pack [c]) . Text.split (== c) 
 
 label :: Text -> Label
 {-# INLINE label #-}

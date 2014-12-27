@@ -48,7 +48,6 @@ extract :: SelectItem -> [Text]
 extract ( SelExp     _ (Star _)   ) = ["*"]
 extract ( SelExp     _ s          ) = f s
   where f (Identifier  _ (Nmc n)  ) = [pack n]
-        -- f (QIdentifier _ xs       ) = map (pack . ncStr) xs
         f (QIdentifier _ xs       ) = [Text.intercalate "_" $ map (pack . ncStr) xs] 
         f _                         = []
 extract ( SelectItem _ _ (Nmc  a) ) = [pack a]
@@ -64,7 +63,7 @@ statmCols :: Statement -> Maybe [Text]
 statmCols ( Insert _ _ xs _ _ ) = Just $ map (pack . ncStr) xs
 statmCols _                     = Nothing
 
--- | Translate underscore_separated_text to camelCaseFormatting.
+-- | Translate underscore_formatted_text to camelCaseFormatting.
 uscToCamel :: Text -> Text
 {-# INLINE uscToCamel #-}
 uscToCamel = toCamelCase "_"
@@ -72,7 +71,8 @@ uscToCamel = toCamelCase "_"
 toCamelCase :: Text -> Text -> Text
 toCamelCase _ "" = ""
 toCamelCase d t  = Text.concat $ head pieces:map oneUp (tail pieces)
-  where pieces = Text.splitOn d t
-        oneUp ""   = ""
-        oneUp text = let (a, b) = Text.splitAt 1 text in Text.concat [Text.toUpper a, b]
+  where 
+    pieces = Text.splitOn d t
+    oneUp ""   = ""
+    oneUp text = let (a, b) = Text.splitAt 1 text in Text.concat [Text.toUpper a, b]
 

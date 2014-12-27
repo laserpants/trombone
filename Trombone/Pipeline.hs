@@ -1,4 +1,5 @@
-{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 module Trombone.Pipeline
     ( module Pipe
     , Connection(..)
