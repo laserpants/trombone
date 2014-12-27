@@ -3,7 +3,7 @@ Command Line Flags
 
 .. raw:: html
 
-    <style> td .line-block { margin: 0 !important; } </style>
+    <style> td .line-block { margin: 0 !important; } .wy-table-responsive { overflow: visible; } </style>
 
 
 +-------------------+-------------------------+---------------------------------------------+
