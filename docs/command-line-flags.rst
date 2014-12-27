@@ -1,6 +1,10 @@
 Command Line Flags
 ==================
 
+.. raw:: html
+
+    <style> td .line-block { margin: 0; } </style>
+
 +-------------------+-------------------------+---------------------------------------------+
 | Flag              | Long option             | Description                                 |
 +===================+=========================+=============================================+
@@ -11,16 +15,16 @@ Command Line Flags
 | ``-x``            | ``--disable-hmac``      | | disable message integrity authentication  |
 |                   |                         | | (HMAC)                                    |
 +-------------------+-------------------------+---------------------------------------------+
-| ``-C``            | ``--cors``              | enable support for cross-origin resource    |
-|                   |                         | sharing                                     |
+| ``-C``            | ``--cors``              | | enable support for cross-origin resource  |
+|                   |                         | | sharing                                   |
 +-------------------+-------------------------+---------------------------------------------+
-| ``-A[USER:PASS]`` | ``--amqp[=USER:PASS]``  | enable RabbitMQ messaging middleware        |
-|                   |                         | [username:password]                         |
+| ``-A[USER:PASS]`` | ``--amqp[=USER:PASS]``  | | enable RabbitMQ messaging middleware      |
+|                   |                         | | [username:password]                       |
 +-------------------+-------------------------+---------------------------------------------+
 | ..                | ``--amqp-host=HOST``    | RabbitMQ host [host]                        |          
 +-------------------+-------------------------+---------------------------------------------+
-| ``-i[FILE]``      | ``--pipelines[=FILE]``  | read request pipelines from external        |
-|                   |                         | file [config. file]                         |                
+| ``-i[FILE]``      | ``--pipelines[=FILE]``  | | read request pipelines from external      |
+|                   |                         | | file [config. file]                       |                
 +-------------------+-------------------------+---------------------------------------------+
 | ``-s PORT``       | ``--port=PORT``         | server port                                 | 
 +-------------------+-------------------------+---------------------------------------------+
@@ -42,11 +46,11 @@ Command Line Flags
 +-------------------+-------------------------+---------------------------------------------+
 | ``-r FILE``       | ``--routes-file=FILE``  | route pattern configuration file            |
 +-------------------+-------------------------+---------------------------------------------+
-| ``-t``            | ``--trust-localhost``   | bypass HMAC authentication for requests     |
-|                   |                         | from localhost                              |
+| ``-t``            | ``--trust-localhost``   | | bypass HMAC authentication for requests   |
+|                   |                         | | from localhost                            |
 +-------------------+-------------------------+---------------------------------------------+
-| ..                | ``--pool-size=SIZE``    | number of connections to keep in            |
-|                   |                         | PostgreSQL connection pool                  |
+| ..                | ``--pool-size=SIZE``    | | number of connections to keep in          |
+|                   |                         | | PostgreSQL connection pool                |
 +-------------------+-------------------------+---------------------------------------------+
 | ..                | ``--verbose``           | print various debug information to stdout   |
 +-------------------+-------------------------+---------------------------------------------+
