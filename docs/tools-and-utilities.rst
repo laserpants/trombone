@@ -83,5 +83,10 @@ To remove a client, use:
 JavaScript libraries
 --------------------
 
-@todo
+::
 
+    trombone.request.js
+    trombone.request.min.js
+
+
+@todo

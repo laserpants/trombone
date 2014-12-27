@@ -74,7 +74,8 @@ When a JSON-formatted request body is present, the dispatch handler will first t
 
 ::
 
-    POST /customer  <>  INSERT INTO customer (name, address, phone) VALUES ( {{name}}, {{address}}, {{phone}} )
+    POST /customer  <>  INSERT INTO customer (name, address, phone) 
+                        VALUES ( {{name}}, {{address}}, {{phone}} )
 
 
 **Request object:**

@@ -20,11 +20,11 @@ run the following command:
 Some commonly used flags are:
 
 ============= ===================================================
-``-C``        enable CORS support
-``-r FILE``   specify a (route) configuration file 
-``--verbose`` verbose output
-``-x``        disable HMAC authentication (for dev. environments)
-``-t``        bypass authentication for localhost
+``-C``        Enable CORS support
+``-r FILE``   Specify a (route) configuration file 
+``--verbose`` Use verbose output
+``-x``        Disable HMAC authentication (for dev. environments)
+``-t``        Bypass authentication for localhost
 ============= ===================================================
 
 For a complete list of flags and switches, see `Command Line Flags <command-line-flags.html>`_, or give the following command.

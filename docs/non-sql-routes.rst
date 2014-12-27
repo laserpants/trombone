@@ -16,7 +16,7 @@ Symbol       Explanation
 Pipelines
 ---------
 
-| *The pipeline syntax is a simple, declarative technique for composition of routes using JavaScript objects (JSON).*
+| *The pipeline construction a simple, declarative technique for composition of routes using JavaScript syntax.*
 
 Pipelines can be declared in two different ways; either in a separate file or as inline definitions.
 
@@ -36,7 +36,6 @@ Structure of a pipeline
 ::
 
     GET  /my-pipeline  |>
-
     {
         "processors": [
         ],
@@ -134,10 +133,12 @@ Example 1.
 
 ::
 
-    GET /stuff  <js>  node/demo.js
+    GET /stuff  <js>  node/demo1.js
 
 
 ::
+
+    // node/demo1.js
 
     var response = {
         statusCode : 200,
@@ -153,12 +154,12 @@ Example 2.
 
 ::
 
-    POST /oracle <js>  node/demo.js
+    POST /oracle <js>  node/demo2.js
 
 
 ::
 
-    // node/demo.js
+    // node/demo2.js
 
     var fs = require('fs');
     
