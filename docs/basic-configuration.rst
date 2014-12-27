@@ -19,19 +19,15 @@ run the following command:
 
 Some commonly used flags are:
 
-============= ===================================================
-``-C``        Enable CORS support
-``-r FILE``   Specify a (route) configuration file 
-``--verbose`` Use verbose output
-``-x``        Disable HMAC authentication (for dev. environments)
-``-t``        Bypass authentication for localhost
-============= ===================================================
+============= ====================================================
+``-C``        Enable CORS support.
+``-r FILE``   Specify a (route) configuration file.
+``--verbose`` Use verbose output.
+``-x``        Disable HMAC authentication (for dev. environments).
+``-t``        Bypass authentication for localhost.
+============= ====================================================
 
-For a complete list of flags and switches, see `Command Line Flags <command-line-flags.html>`_, or give the following command.
-
-::
-
-    $ trombone --help
+For a complete list of flags and switches, see `Command Line Flags <command-line-flags.html>`_, or give the command ``trombone --help``.
 
 
 Ping
