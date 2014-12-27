@@ -321,8 +321,8 @@ Insert the generated ``demo`` key on line 15.
             <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
             <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
             <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
-            <script src="https://raw.githubusercontent.com/johanneshilden/trombone/master/utils/js/trombone.request.min.js"></script>
-            <script src="auth-example.js"></script>
+            <script src="js/trombone.request.min.js"></script>
+            <script src="js/auth-example.js"></script>
         </body>
     </html>
 
