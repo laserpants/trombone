@@ -14,7 +14,7 @@ run the following command:
 
 ::
 
-    ./trombone -d my_database -r my.conf
+    $ trombone -d my_database -r my.conf
 
 
 Some commonly used flags are:
