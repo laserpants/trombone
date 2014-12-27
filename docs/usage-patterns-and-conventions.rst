@@ -24,7 +24,7 @@ Array Actions
     curl http://localhost:3010 --verbose -d '[{"summary":"","name":""}, {"summary":"","name":""}, {"summary":"","name":""}]'
 
 
-::
+.. sourcecode:: javascript
 
     var obj = [
         {
