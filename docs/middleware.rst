@@ -3,7 +3,7 @@ Middleware
 
 .. 
 
-Middlewares are built-in, auxiliary software components providing some functionality which is normally disabled (with the exception of file serving). These components may be enabled at run-time and configured to suit specific needs. See respective section for details on how to activate and configure a specific component.
+Middlewares are built-in, auxiliary software components providing some functionality which is normally disabled (with the exception of file serving). These components may be enabled at run-time and configured to suit specific needs. See respective section for details on how to activate and configure a component.
 
 Available Components
 --------------------

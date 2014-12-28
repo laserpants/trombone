@@ -12,7 +12,7 @@ To establish the authenticity of a request, the server must perform a message in
   
 The result of this operation is compared with the original MAC attached to the request, in order to verify its authenticity.
 
-The key is a random, 40-character long, hexadecimal string.
+A valid key is a random, 40-character long, hexadecimal string.
 
 ::
 
