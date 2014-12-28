@@ -1,7 +1,7 @@
 Non-SQL Routes
 ==============
 
-This is an overview of the various route types that do not interact directly with the database.
+This is an overview of the various route types that are not interacting directly with the database.
 
 ============ =================================================================================
 Symbol       Explanation
