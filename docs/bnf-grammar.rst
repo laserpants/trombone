@@ -50,5 +50,5 @@ BNF Grammar
 
 
 .. NOTE::
-    A complete treatment of the SQL syntax is beyond the scope of this document.
+    A full treatment of the SQL syntax is beyond the scope of this document.
 
