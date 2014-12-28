@@ -26,7 +26,7 @@ The ``keyman`` utility implements a simple CRUD interface, suitable for command 
       -? --help           Display this help.
 
 
-The configuration file contains a list of parameters (identical to those `described here <http://www.postgresql.org/docs/9.1/static/libpq-connect.html>`_.) used to establish a database connection. Note that the default location for this file is ``~/.config/trombone/keyman.conf``.
+The configuration file contains a list of parameters (identical to those `described here <http://www.postgresql.org/docs/9.1/static/libpq-connect.html>`_) used to establish a database connection. Note that the default location for this file is ``~/.config/trombone/keyman.conf``.
 
 Sample ``keyman.conf`` file:
 

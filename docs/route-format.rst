@@ -7,7 +7,7 @@ A Trombone configuration file consists of a collection of route patterns. The fo
 
     <route> ::= <method> <uri> <symbol> <action>
 
-For a more detailed description of the syntactic rules involved in this schema, please see `BNF grammar <bnf-grammar.html>`_. What we consider here is a more general overview. 
+For a more detailed description of the syntactic rules involved in this route schema, please see `BNF grammar <bnf-grammar.html>`_. What we consider here is a more general overview. 
 
 As an example of a simple configuration file:
 

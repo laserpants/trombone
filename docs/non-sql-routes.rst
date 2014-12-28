@@ -16,7 +16,7 @@ Symbol       Explanation
 Pipelines
 ---------
 
-| *The pipeline construction a simple, declarative technique for composition of routes using JavaScript syntax.*
+| *The pipeline construction is a simple, declarative technique for composition of routes using JavaScript syntax.*
 
 Pipelines can be declared in two different ways; either in a separate file or as inline definitions.
 

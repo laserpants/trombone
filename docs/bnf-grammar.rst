@@ -47,3 +47,8 @@ BNF Grammar
 
     <node-js-route>   ::= "<js>"
 
+
+
+.. NOTE::
+    A complete treatment of the SQL syntax is beyond the scope of this document.
+
