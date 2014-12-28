@@ -149,7 +149,7 @@ Typical output
 Static File Serving
 -------------------
 
-Trombone can also act as a simple file server. Files located under the ``public/`` directory or any of its subdirectories are HTTP accessible. E.g.,
+Trombone can also act as a simple file server. Files located under the ``public/`` directory or any of its subdirectories are HTTP accessible. 
 
 ::
 
