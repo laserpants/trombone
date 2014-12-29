@@ -1,7 +1,7 @@
 Trombone
 ========
 
-Trombone is a data access server for PostgreSQL. Its chief purpose is to translate JSON-formatted HTTP requests to database statements, with results returned in JSON and complying with standard response code and error conventions. 
+Trombone is a data access server for PostgreSQL. Its chief purpose is to translate JSON-formatted HTTP requests to database statements, with results returned in JSON while complying with standard response code and error conventions. 
 
 You may find this software useful if;
 
