@@ -127,6 +127,26 @@ Code                                       Comment
 ========================================== ==================
 
 
+Arrays
+------
+
+@todo
+
+::
+
+    POST   /tag/task  >>  
+    
+        SELECT * FROM tasks_tags WHERE task_id IN ( {{ids}} )
+
+(Note the brackets.)
+
+::
+
+    {
+      "ids": [1,2,3,4,5,6,7,39] 
+    }
+
+
 Notes about HTTP Methods
 ------------------------
 
