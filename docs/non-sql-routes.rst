@@ -203,7 +203,7 @@ The ``{..}`` syntax enables for static JSON response objects to be embedded dire
     GET /stuff  {..}  {"status":"Ok.","response":[1,2,3,4]}
 
 
-A possible use-case for this is to deliver machine readable documentation as part of a service (self-describing APIs), where clients automatically can determine their abilities against a communication endpoint using the ``OPTIONS`` HTTP method. See, e.g., http://zacstewart.com/2012/04/14/http-options-method.html for a discussion of this approach.
+A possible use-case for this is to deliver machine readable documentation as part of a service (self-describing APIs), where participants automatically can determine their abilities against a communication endpoint using the ``OPTIONS`` HTTP method. See, e.g., http://zacstewart.com/2012/04/14/http-options-method.html for a discussion of this approach.
 
     | *At the very least, services should be responding with a 200 and the Allow header. That's just correct web server behavior. But there's really no excuse for JSON APIs not to be returning a documentation object.*
     
