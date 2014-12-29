@@ -16,7 +16,7 @@ Available Components
 RabbitMQ
 --------
 
-RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol -- an emerging standard for multi-purpose, asynchronous message delivery. The AMQP middleware integrates Trombone with RabbitMQ and makes it possible for participating applications to receive notifications when server resources are modified.
+RabbitMQ is a a messaging system based on the Advanced Message Queuing Protocol -- an emerging standard for multi-purpose, asynchronous message delivery. The AMQP middleware integrates Trombone with RabbitMQ and makes it possible for third-party applications to receive notifications when server resources are modified.
 
 .. role:: raw-html(raw)
    :format: html
