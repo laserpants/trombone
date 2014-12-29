@@ -66,7 +66,7 @@ Response Codes
 +===========+=================================+=============================================+
 | **200**   | Ok                              | A normal response.                          |
 +-----------+---------------------------------+---------------------------------------------+
-| **202**   | Accepted                        | | This response type indicates that the     |
+| **202**   | Accepted                        | | This response code indicates that the     |
 |           |                                 | | result is a collection (array). That is,  |
 |           |                                 | | each individual response item must be     |
 |           |                                 | | considered separately and no claim is made|
