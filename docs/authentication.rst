@@ -59,7 +59,7 @@ In order for a client application to be granted access to the service, it must;
     
 where ``<client_id>`` is replaced with the name of the application (as it appears in the ``trombone_keys`` table), and ``<hash>`` with the MAC code obtained by hashing a concatenated string -- the constituents of which are given below, using the `HMAC-SHA1 <http://en.wikipedia.org/wiki/SHA-1>`_ algorithm and aforementioned key.
 
-The ``<nonce>`` is an integer value introduced to prevent an adversary from reusing a hash in a, so called, `replay attack <http://en.wikipedia.org/wiki/Replay_attack>`_. The client implementation must therefore ensure that the nonce is strictly increasing for each request. This can be achieved using a timestamp, such as the one used in the reference implementation.   
+The ``<nonce>`` is an integer value introduced to prevent an adversary from reusing a hash under a, so called, `replay attack <http://en.wikipedia.org/wiki/Replay_attack>`_. The client implementation must therefore ensure that the nonce is strictly increasing for each request. This can be achieved using a timestamp, such as the one used in the reference implementation.   
 
 Hash string format
 ``````````````````
