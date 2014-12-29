@@ -71,7 +71,7 @@ The format of the string given as input to the hashing algorithm must be as foll
     <client_id>:<method>:<uri>:<nonce>:<json_body>
 
 
-SHA1 implementations are available for most programming languages. The following have been tested with Trombone:
+SHA1 implementations are available for many programming languages. The following have been tested with Trombone:
 
 ========== ===============================================================       
 JavaScript https://code.google.com/p/crypto-js/ 

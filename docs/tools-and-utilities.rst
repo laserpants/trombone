@@ -63,7 +63,7 @@ Register a new client:
         my_application: 53d5864520d65aa0364a52ddbb116ca78e0df8dc
     
 
-A token is automatically generated for the new client. Alternatively, an existing key (a 40 character long hexadecimal string) may be specified as an extra, trailing argument: ``keyman register my_application 53d5864520d65aa0364a52ddbb116ca78e0df8dc``. Subsequent to registering the application, we can confirm that it appears in the client list with its new key.
+A token is automatically generated for the new client. Alternatively, an existing key (a 40 character long hexadecimal string) may be specified as an extra, trailing argument, e.g., ``keyman register my_application 53d5864520d65aa0364a52ddbb116ca78e0df8dc``. Subsequent to registering the application, we can confirm that it appears in the client list with its new key.
     
 
 .. sourcecode:: bash
