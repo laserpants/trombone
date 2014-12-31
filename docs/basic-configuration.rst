@@ -64,7 +64,7 @@ Console app
 Unix signal handlers
 --------------------
 
-Trombone responds to ``SIGHUP`` by restarting the service after reloading all configuration data. The ``SIGTERM`` handler completes all pending requests and thereafter shuts down the server.
+Trombone responds to ``SIGHUP`` by restarting the service, which causes configuration data to be reloaded. The ``SIGTERM`` handler completes all pending requests and thereafter shuts down the server.
 
 Example
 *******
