@@ -28,7 +28,7 @@ import Database.Persist.Postgresql
 import Database.PostgreSQL.Simple                      ( SqlError(..), ExecStatus(..) )
 import GHC.IO.Exception                             
 import Text.ParserCombinators.ReadP
-import Text.Read.Lex                            hiding ( String )
+import Text.Read.Lex                            hiding ( String, Number )
 
 import qualified Data.Conduit.List                     as CL
 import qualified Data.HashMap.Strict                   as HMS

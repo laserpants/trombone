@@ -56,14 +56,14 @@ instance FromJSON Connection where
                      <*> o .:? "filters"       .!= []
     parseJSON _ = mzero
 
---instance FromJSON Method where
---    parseJSON (String "GET")     = return "GET"
---    parseJSON (String "POST")    = return "POST"
---    parseJSON (String "PUT")     = return "PUT"
---    parseJSON (String "DELETE")  = return "DELETE"
---    parseJSON (String "PATCH")   = return "PATCH"
---    parseJSON (String "OPTIONS") = return "OPTIONS"
---    parseJSON _                  = mzero
+instance FromJSON Method where
+    parseJSON (String "GET")     = return "GET"
+    parseJSON (String "POST")    = return "POST"
+    parseJSON (String "PUT")     = return "PUT"
+    parseJSON (String "DELETE")  = return "DELETE"
+    parseJSON (String "PATCH")   = return "PATCH"
+    parseJSON (String "OPTIONS") = return "OPTIONS"
+    parseJSON _                  = mzero
 
 instance FromJSON Processor where
     parseJSON (Object o)
