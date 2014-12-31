@@ -21,7 +21,7 @@ executable trombone
   -- other-extensions:    
   build-depends:       base >=4.5 
                      , MissingH
-                     , aeson
+                     , aeson >=0.7.0.0
                      , amqp
                      , ansi-terminal
                      , attoparsec
