@@ -4,13 +4,7 @@ Basic Configuration
 Running
 -------
 
-To start the service 
-
-* on port 3010 (default),
-* with the configuration file ``my.conf``, 
-* connecting to the database ``my_database``, 
-  
-run the following command:
+To start the service on port 3010 (default) with the configuration file ``my.conf``, connecting to ``my_database``, run the following command:
 
 ::
 
