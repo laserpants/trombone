@@ -6,7 +6,7 @@ Build Prerequisites
 
 To build Trombone you need 
 
-* the `PostgreSQL database server >`<http://www.postgresql.org/>`_, 
+* the `PostgreSQL database server <http://www.postgresql.org/>`_, 
 * pg_config (comes with libpq-dev on Debian),
 * the `Cabal tool <https://www.haskell.org/cabal/>`_  -- a build system for Haskell programs, and 
 * a recent version of GHC (`The Glasgow Haskell Compiler <https://www.haskell.org/ghc/>`_).
