@@ -52,6 +52,8 @@ A typical response (if the service is running):
 Console app
 ***********
 
+@todo
+
 .. image:: console.png 
 
 
