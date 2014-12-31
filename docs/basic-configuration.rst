@@ -4,13 +4,7 @@ Basic Configuration
 Running
 -------
 
-To start the service 
-
-* on port 3010 (default),
-* with the configuration file ``my.conf``, 
-* connecting to the database ``my_database``, 
-  
-run the following command:
+To start the service on port 3010 (default) with the configuration file ``my.conf``, connecting to ``my_database``, run the following command:
 
 ::
 
@@ -58,13 +52,15 @@ A typical response (if the service is running):
 Console app
 ***********
 
+@todo
+
 .. image:: console.png 
 
 
 Unix signal handlers
 --------------------
 
-Trombone responds to ``SIGHUP`` by restarting the service after reloading all configuration data. The ``SIGTERM`` handler shuts down the server after completion of all pending requests.
+Trombone responds to ``SIGHUP`` by restarting the service, which causes configuration data to be reloaded. The ``SIGTERM`` handler completes all pending requests and thereafter shuts down the server.
 
 Example
 *******
@@ -80,7 +76,7 @@ Configuration data storage
 
 ..  
 
-As a fallback, the server will look for a database table called ``trombone_config`` in the event that a configuration file is not specified (i.e., the ``-r`` flag is omitted). This comes in useful if you cannot rely on persistent disk storage (e.g. on ephemeral file systems), or simply prefer to keep configuration data in the database. 
+The server will look for a database table called ``trombone_config`` in the event that a configuration file is not specified (i.e., the ``-r`` flag is omitted). This comes in useful if you cannot rely on persistent disk storage (e.g. on ephemeral file systems), or simply prefer to keep configuration data in the database. 
 
 ::
 
