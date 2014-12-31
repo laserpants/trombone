@@ -18,7 +18,8 @@ Cabal and GHC come bundled with `the Haskell Platform <https://www.haskell.org/p
 Getting the Haskell Platform
 ****************************
 
-Consult the search utility provided by your distribution's package manager to locate a suitable candidate, or follow the instructions on https://www.haskell.org/platform/ relevant to your operating system.
+Consult the search utility provided by your distribution's package manager to locate a suitable candidate, or 
+follow the instructions on the `download page <https://www.haskell.org/platform/`_ relevant to your operating system.
 
 Building Trombone
 *****************
