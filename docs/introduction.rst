@@ -143,6 +143,6 @@ Configuration file
           , {{tagId}} )
     
     # Load task-tag associations for a collection of tasks
-    POST   /!tag/task  >>  SELECT * FROM tasks_tags WHERE task_id IN ( {{ids}} )
+    POST   /!tag/task  >>  SELECT id, task_id, tag_id FROM tasks_tags WHERE task_id IN ( {{ids}} )
     
 
