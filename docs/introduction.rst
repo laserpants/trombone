@@ -100,7 +100,7 @@ Configuration file
 ::
 
     # Retrieve all tasks, most recent first
-    GET    /task  >>  SELECT * FROM tasks ORDER BY created DESC
+    GET    /task  >>  SELECT id, title, description, created FROM tasks ORDER BY created DESC
     
     # Create a new task
     POST   /task  <>  
@@ -127,7 +127,7 @@ Configuration file
           id = {{:id}}
     
     # Load all tags
-    GET    /tag  >>  SELECT * FROM tags
+    GET    /tag  >>  SELECT id, title FROM tags
     
     # Insert a tag
     POST   /tag  <>  INSERT INTO tags (title) VALUES ({{title}})
