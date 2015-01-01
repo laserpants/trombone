@@ -23,6 +23,7 @@ Contents:
    tools-and-utilities.rst
    bnf-grammar.rst
    examples.rst
+   deployment.rst
    about.rst
 
 
