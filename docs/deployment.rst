@@ -8,7 +8,7 @@ Trombone has been successfully deployed to Heroku, although the process describe
 
 We will use `Joe Nelson's (begriffs) excellent buildpack <https://github.com/begriffs/heroku-buildpack-ghc>`_ to deploy to Heroku, using git. Various other Haskell buildpacks are available, but none of these have been tested with Trombone.
 
-We assume you have your app running locally and the Heroku Toolbelt installed on your local machine. The first step, unless you have an existing git repository, is to initialize one (``git init``) and add the project files.
+We assume you have your app running locally and the Heroku Toolbelt installed on your local machine. The first step, unless you have an existing git repository, is to initialize (``git init``) one and add the project files.
 
 Then create the Heroku app using the ``heroku-buildpack-ghc`` buildpack.
 
