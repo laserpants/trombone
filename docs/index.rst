@@ -9,7 +9,7 @@ Welcome to Trombone's documentation!
 Project home page
 -----------------
 
-* github.com/johanneshilden/trombone
+* `<github.com/johanneshilden/trombone>`_
 
 Contents
 --------
