@@ -6,7 +6,13 @@
 Welcome to Trombone's documentation!
 ====================================
 
-Contents:
+Project home page
+-----------------
+
+* `<github.com/johanneshilden/trombone>`_
+
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2
