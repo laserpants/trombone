@@ -16,7 +16,7 @@ Symbol       Explanation
 Pipelines
 ---------
 
-| *Pipelines are a simple, declarative technique for composition of routes using JavaScript syntax.*
+| *Pipelines offer a simple, declarative syntax for composition of routes using JavaScript syntax.*
 
 Pipelines can be declared in two different ways; either in a separate file or as inline definitions.
 
