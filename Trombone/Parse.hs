@@ -65,7 +65,7 @@ uri = optional slsh *> liftM RoutePattern (item `sepBy` slsh) <* optional slsh
 variable :: Parser RouteSegment
 variable = char ':' >> liftM Variable literal 
 
--- | Parse a text uri segment.
+-- | Parse a textual uri segment.
 atom :: Parser RouteSegment
 atom = liftM Atom literal
 
