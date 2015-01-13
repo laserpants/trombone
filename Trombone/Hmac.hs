@@ -74,7 +74,7 @@ authenticate req body hmacEnabled trustLocal allowPing keys =
               | otherwise                = Nothing
     isLocal = isLocalhost $ remoteHost req 
 
--- | Perform a cryptographic message integrity check using the HMAC encapsulated 
+-- | Perform a cryptographic message integrity check using the HMAC embedded 
 -- in the request's "API-Access" header. A MAC is computed from the request body 
 -- using a stored key associated with the client application from which the 
 -- request claims to originate. The result is then compared to the code found in
