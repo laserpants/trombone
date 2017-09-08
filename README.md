@@ -1,3 +1,5 @@
+## This code is no longer maintained. For a similar project, see https://postgrest.com.
+
 Trombone
 ========
 
